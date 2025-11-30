@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import type { ForumReply } from "@/types/forum";
 import { MarkdownContent } from "./MarkdownContent";
 import { ReplyForm } from "./ReplyForm";
+import { ReputationBadge } from "./ReputationBadge";
 
 interface ReplyCardProps {
   reply: ForumReply;
@@ -63,8 +64,9 @@ export function ReplyCard({
 
       <div className="flex-1 min-w-0">
         {/* Header */}
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className="font-semibold text-sm">{authorName}</span>
+          {reply.author?.id && <ReputationBadge userId={reply.author.id} showPoints={false} />}
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(reply.created_at), {
               addSuffix: true,

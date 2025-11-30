@@ -585,6 +585,38 @@ export type Database = {
           },
         ]
       }
+      forum_subscriptions: {
+        Row: {
+          created_at: string | null
+          id: string
+          notify_replies: boolean | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notify_replies?: boolean | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notify_replies?: boolean | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_subscriptions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_votes: {
         Row: {
           created_at: string
@@ -1586,6 +1618,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_reputation: {
+        Row: {
+          best_answer_count: number | null
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          posts_count: number | null
+          replies_count: number | null
+          reputation_points: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          best_answer_count?: number | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          posts_count?: number | null
+          replies_count?: number | null
+          reputation_points?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          best_answer_count?: number | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          posts_count?: number | null
+          replies_count?: number | null
+          reputation_points?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
