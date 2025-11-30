@@ -8,6 +8,10 @@ import { FollowButton } from "@/components/features/social/FollowButton";
 import { FollowStats } from "@/components/features/social/FollowStats";
 import { BadgeDisplay } from "@/components/features/social/BadgeDisplay";
 import { PointsDisplay } from "@/components/features/social/PointsDisplay";
+import { UserActivityList } from "@/components/features/social/UserActivityList";
+import { UserFavoritesList } from "@/components/features/social/UserFavoritesList";
+import { UserReviewsList } from "@/components/features/social/UserReviewsList";
+import { UserPostsList } from "@/components/features/social/UserPostsList";
 import { User, MapPin, Globe, Twitter, Instagram, Calendar } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
@@ -170,28 +174,20 @@ export default function UserProfile() {
             <TabsTrigger value="posts">Posts</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="activity">
-            <Card className="p-6">
-              <p className="text-muted-foreground">Activity feed coming soon...</p>
-            </Card>
+          <TabsContent value="activity" className="mt-6">
+            <UserActivityList userId={profile.id} />
           </TabsContent>
 
-          <TabsContent value="favorites">
-            <Card className="p-6">
-              <p className="text-muted-foreground">Favorites coming soon...</p>
-            </Card>
+          <TabsContent value="favorites" className="mt-6">
+            <UserFavoritesList userId={profile.id} />
           </TabsContent>
 
-          <TabsContent value="reviews">
-            <Card className="p-6">
-              <p className="text-muted-foreground">Reviews coming soon...</p>
-            </Card>
+          <TabsContent value="reviews" className="mt-6">
+            <UserReviewsList userId={profile.id} />
           </TabsContent>
 
-          <TabsContent value="posts">
-            <Card className="p-6">
-              <p className="text-muted-foreground">Forum posts coming soon...</p>
-            </Card>
+          <TabsContent value="posts" className="mt-6">
+            <UserPostsList userId={profile.id} />
           </TabsContent>
         </Tabs>
       </div>

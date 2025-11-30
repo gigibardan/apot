@@ -342,3 +342,193 @@ export async function getUserStats(userId: string) {
     followingCount: following.count || 0,
   };
 }
+
+// =============================================
+// USER CONTENT QUERIES FOR PUBLIC PROFILE
+// =============================================
+
+/**
+ * Get user's favorite objectives
+ * Returns objectives marked as favorites by the user
+ */
+export async function getUserFavorites(userId: string, page = 1, limit = 12) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
+    .from("user_favorites")
+    .select(`
+      id,
+      created_at,
+      objective:objectives!inner(
+        id,
+        slug,
+        title,
+        excerpt,
+        featured_image,
+        country:countries(name),
+        continent:continents(name)
+      )
+    `, { count: "exact" })
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+
+  // Transform nested arrays to objects
+  const transformedData = (data || []).map((item: any) => ({
+    ...item,
+    objective: Array.isArray(item.objective) ? item.objective[0] : item.objective,
+  }));
+
+  return {
+    favorites: transformedData,
+    total: count || 0,
+    hasMore: (count || 0) > to + 1,
+  };
+}
+
+/**
+ * Get user's reviews (both objective and guide reviews)
+ * Returns combined reviews with related content
+ */
+export async function getUserReviews(userId: string, page = 1, limit = 12) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  // Get objective reviews
+  const { data: objectiveReviews, error: objError } = await supabase
+    .from("objective_reviews")
+    .select(`
+      id,
+      rating,
+      title,
+      comment,
+      created_at,
+      helpful_count,
+      objective:objectives!inner(
+        id,
+        slug,
+        title,
+        featured_image
+      )
+    `)
+    .eq("user_id", userId)
+    .eq("approved", true)
+    .order("created_at", { ascending: false });
+
+  // Get guide reviews
+  const { data: guideReviews, error: guideError } = await supabase
+    .from("guide_reviews")
+    .select(`
+      id,
+      rating,
+      title,
+      comment,
+      created_at,
+      helpful_count,
+      guide:guides!inner(
+        id,
+        slug,
+        full_name,
+        profile_image
+      )
+    `)
+    .eq("user_id", userId)
+    .eq("approved", true)
+    .order("created_at", { ascending: false });
+
+  if (objError) throw objError;
+  if (guideError) throw guideError;
+
+  // Transform and combine results
+  const transformedObjectiveReviews = (objectiveReviews || []).map((r: any) => ({
+    ...r,
+    type: 'objective' as const,
+    objective: Array.isArray(r.objective) ? r.objective[0] : r.objective
+  }));
+
+  const transformedGuideReviews = (guideReviews || []).map((r: any) => ({
+    ...r,
+    type: 'guide' as const,
+    guide: Array.isArray(r.guide) ? r.guide[0] : r.guide
+  }));
+
+  // Combine and sort by date
+  const allReviews = [
+    ...transformedObjectiveReviews,
+    ...transformedGuideReviews
+  ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const paginatedReviews = allReviews.slice(from, to + 1);
+
+  return {
+    reviews: paginatedReviews,
+    total: allReviews.length,
+    hasMore: allReviews.length > to + 1,
+  };
+}
+
+/**
+ * Get user's forum posts
+ * Returns forum posts created by the user
+ */
+export async function getUserForumPosts(userId: string, page = 1, limit = 12) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
+    .from("forum_posts")
+    .select(`
+      id,
+      slug,
+      title,
+      content,
+      created_at,
+      views_count,
+      replies_count,
+      upvotes_count,
+      category:forum_categories!inner(
+        id,
+        slug,
+        name,
+        color
+      )
+    `, { count: "exact" })
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+
+  // Transform nested arrays to objects
+  const transformedData = (data || []).map((item: any) => ({
+    ...item,
+    category: Array.isArray(item.category) ? item.category[0] : item.category,
+  }));
+
+  return {
+    posts: transformedData,
+    total: count || 0,
+    hasMore: (count || 0) > to + 1,
+  };
+}
+
+/**
+ * Get user's recent activity
+ * Returns recent activities formatted for display
+ */
+export async function getUserRecentActivity(userId: string, limit = 10) {
+  const { data, error } = await supabase
+    .from("user_activity")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  return data || [];
+}
