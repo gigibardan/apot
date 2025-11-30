@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
   { name: "Dashboard", href: ADMIN_ROUTES.dashboard, icon: LayoutDashboard },
+  { name: "Analytics", href: ADMIN_ROUTES.analytics, icon: Eye },
   { name: "Obiective", href: ADMIN_ROUTES.objectives, icon: MapPin, showDrafts: true },
   { name: "Blog", href: ADMIN_ROUTES.blog, icon: FileText, showDrafts: true },
   { name: "Circuite", href: ADMIN_ROUTES.circuits, icon: Bus },

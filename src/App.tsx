@@ -44,6 +44,7 @@ import MediaLibrary from "@/pages/admin/MediaLibrary";
 import Settings from "@/pages/admin/Settings";
 import UsersPage from "@/pages/admin/Users";
 import BulkImport from "@/pages/admin/BulkImport";
+import Analytics from "@/pages/admin/Analytics";
 import Templates from "@/pages/admin/Templates";
 import NewsletterAdmin from "@/pages/admin/NewsletterAdmin";
 import ContactMessagesAdmin from "@/pages/admin/ContactMessagesAdmin";
@@ -92,6 +93,7 @@ const App = () => (
             {/* Admin Routes - Protected */}
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
+              <Route path="analytics" element={<Analytics />} />
               <Route path="obiective" element={<ObjectivesAdmin />} />
               <Route path="obiective/nou" element={<ObjectiveForm />} />
               <Route path="obiective/:id" element={<ObjectiveForm />} />
