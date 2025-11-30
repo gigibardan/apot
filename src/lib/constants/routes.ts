@@ -27,6 +27,8 @@ export const ADMIN_ROUTES = {
   media: "/admin/media",
   settings: "/admin/setari",
   users: "/admin/utilizatori",
+  import: "/admin/import",
+  templates: "/admin/templates",
 } as const;
 
 export const AUTH_ROUTES = {
