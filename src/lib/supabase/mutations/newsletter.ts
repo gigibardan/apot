@@ -101,8 +101,22 @@ export async function subscribeToNewsletter(input: NewsletterInput, source: stri
       throw error;
     }
 
-    // TODO: Send confirmation email (implement edge function or use Lovable AI)
-    // await sendConfirmationEmail(validated.email, confirmToken);
+    // Send admin notification (async, non-blocking)
+    supabase.functions
+      .invoke("send-admin-notification", {
+        body: {
+          type: "newsletter",
+          data: {
+            email: validated.email,
+            fullName: validated.full_name,
+            source: source,
+            status: "pending",
+          },
+        },
+      })
+      .then(({ error: notifError }) => {
+        if (notifError) console.error("Failed to send admin notification:", notifError);
+      });
 
     toast.success("Mulțumim! Verifică-ți emailul pentru a confirma abonarea.");
     return { success: true, data, message: "subscribed" };
