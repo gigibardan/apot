@@ -1,18 +1,133 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, MapPin, Heart, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { SEO } from "@/components/seo/SEO";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ContinentCard } from "@/components/features/continents/ContinentCard";
+import { ObjectiveCard } from "@/components/features/objectives/ObjectiveCard";
+import { CircuitCard } from "@/components/features/circuits/CircuitCard";
+import { ArticleCard } from "@/components/features/blog/ArticleCard";
+import { NewsletterSignup } from "@/components/features/newsletter/NewsletterSignup";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { seoDefaults } from "@/lib/constants/seo-defaults";
+import { getContinents } from "@/lib/supabase/queries/taxonomies";
+import { getFeaturedObjectives } from "@/lib/supabase/queries/objectives";
+import { getCircuits } from "@/lib/supabase/queries/jinfotours";
+import { getFeaturedArticles } from "@/lib/supabase/queries/blog";
+import { trackContinentClick, trackCircuitClick } from "@/lib/analytics/events";
+import type { Continent, ObjectiveWithRelations, JinfoursCircuit, BlogArticle } from "@/types/database.types";
 
 /**
  * Homepage
  * Main landing page with hero, features preview, and CTAs
  */
 export default function HomePage() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Data state
+  const [continents, setContinents] = useState<Continent[]>([]);
+  const [objectives, setObjectives] = useState<ObjectiveWithRelations[]>([]);
+  const [circuits, setCircuits] = useState<JinfoursCircuit[]>([]);
+  const [articles, setArticles] = useState<BlogArticle[]>([]);
+  
+  // Loading state
+  const [continentsLoading, setContinentsLoading] = useState(true);
+  const [objectivesLoading, setObjectivesLoading] = useState(true);
+  const [circuitsLoading, setCircuitsLoading] = useState(true);
+  const [articlesLoading, setArticlesLoading] = useState(true);
+  
+  // Error state
+  const [continentsError, setContinentsError] = useState<string | null>(null);
+  const [objectivesError, setObjectivesError] = useState<string | null>(null);
+  const [circuitsError, setCircuitsError] = useState<string | null>(null);
+  const [articlesError, setArticlesError] = useState<string | null>(null);
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchContinents();
+    fetchObjectives();
+    fetchCircuits();
+    fetchArticles();
+  }, []);
+
+  const fetchContinents = async () => {
+    try {
+      setContinentsLoading(true);
+      setContinentsError(null);
+      const data = await getContinents();
+      setContinents(data);
+    } catch (error) {
+      console.error("Error fetching continents:", error);
+      setContinentsError("Nu am putut încărca continentele");
+    } finally {
+      setContinentsLoading(false);
+    }
+  };
+
+  const fetchObjectives = async () => {
+    try {
+      setObjectivesLoading(true);
+      setObjectivesError(null);
+      const result = await getFeaturedObjectives(6);
+      setObjectives(result.data);
+    } catch (error) {
+      console.error("Error fetching objectives:", error);
+      setObjectivesError("Nu am putut încărca obiectivele");
+    } finally {
+      setObjectivesLoading(false);
+    }
+  };
+
+  const fetchCircuits = async () => {
+    try {
+      setCircuitsLoading(true);
+      setCircuitsError(null);
+      const circuits = await getCircuits(true);
+      setCircuits(circuits.slice(0, 3));
+    } catch (error) {
+      console.error("Error fetching circuits:", error);
+      setCircuitsError("Nu am putut încărca circuitele");
+    } finally {
+      setCircuitsLoading(false);
+    }
+  };
+
+  const fetchArticles = async () => {
+    try {
+      setArticlesLoading(true);
+      setArticlesError(null);
+      const result = await getFeaturedArticles(3);
+      setArticles(result.data);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      setArticlesError("Nu am putut încărca articolele");
+    } finally {
+      setArticlesLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`${PUBLIC_ROUTES.objectives}?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleCircuitClick = (circuitId: string, circuit: JinfoursCircuit) => {
+    trackCircuitClick(
+      circuitId,
+      circuit.title,
+      circuit.countries?.[0] || "Unknown",
+      "homepage"
+    );
+  };
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -49,25 +164,23 @@ export default function HomePage() {
               UNESCO. Informații detaliate pentru fiecare destinație.
             </p>
 
-            {/* Search Bar (disabled for now) */}
-            <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="search"
                   placeholder="Caută obiective turistice..."
-                  disabled
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 bg-white/90 border-0"
                   aria-label="Caută obiective turistice"
                 />
               </div>
-              <Button size="lg" disabled className="bg-accent hover:bg-accent/90">
+              <Button size="lg" type="submit" className="bg-accent hover:bg-accent/90">
                 Caută
               </Button>
-            </div>
-            <p className="text-sm text-white/70">
-              Coming soon - În dezvoltare
-            </p>
+            </form>
 
             {/* CTA Button */}
             <div className="pt-4">
@@ -86,7 +199,302 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* Features Preview */}
+      {/* Continents Section */}
+      <Section variant="default">
+        <Container>
+          <div className="text-center mb-12 animate-fade-in">
+            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
+              Explorează pe Continente
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Descoperă obiective turistice din fiecare colț al lumii
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {continentsLoading && (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-48 rounded-lg" />
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {continentsError && (
+            <EmptyState
+              icon="⚠️"
+              title="Eroare la încărcare"
+              description={continentsError}
+              action={{
+                label: "Încearcă din nou",
+                onClick: fetchContinents,
+              }}
+            />
+          )}
+
+          {/* Success State */}
+          {!continentsLoading && !continentsError && continents.length > 0 && (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {continents.map((continent, index) => (
+                <div
+                  key={continent.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                  onClick={() => trackContinentClick(continent.slug, continent.name)}
+                >
+                  <ContinentCard continent={continent} />
+                </div>
+              ))}
+            </div>
+          )}
+        </Container>
+      </Section>
+
+      {/* Featured Objectives Section */}
+      <Section variant="muted">
+        <Container>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
+              Obiective Turistice Populare
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Cele mai vizitate și apreciate destinații
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {objectivesLoading && (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-96 rounded-lg" />
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {objectivesError && (
+            <EmptyState
+              icon="⚠️"
+              title="Eroare la încărcare"
+              description={objectivesError}
+              action={{
+                label: "Încearcă din nou",
+                onClick: fetchObjectives,
+              }}
+            />
+          )}
+
+          {/* Empty State */}
+          {!objectivesLoading && !objectivesError && objectives.length === 0 && (
+            <EmptyState
+              icon="🗺️"
+              title="Obiectivele turistice vor fi adăugate în curând"
+              description="Echipa noastră lucrează la crearea primelor destinații fascinante. Revino în curând pentru a descoperi locuri extraordinare!"
+              action={{
+                label: "Explorează Continentele",
+                onClick: () => {
+                  document.getElementById("continents-section")?.scrollIntoView({ behavior: "smooth" });
+                },
+              }}
+            />
+          )}
+
+          {/* Success State */}
+          {!objectivesLoading && !objectivesError && objectives.length > 0 && (
+            <>
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {objectives.map((objective, index) => (
+                  <div
+                    key={objective.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <ObjectiveCard objective={objective} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-12">
+                <Button size="lg" asChild>
+                  <Link to={PUBLIC_ROUTES.objectives}>
+                    Vezi Toate Obiectivele
+                  </Link>
+                </Button>
+              </div>
+            </>
+          )}
+        </Container>
+      </Section>
+
+      {/* Jinfotours Circuits Section */}
+      <Section className="bg-gradient-to-br from-accent/5 via-accent/10 to-accent/5">
+        <Container>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
+              Circuite Complete în Toată Lumea
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Explorează circuite organizate de partenerul nostru Jinfotours
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              În parteneriat cu{" "}
+              <a
+                href="https://jinfotours.ro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-primary"
+              >
+                Jinfotours.ro
+              </a>
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {circuitsLoading && (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-[500px] rounded-lg" />
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {circuitsError && (
+            <EmptyState
+              icon="⚠️"
+              title="Eroare la încărcare"
+              description={circuitsError}
+              action={{
+                label: "Încearcă din nou",
+                onClick: fetchCircuits,
+              }}
+            />
+          )}
+
+          {/* Empty State */}
+          {!circuitsLoading && !circuitsError && circuits.length === 0 && (
+            <EmptyState
+              icon="✈️"
+              title="Circuitele vor fi adăugate în curând"
+              description="Pregătim cele mai interesante circuite turistice în colaborare cu Jinfotours"
+              action={{
+                label: "Vizitează Jinfotours.ro",
+                href: "https://jinfotours.ro",
+              }}
+            />
+          )}
+
+          {/* Success State */}
+          {!circuitsLoading && !circuitsError && circuits.length > 0 && (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {circuits.map((circuit, index) => (
+                <div
+                  key={circuit.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <CircuitCard
+                    circuit={circuit}
+                    onCtaClick={(id) => handleCircuitClick(id, circuit)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </Container>
+      </Section>
+
+      {/* Blog Preview Section */}
+      <Section variant="default">
+        <Container>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
+              Ultimele Articole
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Ghiduri de călătorie, sfaturi și povești de aventură
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {articlesLoading && (
+            <div className="grid gap-8 md:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-96 rounded-lg" />
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {articlesError && (
+            <EmptyState
+              icon="⚠️"
+              title="Eroare la încărcare"
+              description={articlesError}
+              action={{
+                label: "Încearcă din nou",
+                onClick: fetchArticles,
+              }}
+            />
+          )}
+
+          {/* Empty State */}
+          {!articlesLoading && !articlesError && articles.length === 0 && (
+            <EmptyState
+              icon="📝"
+              title="Primul articol va fi publicat în curând"
+              description="Pregătim ghiduri complete despre cele mai fascinante destinații din întreaga lume"
+            />
+          )}
+
+          {/* Success State */}
+          {!articlesLoading && !articlesError && articles.length > 0 && (
+            <>
+              <div className="grid gap-8 md:grid-cols-3">
+                {articles.map((article, index) => (
+                  <div
+                    key={article.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <ArticleCard article={article} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-12">
+                <Button size="lg" variant="outline" asChild>
+                  <Link to={PUBLIC_ROUTES.blog}>Vezi Toate Articolele</Link>
+                </Button>
+              </div>
+            </>
+          )}
+        </Container>
+      </Section>
+
+      {/* Newsletter Section */}
+      <Section className="bg-gradient-to-br from-accent via-accent/90 to-primary">
+        <Container>
+          <div className="text-center space-y-6 max-w-2xl mx-auto">
+            <div className="text-5xl mb-4" aria-hidden="true">
+              ✉️
+            </div>
+            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl text-white">
+              Primește Ghiduri de Călătorie în Email
+            </h2>
+            <p className="text-lg text-white/90">
+              Descoperă obiective turistice fascinante, sfaturi practice și
+              oferte exclusive
+            </p>
+            <div className="pt-4">
+              <NewsletterSignup />
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Why APOT Section */}
       <Section variant="default">
         <Container>
           <div className="text-center mb-12">
@@ -150,34 +558,7 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* Coming Soon Sections */}
-      <Section variant="muted">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-display font-bold tracking-tight">
-                Obiective Turistice Populare
-              </h2>
-              <p className="text-muted-foreground">
-                Coming soon - Lista cu cele mai populare obiective turistice va
-                fi disponibilă în curând.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-2xl font-display font-bold tracking-tight">
-                Articole Blog Recente
-              </h2>
-              <p className="text-muted-foreground">
-                Coming soon - Ghiduri de călătorie, sfaturi și povești din
-                jurul lumii.
-              </p>
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* CTA Section */}
+      {/* Final CTA Section */}
       <Section className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10">
         <Container>
           <div className="text-center space-y-6 max-w-2xl mx-auto">
