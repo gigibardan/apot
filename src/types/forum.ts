@@ -34,6 +34,7 @@ export interface ForumPost {
   author?: {
     id: string;
     full_name: string | null;
+    username: string | null;
     avatar_url: string | null;
   };
   user_vote?: 'upvote' | 'downvote' | null;
@@ -55,6 +56,7 @@ export interface ForumReply {
   author?: {
     id: string;
     full_name: string | null;
+    username: string | null;
     avatar_url: string | null;
   };
   user_vote?: 'upvote' | 'downvote' | null;

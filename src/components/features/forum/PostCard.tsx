@@ -49,7 +49,13 @@ export function PostCard({ post, categorySlug }: PostCardProps) {
 
               {/* Meta info */}
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-2">
-                <span>de {authorName}</span>
+                <Link 
+                  to={`/profil/${post.author?.username || post.user_id}`}
+                  className="hover:text-primary transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  de {authorName}
+                </Link>
                 {post.author?.id && <ReputationBadge userId={post.author.id} showPoints={false} />}
                 <span>•</span>
                 <span>

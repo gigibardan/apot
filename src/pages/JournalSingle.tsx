@@ -99,7 +99,7 @@ export default function JournalSingle() {
           {/* Author Info */}
           <div className="flex items-center justify-between border-y py-4">
             <Link 
-              to={`/user/${journal.user?.username || journal.user_id}`}
+              to={`/profil/${journal.user?.username || journal.user_id}`}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             >
               <Avatar>

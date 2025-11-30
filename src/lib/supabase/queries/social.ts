@@ -105,12 +105,26 @@ export async function getFollowStats(userId: string) {
 // USER PROFILES
 // =============================================
 
-export async function getUserProfile(username: string) {
-  const { data, error } = await supabase
+export async function getUserProfile(usernameOrId: string) {
+  // Try to find by username first
+  let query = supabase
     .from("profiles")
     .select("*")
-    .eq("username", username)
-    .single();
+    .eq("username", usernameOrId);
+  
+  let { data, error } = await query.single();
+
+  // If not found and looks like UUID, try by ID
+  if (error && usernameOrId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    const { data: dataById, error: errorById } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", usernameOrId)
+      .single();
+    
+    data = dataById;
+    error = errorById;
+  }
 
   if (error) throw error;
 
