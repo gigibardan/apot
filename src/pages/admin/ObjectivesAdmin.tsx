@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Eye, Trash2, Loader2, MapPin, Copy } from "lucide-react";
+import { Plus, Search, Pencil, Eye, Trash2, Loader2, MapPin, Copy, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -44,6 +45,9 @@ export default function ObjectivesAdmin() {
   const [search, setSearch] = useState("");
   const [continentFilter, setContinentFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<string>("");
+  const [bulkLoading, setBulkLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     id: string;
@@ -117,6 +121,95 @@ export default function ObjectivesAdmin() {
     }
   }
 
+  function handleSelectAll(checked: boolean) {
+    if (checked) {
+      setSelectedIds(objectives.map(obj => obj.id));
+    } else {
+      setSelectedIds([]);
+    }
+  }
+
+  function handleSelectOne(id: string, checked: boolean) {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  }
+
+  async function handleBulkAction() {
+    if (!bulkAction || selectedIds.length === 0) return;
+
+    setBulkLoading(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      if (bulkAction === "publish" || bulkAction === "unpublish") {
+        const published = bulkAction === "publish";
+        for (const id of selectedIds) {
+          try {
+            await toggleObjectivePublish(id, published);
+            successCount++;
+          } catch (error) {
+            errorCount++;
+          }
+        }
+        toast.success(`${successCount} obiective ${published ? "publicate" : "nepublicate"}`);
+      } else if (bulkAction === "delete") {
+        for (const id of selectedIds) {
+          try {
+            await deleteObjective(id);
+            successCount++;
+          } catch (error) {
+            errorCount++;
+          }
+        }
+        toast.success(`${successCount} obiective șterse`);
+      } else if (bulkAction === "export") {
+        exportToCSV();
+        toast.success("Export CSV inițiat");
+      }
+
+      if (errorCount > 0) {
+        toast.error(`${errorCount} operațiuni eșuate`);
+      }
+
+      setSelectedIds([]);
+      setBulkAction("");
+      loadData();
+    } catch (error) {
+      console.error("Bulk action error:", error);
+      toast.error("Eroare la executarea acțiunii în masă");
+    } finally {
+      setBulkLoading(false);
+    }
+  }
+
+  function exportToCSV() {
+    const selectedObjs = objectives.filter(obj => selectedIds.includes(obj.id));
+    const csv = [
+      ["ID", "Titlu", "Slug", "Țară", "Status", "Featured", "Vizualizări"].join(","),
+      ...selectedObjs.map(obj => [
+        obj.id,
+        `"${obj.title}"`,
+        obj.slug,
+        obj.country?.name || "",
+        obj.published ? "Publicat" : "Draft",
+        obj.featured ? "Da" : "Nu",
+        obj.views_count || 0
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `obiective_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Obiective" }]} />
@@ -138,6 +231,42 @@ export default function ObjectivesAdmin() {
           </Link>
         </Button>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedIds.length > 0 && (
+        <div className="sticky top-0 z-10 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="font-medium">{selectedIds.length} selectate</span>
+            <Select value={bulkAction} onValueChange={setBulkAction}>
+              <SelectTrigger className="w-48 bg-primary-foreground text-foreground">
+                <SelectValue placeholder="Alege acțiune" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="publish">Publică</SelectItem>
+                <SelectItem value="unpublish">Nepublică</SelectItem>
+                <SelectItem value="delete">Șterge</SelectItem>
+                <SelectItem value="export">Exportă CSV</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleBulkAction}
+              disabled={!bulkAction || bulkLoading}
+              variant="secondary"
+            >
+              {bulkLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Aplică
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedIds([])}
+            className="text-primary-foreground hover:text-primary-foreground/80"
+          >
+            Anulează
+          </Button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -197,6 +326,12 @@ export default function ObjectivesAdmin() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedIds.length === objectives.length && objectives.length > 0}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
                 <TableHead className="w-20">Imagine</TableHead>
                 <TableHead>Titlu</TableHead>
                 <TableHead>Țară</TableHead>
@@ -209,6 +344,12 @@ export default function ObjectivesAdmin() {
             <TableBody>
               {objectives.map((objective) => (
                 <TableRow key={objective.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.includes(objective.id)}
+                      onCheckedChange={(checked) => handleSelectOne(objective.id, checked === true)}
+                    />
+                  </TableCell>
                   <TableCell>
                     {objective.featured_image ? (
                       <img

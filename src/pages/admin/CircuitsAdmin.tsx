@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Trash2, Loader2, Bus } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Bus, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -34,6 +41,9 @@ export default function CircuitsAdmin() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<string>("");
+  const [bulkLoading, setBulkLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     id: string;
@@ -69,6 +79,83 @@ export default function CircuitsAdmin() {
     }
   }
 
+  function handleSelectAll(checked: boolean) {
+    if (checked) {
+      setSelectedIds(circuits.map(cir => cir.id));
+    } else {
+      setSelectedIds([]);
+    }
+  }
+
+  function handleSelectOne(id: string, checked: boolean) {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  }
+
+  async function handleBulkAction() {
+    if (!bulkAction || selectedIds.length === 0) return;
+
+    setBulkLoading(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      if (bulkAction === "delete") {
+        for (const id of selectedIds) {
+          try {
+            await deleteCircuit(id);
+            successCount++;
+          } catch (error) {
+            errorCount++;
+          }
+        }
+        toast.success(`${successCount} circuite șterse`);
+      } else if (bulkAction === "export") {
+        exportToCSV();
+        toast.success("Export CSV inițiat");
+      }
+
+      if (errorCount > 0) {
+        toast.error(`${errorCount} operațiuni eșuate`);
+      }
+
+      setSelectedIds([]);
+      setBulkAction("");
+      loadData();
+    } catch (error) {
+      console.error("Bulk action error:", error);
+      toast.error("Eroare la executarea acțiunii în masă");
+    } finally {
+      setBulkLoading(false);
+    }
+  }
+
+  function exportToCSV() {
+    const selectedCircs = circuits.filter(cir => selectedIds.includes(cir.id));
+    const csv = [
+      ["ID", "Titlu", "Slug", "Durată (zile)", "Preț", "Featured"].join(","),
+      ...selectedCircs.map(cir => [
+        cir.id,
+        `"${cir.title}"`,
+        cir.slug,
+        cir.duration_days || 0,
+        cir.price_from || 0,
+        cir.featured ? "Da" : "Nu"
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `circuite_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Circuite" }]} />
@@ -90,6 +177,40 @@ export default function CircuitsAdmin() {
           </Link>
         </Button>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedIds.length > 0 && (
+        <div className="sticky top-0 z-10 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="font-medium">{selectedIds.length} selectate</span>
+            <Select value={bulkAction} onValueChange={setBulkAction}>
+              <SelectTrigger className="w-48 bg-primary-foreground text-foreground">
+                <SelectValue placeholder="Alege acțiune" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="delete">Șterge</SelectItem>
+                <SelectItem value="export">Exportă CSV</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleBulkAction}
+              disabled={!bulkAction || bulkLoading}
+              variant="secondary"
+            >
+              {bulkLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Aplică
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedIds([])}
+            className="text-primary-foreground hover:text-primary-foreground/80"
+          >
+            Anulează
+          </Button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -138,6 +259,12 @@ export default function CircuitsAdmin() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedIds.length === circuits.length && circuits.length > 0}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
                 <TableHead className="w-20">Imagine</TableHead>
                 <TableHead>Titlu</TableHead>
                 <TableHead>Destinație</TableHead>
@@ -150,6 +277,12 @@ export default function CircuitsAdmin() {
             <TableBody>
               {circuits.map((circuit) => (
                 <TableRow key={circuit.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.includes(circuit.id)}
+                      onCheckedChange={(checked) => handleSelectOne(circuit.id, checked === true)}
+                    />
+                  </TableCell>
                   <TableCell>
                     {circuit.thumbnail_url ? (
                       <img
