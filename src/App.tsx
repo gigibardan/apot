@@ -28,6 +28,7 @@ import ObjectiveForm from "@/pages/admin/ObjectiveForm";
 import GuidesAdmin from "@/pages/admin/GuidesAdmin";
 import GuideForm from "@/pages/admin/GuideForm";
 import AuthorizedGuidesAdmin from "@/pages/admin/AuthorizedGuidesAdmin";
+import ReviewsAdmin from "@/pages/admin/ReviewsAdmin";
 import BlogAdmin from "@/pages/admin/BlogAdmin";
 import BlogArticleForm from "@/pages/admin/BlogArticleForm";
 import CircuitsAdmin from "@/pages/admin/CircuitsAdmin";
@@ -77,6 +78,7 @@ const App = () => (
               <Route path="ghizi/nou" element={<GuideForm />} />
               <Route path="ghizi/:id/edit" element={<GuideForm />} />
               <Route path="ghizi-autorizati" element={<AuthorizedGuidesAdmin />} />
+              <Route path="recenzii" element={<ReviewsAdmin />} />
               <Route path="blog" element={<BlogAdmin />} />
               <Route path="blog/nou" element={<BlogArticleForm />} />
               <Route path="blog/:id" element={<BlogArticleForm />} />
