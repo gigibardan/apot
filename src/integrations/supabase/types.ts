@@ -1746,6 +1746,7 @@ export type Database = {
       }
       page_views: {
         Row: {
+          created_at: string
           id: string
           ip_address: unknown
           page_title: string | null
@@ -1753,9 +1754,11 @@ export type Database = {
           referrer: string | null
           session_id: string | null
           user_agent: string | null
+          user_id: string | null
           viewed_at: string
         }
         Insert: {
+          created_at?: string
           id?: string
           ip_address?: unknown
           page_title?: string | null
@@ -1763,9 +1766,11 @@ export type Database = {
           referrer?: string | null
           session_id?: string | null
           user_agent?: string | null
+          user_id?: string | null
           viewed_at?: string
         }
         Update: {
+          created_at?: string
           id?: string
           ip_address?: unknown
           page_title?: string | null
@@ -1773,6 +1778,7 @@ export type Database = {
           referrer?: string | null
           session_id?: string | null
           user_agent?: string | null
+          user_id?: string | null
           viewed_at?: string
         }
         Relationships: []
