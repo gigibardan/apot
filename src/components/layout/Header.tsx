@@ -10,6 +10,7 @@ import { Container } from "@/components/layout/Container";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFavoritesCount } from "@/lib/supabase/queries/favorites";
+import { NotificationBell } from "@/components/features/forum/NotificationBell";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -123,6 +124,7 @@ export function Header() {
 
           {/* Theme Toggle & Mobile Menu Button */}
           <div className="flex items-center space-x-2">
+            {user && <NotificationBell />}
             <Button
               variant="ghost"
               size="icon"
