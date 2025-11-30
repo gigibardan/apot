@@ -399,10 +399,9 @@ export default function ContactMessagesAdmin() {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
 
-      {/* Details Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        {/* Details Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
@@ -581,6 +580,6 @@ export default function ContactMessagesAdmin() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
   );
 }
