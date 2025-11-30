@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageUpload from "@/components/admin/ImageUpload";
 import { toast } from "sonner";
 import { ADMIN_ROUTES } from "@/lib/constants/routes";
@@ -29,6 +30,13 @@ const circuitSchema = z.object({
   external_url: z.string().url("URL invalid").min(1, "URL-ul Jinfotours este obligatoriu"),
   featured: z.boolean().optional(),
   order_index: z.number().optional(),
+  // Discount fields
+  discount_percentage: z.number().min(0).max(100).optional(),
+  original_price: z.number().min(0).optional(),
+  discount_until: z.string().optional(),
+  // Badge fields
+  badge_text: z.string().max(50).optional(),
+  badge_color: z.enum(['accent', 'destructive', 'secondary']).optional(),
 });
 
 type CircuitFormData = z.infer<typeof circuitSchema>;
@@ -56,6 +64,8 @@ export default function CircuitForm() {
   const title = watch("title");
   const slug = watch("slug");
   const featured = watch("featured");
+  const discountPercentage = watch("discount_percentage");
+  const badgeColor = watch("badge_color");
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -276,6 +286,101 @@ export default function CircuitForm() {
             <p className="text-xs text-muted-foreground mt-1">
               Pentru sortare manuală (0 = primul)
             </p>
+          </div>
+
+          {/* Discount Section */}
+          <div className="pt-6 border-t">
+            <h3 className="text-lg font-semibold mb-4">Oferte și Reduceri</h3>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="discount_percentage">Reducere (%)</Label>
+                  <Input
+                    id="discount_percentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    {...register("discount_percentage", { valueAsNumber: true })}
+                    placeholder="0"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Procentul de reducere (0-100)
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="original_price">Preț Original (EUR)</Label>
+                  <Input
+                    id="original_price"
+                    type="number"
+                    {...register("original_price", { valueAsNumber: true })}
+                    placeholder="1299"
+                    className="mt-2"
+                    disabled={!discountPercentage || discountPercentage === 0}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Necesar dacă ai reducere
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="discount_until">Reducere Validă Până La</Label>
+                <Input
+                  id="discount_until"
+                  type="datetime-local"
+                  {...register("discount_until")}
+                  className="mt-2"
+                  disabled={!discountPercentage || discountPercentage === 0}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Data și ora limită pentru oferta specială
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Badge Section */}
+          <div className="pt-6 border-t">
+            <h3 className="text-lg font-semibold mb-4">Badge Personalizat</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="badge_text">Text Badge (Opțional)</Label>
+                <Input
+                  id="badge_text"
+                  {...register("badge_text")}
+                  placeholder="ex: Ofertă Limitată, Popular, Nou"
+                  className="mt-2"
+                  maxLength={50}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Text scurt pentru badge promoțional (max 50 caractere)
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="badge_color">Culoare Badge</Label>
+                <Select
+                  value={badgeColor || 'accent'}
+                  onValueChange={(value) => setValue("badge_color", value as any)}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Selectează culoarea" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="accent">Accent (Albastru)</SelectItem>
+                    <SelectItem value="destructive">Destructive (Roșu)</SelectItem>
+                    <SelectItem value="secondary">Secondary (Gri)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Culoarea badge-ului personalizat
+                </p>
+              </div>
+            </div>
           </div>
         </Card>
 

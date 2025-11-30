@@ -24,6 +24,7 @@ import NewsletterConfirm from "@/pages/NewsletterConfirm";
 import NewsletterUnsubscribe from "@/pages/NewsletterUnsubscribe";
 import GuidesPage from "@/pages/GuidesPage";
 import GuideSinglePage from "@/pages/GuideSinglePage";
+import CircuitsPage from "@/pages/CircuitsPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogArticle from "@/pages/BlogArticle";
 import AboutPage from "@/pages/AboutPage";
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="newsletter/dezabonare" element={<NewsletterUnsubscribe />} />
               <Route path="ghizi" element={<GuidesPage />} />
               <Route path="ghid/:slug" element={<GuideSinglePage />} />
+              <Route path="circuite" element={<CircuitsPage />} />
               <Route path="blog" element={<BlogPage />} />
               <Route path="blog/:slug" element={<BlogArticle />} />
               <Route path="despre" element={<AboutPage />} />

@@ -391,20 +391,30 @@ export default function HomePage() {
 
           {/* Success State */}
           {!circuitsLoading && !circuitsError && circuits.length > 0 && (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {circuits.map((circuit, index) => (
-                <div
-                  key={circuit.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <CircuitCard
-                    circuit={circuit}
-                    onCtaClick={(id) => handleCircuitClick(id, circuit)}
-                  />
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {circuits.map((circuit, index) => (
+                  <div
+                    key={circuit.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <CircuitCard
+                      circuit={circuit}
+                      onCtaClick={(id) => handleCircuitClick(id, circuit)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-12">
+                <Button size="lg" asChild>
+                  <Link to={PUBLIC_ROUTES.circuits}>
+                    Vezi Toate Circuitele
+                  </Link>
+                </Button>
+              </div>
+            </>
           )}
         </Container>
       </Section>

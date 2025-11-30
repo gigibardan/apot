@@ -169,6 +169,13 @@ export interface JinfoursCircuit {
   highlights: string[];
   featured: boolean;
   order_index: number;
+  // Discount fields
+  discount_percentage: number | null;
+  original_price: number | null;
+  discount_until: string | null;
+  // Badge fields
+  badge_text: string | null;
+  badge_color: string | null;
   created_at: string;
   updated_at: string;
 }
