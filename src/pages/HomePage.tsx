@@ -17,13 +17,15 @@ import { NewsletterSignup } from "@/components/features/newsletter/NewsletterSig
 import { FeaturedGuides } from "@/components/features/guides/FeaturedGuides";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { seoDefaults } from "@/lib/constants/seo-defaults";
-import { getContinents } from "@/lib/supabase/queries/taxonomies";
+import { getContinentsWithTranslations } from "@/lib/supabase/queries/continents";
 import { getFeaturedObjectives } from "@/lib/supabase/queries/objectives";
 import { getCircuits } from "@/lib/supabase/queries/jinfotours";
 import { getFeaturedArticles } from "@/lib/supabase/queries/blog";
 import { trackContinentClick, trackCircuitClick } from "@/lib/analytics/events";
 import { generateWebsiteSchema, generateOrganizationSchema } from "@/lib/utils/structured-data";
 import type { Continent, ObjectiveWithRelations, JinfoursCircuit, BlogArticle } from "@/types/database.types";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslatedObjectives } from "@/hooks/useTranslatedContent";
 
 /**
  * Homepage
@@ -32,13 +34,17 @@ import type { Continent, ObjectiveWithRelations, JinfoursCircuit, BlogArticle } 
 export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   
   // Data state
   const [continents, setContinents] = useState<Continent[]>([]);
-  const [objectives, setObjectives] = useState<ObjectiveWithRelations[]>([]);
+  const [rawObjectives, setRawObjectives] = useState<ObjectiveWithRelations[]>([]);
   const [circuits, setCircuits] = useState<JinfoursCircuit[]>([]);
   const [articles, setArticles] = useState<BlogArticle[]>([]);
+  
+  // Get translated objectives using custom hook
+  const { content: objectives, isLoading: objectivesTranslationLoading } = useTranslatedObjectives(rawObjectives);
   
   // Loading state
   const [continentsLoading, setContinentsLoading] = useState(true);
@@ -52,23 +58,23 @@ export default function HomePage() {
   const [circuitsError, setCircuitsError] = useState<string | null>(null);
   const [articlesError, setArticlesError] = useState<string | null>(null);
 
-  // Fetch data on mount
+  // Fetch data on mount and when language changes
   useEffect(() => {
     fetchContinents();
     fetchObjectives();
     fetchCircuits();
     fetchArticles();
-  }, []);
+  }, [currentLanguage]);
 
   const fetchContinents = async () => {
     try {
       setContinentsLoading(true);
       setContinentsError(null);
-      const data = await getContinents();
+      const data = await getContinentsWithTranslations(currentLanguage);
       setContinents(data);
     } catch (error) {
       console.error("Error fetching continents:", error);
-      setContinentsError("Nu am putut încărca continentele");
+      setContinentsError(t("errors.loadContinents", "Nu am putut încărca continentele"));
     } finally {
       setContinentsLoading(false);
     }
@@ -79,10 +85,10 @@ export default function HomePage() {
       setObjectivesLoading(true);
       setObjectivesError(null);
       const result = await getFeaturedObjectives(6);
-      setObjectives(result.data);
+      setRawObjectives(result.data);
     } catch (error) {
       console.error("Error fetching objectives:", error);
-      setObjectivesError("Nu am putut încărca obiectivele");
+      setObjectivesError(t("errors.loadObjectives", "Nu am putut încărca obiectivele"));
     } finally {
       setObjectivesLoading(false);
     }
