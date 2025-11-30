@@ -10,6 +10,8 @@ import { ObjectiveCard } from "@/components/features/objectives/ObjectiveCard";
 import { ObjectiveGallery } from "@/components/features/objectives/ObjectiveGallery";
 import { ObjectiveMap } from "@/components/features/objectives/ObjectiveMap";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
+import { ReadingProgress } from "@/components/shared/ReadingProgress";
+import { MobileStickyCTA } from "@/components/shared/MobileStickyCTA";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -217,6 +219,12 @@ export default function ObjectiveSingle() {
         ogType="website"
         structuredData={getStructuredData()}
       />
+
+      {/* Reading Progress Bar */}
+      <ReadingProgress />
+
+      {/* Mobile Sticky CTA */}
+      {objective.country && <MobileStickyCTA countryName={objective.country.name} />}
 
       {/* Breadcrumbs */}
       <Section className="py-4 bg-muted/30">
