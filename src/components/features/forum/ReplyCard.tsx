@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,7 +66,13 @@ export function ReplyCard({
       <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <span className="font-semibold text-sm">{authorName}</span>
+          <Link
+            to={`/profil/${reply.author?.username || reply.user_id}`}
+            className="font-semibold text-sm hover:text-primary transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {authorName}
+          </Link>
           {reply.author?.id && <ReputationBadge userId={reply.author.id} showPoints={false} />}
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(reply.created_at), {

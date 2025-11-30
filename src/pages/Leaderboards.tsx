@@ -93,8 +93,8 @@ export default function Leaderboards() {
                         {getRankBadge(index + 1)}
                       </div>
                       <Link
-                        to={`/user/${contributor.user.username || contributor.user_id}`}
-                        className="flex items-center gap-3 flex-1"
+                        to={`/profil/${contributor.user.username || contributor.user_id}`}
+                        className="flex items-center gap-3 flex-1 hover:text-primary transition-colors"
                       >
                         <Avatar>
                           <AvatarImage src={contributor.user.avatar_url} />
@@ -144,8 +144,8 @@ export default function Leaderboards() {
                         {getRankBadge(index + 1)}
                       </div>
                       <Link
-                        to={`/user/${explorer.user.username || explorer.user.id}`}
-                        className="flex items-center gap-3 flex-1"
+                        to={`/profil/${explorer.user.username || explorer.user.id}`}
+                        className="flex items-center gap-3 flex-1 hover:text-primary transition-colors"
                       >
                         <Avatar>
                           <AvatarImage src={explorer.user.avatar_url} />
@@ -195,8 +195,8 @@ export default function Leaderboards() {
                         {getRankBadge(index + 1)}
                       </div>
                       <Link
-                        to={`/user/${leader.user.username || leader.user_id}`}
-                        className="flex items-center gap-3 flex-1"
+                        to={`/profil/${leader.user.username || leader.user_id}`}
+                        className="flex items-center gap-3 flex-1 hover:text-primary transition-colors"
                       >
                         <Avatar>
                           <AvatarImage src={leader.user.avatar_url} />

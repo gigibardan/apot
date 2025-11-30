@@ -44,7 +44,7 @@ export async function getPostsByCategory(
     .select(`
       *,
       category:forum_categories(*),
-      author:profiles!forum_posts_user_id_fkey(id, full_name, avatar_url)
+      author:profiles!forum_posts_user_id_fkey(id, full_name, username, avatar_url)
     `, { count: 'exact' })
     .eq('category_id', categoryId)
     .eq('status', 'active');
@@ -91,7 +91,7 @@ export async function getPostBySlug(
     .select(`
       *,
       category:forum_categories(*),
-      author:profiles!forum_posts_user_id_fkey(id, full_name, avatar_url)
+      author:profiles!forum_posts_user_id_fkey(id, full_name, username, avatar_url)
     `)
     .eq('category_id', category.id)
     .eq('slug', postSlug)
@@ -119,7 +119,7 @@ export async function getRepliesForPost(postId: string): Promise<ForumReply[]> {
     .from('forum_replies')
     .select(`
       *,
-      author:profiles!forum_replies_user_id_fkey(id, full_name, avatar_url)
+      author:profiles!forum_replies_user_id_fkey(id, full_name, username, avatar_url)
     `)
     .eq('post_id', postId)
     .eq('status', 'active')
