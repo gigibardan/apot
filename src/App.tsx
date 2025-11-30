@@ -17,6 +17,8 @@ import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
 import ObjectiveSingle from "@/pages/ObjectiveSingle";
 import FavoritesPage from "@/pages/FavoritesPage";
+import NewsletterConfirm from "@/pages/NewsletterConfirm";
+import NewsletterUnsubscribe from "@/pages/NewsletterUnsubscribe";
 import GuidesPage from "@/pages/GuidesPage";
 import GuideSinglePage from "@/pages/GuideSinglePage";
 import BlogPage from "@/pages/BlogPage";
@@ -40,6 +42,7 @@ import Settings from "@/pages/admin/Settings";
 import UsersPage from "@/pages/admin/Users";
 import BulkImport from "@/pages/admin/BulkImport";
 import Templates from "@/pages/admin/Templates";
+import NewsletterAdmin from "@/pages/admin/NewsletterAdmin";
 import LoginPage from "@/pages/auth/Login";
 import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import NotFound from "@/pages/NotFound";
@@ -63,6 +66,8 @@ const App = () => (
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
               <Route path="favorite" element={<FavoritesPage />} />
+              <Route path="newsletter/confirmare" element={<NewsletterConfirm />} />
+              <Route path="newsletter/dezabonare" element={<NewsletterUnsubscribe />} />
               <Route path="ghizi" element={<GuidesPage />} />
               <Route path="ghid/:slug" element={<GuideSinglePage />} />
               <Route path="blog" element={<BlogPage />} />
@@ -90,6 +95,7 @@ const App = () => (
               <Route path="circuite/nou" element={<CircuitForm />} />
               <Route path="circuite/:id" element={<CircuitForm />} />
               <Route path="media" element={<MediaLibrary />} />
+              <Route path="newsletter" element={<NewsletterAdmin />} />
               <Route path="setari" element={<Settings />} />
               <Route path="utilizatori" element={<ProtectedRoute requireRole="admin"><UsersPage /></ProtectedRoute>} />
               <Route path="import" element={<BulkImport />} />

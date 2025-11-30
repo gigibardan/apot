@@ -127,7 +127,7 @@ export function BlogListingSidebar({
           <p className="text-sm text-muted-foreground mb-4">
             Abonează-te pentru a primi notificări despre articolele noi
           </p>
-          <NewsletterSignup variant="compact" />
+          <NewsletterSignup variant="sidebar" source="blog-sidebar" />
         </CardContent>
       </Card>
     </div>

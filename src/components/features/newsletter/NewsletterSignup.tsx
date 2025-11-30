@@ -1,183 +1,252 @@
 import { useState } from "react";
-import { Mail, Loader2, Check } from "lucide-react";
+import { Mail, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import { subscribeToNewsletter, type NewsletterInput } from "@/lib/supabase/mutations/newsletter";
+import { cn } from "@/lib/utils";
+
+interface NewsletterSignupProps {
+  variant?: "default" | "inline" | "sidebar";
+  source?: string;
+  className?: string;
+}
 
 /**
  * NewsletterSignup Component
- * Email capture form with GDPR compliance
- * Phase 1: UI only, backend integration later
+ * Secure newsletter subscription form with validation
+ * Supports multiple display variants and GDPR compliance
  */
-interface NewsletterSignupProps {
-  variant?: "default" | "compact";
-}
-
-export function NewsletterSignup({ variant = "default" }: NewsletterSignupProps) {
+export function NewsletterSignup({ 
+  variant = "default",
+  source = "website",
+  className 
+}: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const { toast } = useToast();
-
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    // Validation
-    if (!email) {
-      toast({
-        title: "Email necesar",
-        description: "Te rugăm să introduci adresa de email.",
-        variant: "destructive",
-      });
-      return;
-    }
+    try {
+      const input: NewsletterInput = {
+        email,
+        ...(fullName && { full_name: fullName }),
+      };
 
-    if (!validateEmail(email)) {
-      toast({
-        title: "Email invalid",
-        description: "Te rugăm să introduci o adresă de email validă.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!agreedToTerms) {
-      toast({
-        title: "Acord necesar",
-        description: "Te rugăm să accepți Politica de Confidențialitate.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Simulate API call (Phase 1)
-    setIsSubmitting(true);
-    
-    // TODO: In future, integrate with email service (MailChimp, ConvertKit, etc.)
-    console.log("Newsletter signup:", { email, timestamp: new Date() });
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      toast({
-        title: "Mulțumim! 🎉",
-        description: "Vei primi primul newsletter în curând.",
-      });
+      const result = await subscribeToNewsletter(input, source);
       
-      // Reset form after 3 seconds
-      setTimeout(() => {
+      if (result.success) {
+        setSuccess(true);
         setEmail("");
-        setAgreedToTerms(false);
-        setIsSuccess(false);
-      }, 3000);
-    }, 1000);
+        setFullName("");
+        
+        // Reset success message after 5 seconds
+        setTimeout(() => setSuccess(false), 5000);
+      }
+    } catch (err: any) {
+      // Error handling is done in the mutation function with toasts
+      // Set error state only for display purposes
+      if (err.name === "ZodError") {
+        setError("Te rugăm să verifici datele introduse");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (isSuccess) {
+  // Success state
+  if (success) {
     return (
-      <div className="flex flex-col items-center gap-4 p-8 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
-        <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-          <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
-        </div>
-        <div className="text-center">
-          <h3 className="text-xl font-display font-bold text-green-900 dark:text-green-100">
-            Mulțumim pentru abonare!
-          </h3>
-          <p className="text-sm text-green-700 dark:text-green-300 mt-2">
-            Vei primi primul newsletter în curând
+      <Card className={cn("border-green-500/50 bg-green-500/5", className)}>
+        <CardContent className="p-6 text-center">
+          <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Mulțumim pentru abonare!</h3>
+          <p className="text-sm text-muted-foreground">
+            Verifică-ți emailul pentru a confirma abonarea la newsletter.
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
-  const isCompact = variant === "compact";
-
-  return (
-    <form onSubmit={handleSubmit} className={`space-y-4 ${!isCompact && "max-w-md mx-auto"}`}>
-      {/* Email Input */}
-      <div className={`flex ${isCompact ? "flex-col" : "flex-col sm:flex-row"} gap-3`}>
-        <div className="relative flex-1">
-          {!isCompact && (
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          )}
-          <Input
-            type="email"
-            placeholder="adresa@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isSubmitting}
-            className={`${!isCompact && "pl-10"} bg-white dark:bg-background`}
-            aria-label="Adresa de email"
-            required
-          />
-        </div>
-        <Button
-          type="submit"
-          size={isCompact ? "default" : "lg"}
-          disabled={isSubmitting || !agreedToTerms}
-          className="bg-accent hover:bg-accent/90"
+  // Inline variant (for footer)
+  if (variant === "inline") {
+    return (
+      <form onSubmit={handleSubmit} className={cn("flex gap-2", className)}>
+        <Input
+          type="email"
+          placeholder="Email-ul tău"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
+          className="flex-1"
+          aria-label="Adresă de email pentru newsletter"
+        />
+        <Button 
+          type="submit" 
+          disabled={loading}
+          size="icon"
+          aria-label="Abonează-te"
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {isCompact ? "Se trimite..." : "Se trimite..."}
-            </>
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            "Abonează-te"
+            <Mail className="h-4 w-4" />
           )}
         </Button>
-      </div>
+      </form>
+    );
+  }
 
-      {/* GDPR Checkbox */}
-      <div className="flex items-start gap-2">
-        <Checkbox
-          id={`terms-${variant}`}
-          checked={agreedToTerms}
-          onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
-          disabled={isSubmitting}
-          className="mt-0.5"
-        />
-        <Label
-          htmlFor={`terms-${variant}`}
-          className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
-        >
-          {isCompact ? (
-            <>
-              Accept{" "}
-              <a
-                href="/politica-confidentialitate"
-                className="underline hover:text-primary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Politica
-              </a>
-            </>
-          ) : (
-            <>
-              Sunt de acord cu{" "}
-              <a
-                href="/politica-confidentialitate"
-                className="underline hover:text-primary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Politica de Confidențialitate
-              </a>{" "}
-              și doresc să primesc newsletter-ul APOT
-            </>
+  // Sidebar variant
+  if (variant === "sidebar") {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Mail className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold">Newsletter</h3>
+              <p className="text-xs text-muted-foreground">
+                Primește ultimele noutăți
+              </p>
+            </div>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Input
+              type="text"
+              placeholder="Numele tău"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              disabled={loading}
+            />
+            <Input
+              type="email"
+              placeholder="Email-ul tău"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Se procesează...
+                </>
+              ) : (
+                <>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Abonează-te
+                </>
+              )}
+            </Button>
+          </form>
+          
+          {error && (
+            <p className="text-xs text-destructive mt-2">{error}</p>
           )}
-        </Label>
-      </div>
-    </form>
+          
+          <p className="text-xs text-muted-foreground mt-3">
+            Respectăm confidențialitatea ta. Poți anula abonarea oricând.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Default variant (full card)
+  return (
+    <Card className={className}>
+      <CardContent className="p-8">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
+            <Mail className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">
+            Abonează-te la Newsletter
+          </h2>
+          <p className="text-muted-foreground">
+            Primește cele mai recente articole, ghiduri turistice și oferte exclusive direct în inbox.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="newsletter-name" className="text-sm font-medium mb-2 block">
+              Nume (opțional)
+            </label>
+            <Input
+              id="newsletter-name"
+              type="text"
+              placeholder="Numele tău"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="newsletter-email" className="text-sm font-medium mb-2 block">
+              Email *
+            </label>
+            <Input
+              id="newsletter-email"
+              type="email"
+              placeholder="exemplu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full"
+            size="lg"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Se procesează...
+              </>
+            ) : (
+              <>
+                <Mail className="h-5 w-5 mr-2" />
+                Abonează-te Gratuit
+              </>
+            )}
+          </Button>
+
+          {error && (
+            <p className="text-sm text-destructive text-center">{error}</p>
+          )}
+        </form>
+
+        <p className="text-xs text-muted-foreground text-center mt-6">
+          Prin abonare, ești de acord cu{" "}
+          <a href="/termeni" className="underline hover:text-primary">
+            Termenii și Condițiile
+          </a>{" "}
+          noastre. Poți anula abonarea oricând.
+        </p>
+      </CardContent>
+    </Card>
   );
 }
