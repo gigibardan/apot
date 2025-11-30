@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import DOMPurify from "dompurify";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { SEO } from "@/components/seo/SEO";
@@ -121,6 +122,16 @@ export default function ObjectiveSingle() {
       ...(objective.opening_hours ? { openingHours: objective.opening_hours } : {}),
     };
   };
+
+  // Sanitize HTML description to prevent XSS attacks
+  const sanitizedDescription = useMemo(() => {
+    if (!objective?.description) return null;
+    return DOMPurify.sanitize(objective.description, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a', 'blockquote'],
+      ALLOWED_ATTR: ['href', 'target', 'rel'],
+      ALLOW_DATA_ATTR: false,
+    });
+  }, [objective?.description]);
 
   // Loading State
   if (loading) {
@@ -290,10 +301,10 @@ export default function ObjectiveSingle() {
                 <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
                   Despre {objective.title}
                 </h2>
-                {objective.description ? (
+                {sanitizedDescription ? (
                   <div
-                    className="prose prose-slate dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: objective.description }}
+                    className="prose prose-slate dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
+                    dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
                   />
                 ) : objective.excerpt ? (
                   <p className="text-lg text-muted-foreground leading-relaxed">{objective.excerpt}</p>
