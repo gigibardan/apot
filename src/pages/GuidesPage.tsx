@@ -1,45 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/seo/SEO";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { Input } from "@/components/ui/input";
+import { SearchBar } from "@/components/shared/SearchBar";
+import { GuideAdvancedFilters, GuideFiltersState } from "@/components/features/guides/GuideAdvancedFilters";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { getGuides, getGuideSpecializations, getGuideRegions } from "@/lib/supabase/queries/guides";
-import { Search, Star, Shield, MapPin, Languages } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { searchGuides, getFilterOptions } from "@/lib/supabase/queries/search";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Star, Shield, MapPin, Languages } from "lucide-react";
 
 export default function GuidesPage() {
-  const [search, setSearch] = useState("");
-  const [specialization, setSpecialization] = useState<string>("");
-  const [region, setRegion] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<GuideFiltersState>({});
+  const [page, setPage] = useState(1);
+  
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const { data: guides, isLoading } = useQuery({
-    queryKey: ["guides", search, specialization, region],
-    queryFn: () =>
-      getGuides({
-        search: search || undefined,
-        specialization: specialization || undefined,
-        region: region || undefined,
-      }),
+  // Fetch guides with search and filters
+  const { data: guidesData, isLoading } = useQuery({
+    queryKey: ["guides-search", debouncedSearch, filters, page],
+    queryFn: () => searchGuides(debouncedSearch, filters, page, 12),
   });
 
-  const { data: specializations } = useQuery({
-    queryKey: ["guide-specializations"],
-    queryFn: getGuideSpecializations,
-  });
-
-  const { data: regions } = useQuery({
-    queryKey: ["guide-regions"],
-    queryFn: getGuideRegions,
-  });
+  // Reset page when search or filters change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, filters]);
 
   return (
     <>
@@ -62,53 +50,36 @@ export default function GuidesPage() {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="bg-card border rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Caută ghid..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select value={specialization} onValueChange={setSpecialization}>
-              <SelectTrigger>
-                <SelectValue placeholder="Specializare" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toate</SelectItem>
-                {specializations?.map((spec) => (
-                  <SelectItem key={spec} value={spec}>
-                    {spec}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={region} onValueChange={setRegion}>
-              <SelectTrigger>
-                <SelectValue placeholder="Regiune" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toate</SelectItem>
-                {regions?.map((reg) => (
-                  <SelectItem key={reg} value={reg}>
-                    {reg}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Search and Filters */}
+        <div className="bg-card border rounded-lg p-6 mb-8 space-y-6">
+          <SearchBar 
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Caută ghizi după nume, specializare sau regiune..."
+            className="w-full"
+          />
+          
+          <GuideAdvancedFilters
+            filters={filters}
+            onChange={setFilters}
+          />
         </div>
+
+        {/* Results Summary */}
+        {!isLoading && guidesData && (
+          <div className="mb-6 text-sm text-muted-foreground">
+            Găsite {guidesData.total} ghizi
+            {guidesData.total > 12 && ` (pagina ${page} din ${guidesData.pages})`}
+          </div>
+        )}
 
         {/* Guides Grid */}
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {guides?.guides.map((guide) => (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {guidesData?.guides.map((guide) => (
               <Link key={guide.id} to={`/ghid/${guide.slug}`}>
                 <Card className="p-6 hover:shadow-lg transition-shadow h-full">
                   <div className="flex items-start gap-4 mb-4">
@@ -187,11 +158,51 @@ export default function GuidesPage() {
                   </div>
                 </Card>
               </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {guidesData && guidesData.pages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-8">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+                >
+                  Anterior
+                </button>
+                <div className="flex gap-1">
+                  {[...Array(Math.min(guidesData.pages, 5))].map((_, i) => {
+                    const pageNum = page > 3 ? page - 2 + i : i + 1;
+                    if (pageNum > guidesData.pages) return null;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`px-3 py-1 border rounded-md transition-colors ${
+                          page === pageNum 
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-muted"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  onClick={() => setPage(p => Math.min(guidesData.pages, p + 1))}
+                  disabled={page === guidesData.pages}
+                  className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-colors"
+                >
+                  Următorul
+                </button>
+              </div>
+            )}
+          </>
         )}
 
-        {!isLoading && guides?.guides.length === 0 && (
+        {!isLoading && guidesData?.guides.length === 0 && (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">
               Nu am găsit ghizi care să corespundă criteriilor tale.
