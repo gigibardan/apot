@@ -7,7 +7,7 @@ export const siteConfig = {
   name: "APOT",
   fullName: "Asociația pentru Protejarea Obiectivelor Turistice",
   description: "Platformă mondială cu informații detaliate despre obiective turistice din întreaga lume. Descoperă monumente, muzee, parcuri naturale și situri UNESCO.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url: typeof window !== 'undefined' ? window.location.origin : "https://apot.ro",
   ogImage: "/images/og-image.jpg",
   locale: "ro-RO",
   links: {
