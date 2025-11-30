@@ -43,6 +43,7 @@ import UsersPage from "@/pages/admin/Users";
 import BulkImport from "@/pages/admin/BulkImport";
 import Templates from "@/pages/admin/Templates";
 import NewsletterAdmin from "@/pages/admin/NewsletterAdmin";
+import ContactMessagesAdmin from "@/pages/admin/ContactMessagesAdmin";
 import LoginPage from "@/pages/auth/Login";
 import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import NotFound from "@/pages/NotFound";
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="circuite/:id" element={<CircuitForm />} />
               <Route path="media" element={<MediaLibrary />} />
               <Route path="newsletter" element={<NewsletterAdmin />} />
+              <Route path="mesaje-contact" element={<ContactMessagesAdmin />} />
               <Route path="setari" element={<Settings />} />
               <Route path="utilizatori" element={<ProtectedRoute requireRole="admin"><UsersPage /></ProtectedRoute>} />
               <Route path="import" element={<BulkImport />} />

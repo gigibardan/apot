@@ -161,6 +161,60 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          ip_address: unknown
+          message: string
+          phone: string | null
+          read_at: string | null
+          replied_at: string | null
+          status: string
+          subject: string
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          ip_address?: unknown
+          message: string
+          phone?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          ip_address?: unknown
+          message?: string
+          phone?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       continents: {
         Row: {
           created_at: string
@@ -258,6 +312,83 @@ export type Database = {
             columns: ["continent_id"]
             isOneToOne: false
             referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_booking_requests: {
+        Row: {
+          admin_notes: string | null
+          budget_range: string | null
+          created_at: string | null
+          destinations: string[] | null
+          duration_days: number | null
+          email: string
+          full_name: string
+          guide_id: string
+          id: string
+          ip_address: unknown
+          language_preference: string | null
+          number_of_people: number
+          phone: string
+          preferred_date: string
+          read_at: string | null
+          replied_at: string | null
+          special_requests: string | null
+          status: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          budget_range?: string | null
+          created_at?: string | null
+          destinations?: string[] | null
+          duration_days?: number | null
+          email: string
+          full_name: string
+          guide_id: string
+          id?: string
+          ip_address?: unknown
+          language_preference?: string | null
+          number_of_people: number
+          phone: string
+          preferred_date: string
+          read_at?: string | null
+          replied_at?: string | null
+          special_requests?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          budget_range?: string | null
+          created_at?: string | null
+          destinations?: string[] | null
+          duration_days?: number | null
+          email?: string
+          full_name?: string
+          guide_id?: string
+          id?: string
+          ip_address?: unknown
+          language_preference?: string | null
+          number_of_people?: number
+          phone?: string
+          preferred_date?: string
+          read_at?: string | null
+          replied_at?: string | null
+          special_requests?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_booking_requests_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
             referencedColumns: ["id"]
           },
         ]
@@ -700,6 +831,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      objective_inquiries: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          ip_address: unknown
+          message: string
+          number_of_people: number | null
+          objective_id: string
+          phone: string | null
+          read_at: string | null
+          replied_at: string | null
+          status: string
+          updated_at: string | null
+          user_id: string | null
+          visit_date: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          ip_address?: unknown
+          message: string
+          number_of_people?: number | null
+          objective_id: string
+          phone?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          visit_date?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          ip_address?: unknown
+          message?: string
+          number_of_people?: number | null
+          objective_id?: string
+          phone?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          visit_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objective_inquiries_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       objective_types: {
         Row: {
