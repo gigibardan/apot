@@ -4,11 +4,8 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-export async function getPendingSuggestions(page = 1, limit = 20) {
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
-
-  const { data, error, count } = await supabase
+export async function getPendingSuggestions() {
+  const { data, error } = await supabase
     .from("objective_suggestions")
     .select(
       `
@@ -18,20 +15,14 @@ export async function getPendingSuggestions(page = 1, limit = 20) {
         username,
         avatar_url
       )
-    `,
-      { count: "exact" }
+    `
     )
     .eq("status", "pending")
-    .order("created_at", { ascending: false })
-    .range(from, to);
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
 
-  return {
-    suggestions: data || [],
-    total: count || 0,
-    hasMore: (count || 0) > to + 1,
-  };
+  return data || [];
 }
 
 export async function getUserSuggestions(userId: string, page = 1, limit = 20) {
