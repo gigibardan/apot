@@ -135,6 +135,39 @@ export async function submitContactForm(input: ContactFormInput) {
 
     if (error) throw error;
 
+    // Send confirmation email to user (async, non-blocking)
+    supabase.functions
+      .invoke("send-confirmation-email", {
+        body: {
+          type: "contact",
+          recipientEmail: validated.email,
+          recipientName: validated.full_name,
+          data: { subject: validated.subject },
+        },
+      })
+      .then(({ error: emailError }) => {
+        if (emailError) console.error("Failed to send confirmation email:", emailError);
+      });
+
+    // Send admin notification (async, non-blocking)
+    supabase.functions
+      .invoke("send-admin-notification", {
+        body: {
+          type: "contact",
+          data: {
+            id: data.id,
+            fullName: validated.full_name,
+            email: validated.email,
+            phone: validated.phone,
+            subject: validated.subject,
+            message: validated.message,
+          },
+        },
+      })
+      .then(({ error: notifError }) => {
+        if (notifError) console.error("Failed to send admin notification:", notifError);
+      });
+
     toast.success("Mesajul a fost trimis cu succes! Vă vom răspunde în cel mai scurt timp.");
     return { success: true, data };
   } catch (error) {
@@ -176,6 +209,48 @@ export async function submitObjectiveInquiry(input: ObjectiveInquiryInput) {
       .single();
 
     if (error) throw error;
+
+    // Get objective title - we need to pass it separately
+    const objectiveTitle = (input as any).objectiveTitle || "Obiectiv";
+
+    // Send confirmation email to user (async, non-blocking)
+    supabase.functions
+      .invoke("send-confirmation-email", {
+        body: {
+          type: "objective_inquiry",
+          recipientEmail: validated.email,
+          recipientName: validated.full_name,
+          data: {
+            objectiveTitle,
+            visitDate: validated.visit_date,
+            numberOfPeople: validated.number_of_people,
+          },
+        },
+      })
+      .then(({ error: emailError }) => {
+        if (emailError) console.error("Failed to send confirmation email:", emailError);
+      });
+
+    // Send admin notification (async, non-blocking)
+    supabase.functions
+      .invoke("send-admin-notification", {
+        body: {
+          type: "objective_inquiry",
+          data: {
+            id: data.id,
+            objectiveTitle,
+            fullName: validated.full_name,
+            email: validated.email,
+            phone: validated.phone,
+            visitDate: validated.visit_date,
+            numberOfPeople: validated.number_of_people,
+            message: validated.message,
+          },
+        },
+      })
+      .then(({ error: notifError }) => {
+        if (notifError) console.error("Failed to send admin notification:", notifError);
+      });
 
     toast.success("Întrebarea a fost trimisă cu succes! Vă vom răspunde în curând.");
     return { success: true, data };
@@ -222,6 +297,52 @@ export async function submitGuideBookingRequest(input: GuideBookingInput) {
       .single();
 
     if (error) throw error;
+
+    // Get guide name - we need to pass it separately
+    const guideName = (input as any).guideName || "Ghid";
+
+    // Send confirmation email to user (async, non-blocking)
+    supabase.functions
+      .invoke("send-confirmation-email", {
+        body: {
+          type: "guide_booking",
+          recipientEmail: validated.email,
+          recipientName: validated.full_name,
+          data: {
+            guideName,
+            preferredDate: validated.preferred_date,
+            numberOfPeople: validated.number_of_people,
+            durationDays: validated.duration_days,
+          },
+        },
+      })
+      .then(({ error: emailError }) => {
+        if (emailError) console.error("Failed to send confirmation email:", emailError);
+      });
+
+    // Send admin notification (async, non-blocking)
+    supabase.functions
+      .invoke("send-admin-notification", {
+        body: {
+          type: "guide_booking",
+          data: {
+            id: data.id,
+            guideName,
+            fullName: validated.full_name,
+            email: validated.email,
+            phone: validated.phone,
+            preferredDate: validated.preferred_date,
+            numberOfPeople: validated.number_of_people,
+            durationDays: validated.duration_days,
+            budgetRange: validated.budget_range,
+            languagePreference: validated.language_preference,
+            specialRequests: validated.special_requests,
+          },
+        },
+      })
+      .then(({ error: notifError }) => {
+        if (notifError) console.error("Failed to send admin notification:", notifError);
+      });
 
     toast.success("Cererea de rezervare a fost trimisă! Vă vom contacta în cel mai scurt timp.");
     return { success: true, data };
