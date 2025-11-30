@@ -4,6 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HelpCircle } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface PostFormProps {
   categoryId: string;
@@ -62,16 +68,40 @@ export function PostForm({
           </div>
 
           <div>
-            <Label htmlFor="post-content">Conținut</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label htmlFor="post-content">Conținut</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" type="button">
+                    <HelpCircle className="h-4 w-4 mr-1" />
+                    Markdown
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="space-y-2 text-sm">
+                    <h4 className="font-semibold">Formatare Markdown</h4>
+                    <div className="space-y-1 text-muted-foreground">
+                      <p><code>**bold**</code> pentru <strong>bold</strong></p>
+                      <p><code>*italic*</code> pentru <em>italic</em></p>
+                      <p><code>[link](url)</code> pentru linkuri</p>
+                      <p><code>`code`</code> pentru cod inline</p>
+                      <p><code>```code block```</code> pentru bloc de cod</p>
+                      <p><code>&gt; quote</code> pentru citat</p>
+                      <p><code>- item</code> pentru listă</p>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
             <Textarea
               id="post-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Scrie conținutul discuției..."
+              placeholder="Scrie conținutul discuției... (suportă Markdown)"
               rows={12}
               required
               disabled={isSubmitting}
-              className="resize-none"
+              className="resize-none font-mono"
             />
           </div>
 

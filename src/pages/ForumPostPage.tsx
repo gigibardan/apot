@@ -25,6 +25,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { MarkdownContent } from "@/components/features/forum/MarkdownContent";
 import { 
   getPostBySlug, 
   getRepliesForPost,
@@ -223,9 +224,7 @@ export default function ForumPostPage() {
           </div>
 
           {/* Content */}
-          <div className="prose prose-sm max-w-none mb-6">
-            <div className="whitespace-pre-wrap">{post.content}</div>
-          </div>
+          <MarkdownContent content={post.content} className="mb-6" />
 
           {/* Stats & Actions */}
           <div className="flex flex-wrap items-center gap-4 pt-4 border-t">
