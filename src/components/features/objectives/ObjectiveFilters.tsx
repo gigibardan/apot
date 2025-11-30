@@ -155,16 +155,16 @@ export function ObjectiveFilters({
       <div className="space-y-2">
         <Label htmlFor="continent">Continent</Label>
         <Select
-          value={filters.continent}
+          value={filters.continent || "all"}
           onValueChange={(value) =>
-            onFiltersChange({ ...filters, continent: value, country: "" })
+            onFiltersChange({ ...filters, continent: value === "all" ? "" : value, country: "" })
           }
         >
           <SelectTrigger id="continent">
             <SelectValue placeholder="Toate Continentele" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toate Continentele</SelectItem>
+            <SelectItem value="all">Toate Continentele</SelectItem>
             {continents.map((continent) => (
               <SelectItem key={continent.id} value={continent.slug}>
                 {continent.name}
@@ -178,9 +178,9 @@ export function ObjectiveFilters({
       <div className="space-y-2">
         <Label htmlFor="country">Țară</Label>
         <Select
-          value={filters.country}
+          value={filters.country || "all"}
           onValueChange={(value) =>
-            onFiltersChange({ ...filters, country: value })
+            onFiltersChange({ ...filters, country: value === "all" ? "" : value })
           }
           disabled={!filters.continent}
         >
@@ -188,7 +188,7 @@ export function ObjectiveFilters({
             <SelectValue placeholder="Toate Țările" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toate Țările</SelectItem>
+            <SelectItem value="all">Toate Țările</SelectItem>
             {countries.map((country) => (
               <SelectItem key={country.id} value={country.slug}>
                 {country.flag_emoji && `${country.flag_emoji} `}
