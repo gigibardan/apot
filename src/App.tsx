@@ -21,6 +21,12 @@ import ContactPage from "@/pages/ContactPage";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import ObjectivesAdmin from "@/pages/admin/ObjectivesAdmin";
 import ObjectiveForm from "@/pages/admin/ObjectiveForm";
+import BlogAdmin from "@/pages/admin/BlogAdmin";
+import BlogArticleForm from "@/pages/admin/BlogArticleForm";
+import CircuitsAdmin from "@/pages/admin/CircuitsAdmin";
+import CircuitForm from "@/pages/admin/CircuitForm";
+import MediaLibrary from "@/pages/admin/MediaLibrary";
+import Settings from "@/pages/admin/Settings";
 import LoginPage from "@/pages/auth/Login";
 import NotFound from "@/pages/NotFound";
 import TestDatabase from "@/pages/TestDatabase";
@@ -51,7 +57,16 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="obiective" element={<ObjectivesAdmin />} />
+              <Route path="obiective/nou" element={<ObjectiveForm />} />
               <Route path="obiective/:id" element={<ObjectiveForm />} />
+              <Route path="blog" element={<BlogAdmin />} />
+              <Route path="blog/nou" element={<BlogArticleForm />} />
+              <Route path="blog/:id" element={<BlogArticleForm />} />
+              <Route path="circuite" element={<CircuitsAdmin />} />
+              <Route path="circuite/nou" element={<CircuitForm />} />
+              <Route path="circuite/:id" element={<CircuitForm />} />
+              <Route path="media" element={<MediaLibrary />} />
+              <Route path="setari" element={<Settings />} />
             </Route>
 
             {/* Auth Routes */}
