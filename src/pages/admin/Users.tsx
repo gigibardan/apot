@@ -170,12 +170,33 @@ export default function UsersPage() {
     setInviteLoading(true);
 
     try {
-      // In production, this would be an edge function call
-      // that creates the user via admin API and sends invitation email
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-user`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: inviteEmail,
+            name: inviteName,
+            role: inviteRole,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to invite user");
+      }
       
       toast({
         title: "Invitație trimisă!",
-        description: `Utilizatorul ${inviteName} a fost invitat cu succes.`,
+        description: `Utilizatorul ${inviteName} a fost invitat. Va primi un email pentru setarea parolei.`,
       });
 
       setInviteDialogOpen(false);
@@ -183,12 +204,13 @@ export default function UsersPage() {
       setInviteName("");
       setInviteRole("user");
       fetchUsers();
+      fetchStats();
     } catch (error) {
       console.error("Error inviting user:", error);
       toast({
         variant: "destructive",
         title: "Eroare",
-        description: "Nu am putut trimite invitația",
+        description: error instanceof Error ? error.message : "Nu am putut trimite invitația",
       });
     } finally {
       setInviteLoading(false);
