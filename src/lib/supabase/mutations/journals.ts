@@ -147,3 +147,22 @@ export async function unlikeJournal(journalId: string) {
 
   return { success: true };
 }
+
+export async function toggleJournalLike(journalId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  // Check if already liked
+  const { data: existing } = await supabase
+    .from("journal_likes")
+    .select("id")
+    .eq("journal_id", journalId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (existing) {
+    return unlikeJournal(journalId);
+  } else {
+    return likeJournal(journalId);
+  }
+}

@@ -62,9 +62,12 @@ import ActivityFeed from "@/pages/ActivityFeed";
 import Leaderboards from "@/pages/Leaderboards";
 import TravelJournals from "@/pages/TravelJournals";
 import CreateJournal from "@/pages/CreateJournal";
+import JournalSingle from "@/pages/JournalSingle";
 import PhotoContests from "@/pages/PhotoContests";
+import ContestSingle from "@/pages/ContestSingle";
 import CommunityChallenges from "@/pages/CommunityChallenges";
 import SuggestObjective from "@/pages/SuggestObjective";
+import SuggestionsAdmin from "@/pages/admin/SuggestionsAdmin";
 
 const queryClient = new QueryClient();
 
@@ -109,7 +112,9 @@ const App = () => (
               <Route path="leaderboards" element={<Leaderboards />} />
               <Route path="journals" element={<TravelJournals />} />
               <Route path="journals/new" element={<ProtectedRoute><CreateJournal /></ProtectedRoute>} />
+              <Route path="journals/:slug" element={<JournalSingle />} />
               <Route path="contests" element={<PhotoContests />} />
+              <Route path="contests/:slug" element={<ContestSingle />} />
               <Route path="challenges" element={<CommunityChallenges />} />
               <Route path="suggest-objective" element={<ProtectedRoute><SuggestObjective /></ProtectedRoute>} />
             </Route>
@@ -141,6 +146,7 @@ const App = () => (
               <Route path="utilizatori" element={<ProtectedRoute requireRole="admin"><UsersPage /></ProtectedRoute>} />
               <Route path="import" element={<BulkImport />} />
               <Route path="templates" element={<Templates />} />
+              <Route path="suggestions" element={<SuggestionsAdmin />} />
             </Route>
 
             {/* Forum Admin Route */}
