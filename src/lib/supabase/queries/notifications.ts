@@ -41,8 +41,7 @@ export async function getUserNotifications(
     .select(`
       *,
       actor:profiles!forum_notifications_actor_id_fkey(id, full_name, avatar_url),
-      post:forum_posts!forum_notifications_post_id_fkey(title, slug, category_id),
-      category:forum_posts!forum_notifications_post_id_fkey(category:forum_categories(slug))
+      post:forum_posts!forum_notifications_post_id_fkey(title, slug, category_id)
     `, { count: 'exact' })
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
@@ -55,8 +54,34 @@ export async function getUserNotifications(
 
   const { data, error, count } = await query;
   
-  if (error) throw error;
-  return { notifications: (data || []) as any[], count: count || 0 };
+  if (error) {
+    console.error('Error fetching notifications:', error);
+    throw error;
+  }
+  
+  // Fetch category info separately for posts that have it
+  const notifications = data || [];
+  if (notifications.length > 0) {
+    const postsWithCategories = notifications.filter(n => n.post?.category_id);
+    if (postsWithCategories.length > 0) {
+      const categoryIds = [...new Set(postsWithCategories.map(n => n.post.category_id))];
+      const { data: categories } = await supabase
+        .from('forum_categories')
+        .select('id, slug')
+        .in('id', categoryIds);
+      
+      if (categories) {
+        const categoryMap = Object.fromEntries(categories.map(c => [c.id, c]));
+        notifications.forEach(n => {
+          if (n.post?.category_id) {
+            n.category = categoryMap[n.post.category_id];
+          }
+        });
+      }
+    }
+  }
+  
+  return { notifications: notifications as any[], count: count || 0 };
 }
 
 /**
@@ -122,13 +147,24 @@ export function subscribeToNotifications(
           .select(`
             *,
             actor:profiles!forum_notifications_actor_id_fkey(id, full_name, avatar_url),
-            post:forum_posts!forum_notifications_post_id_fkey(title, slug, category_id),
-            category:forum_posts!forum_notifications_post_id_fkey(category:forum_categories(slug))
+            post:forum_posts!forum_notifications_post_id_fkey(title, slug, category_id)
           `)
           .eq('id', payload.new.id)
           .single();
         
         if (data) {
+          // Fetch category separately if needed
+          if (data.post?.category_id) {
+            const { data: category } = await supabase
+              .from('forum_categories')
+              .select('slug')
+              .eq('id', data.post.category_id)
+              .single();
+            
+            if (category) {
+              (data as any).category = category;
+            }
+          }
           callback(data as any);
         }
       }
