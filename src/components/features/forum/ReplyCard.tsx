@@ -8,6 +8,7 @@ import { ro } from "date-fns/locale";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import type { ForumReply } from "@/types/forum";
+import { MarkdownContent } from "./MarkdownContent";
 import { ReplyForm } from "./ReplyForm";
 
 interface ReplyCardProps {
@@ -95,8 +96,8 @@ export function ReplyCard({
             </div>
           </div>
         ) : (
-          <div className="prose prose-sm max-w-none mb-3 text-foreground">
-            {reply.content}
+          <div className="mb-3">
+            <MarkdownContent content={reply.content} />
           </div>
         )}
 

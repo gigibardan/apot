@@ -52,6 +52,7 @@ import TestDatabase from "@/pages/TestDatabase";
 import ForumHomePage from "@/pages/ForumHomePage";
 import ForumCategoryPage from "@/pages/ForumCategoryPage";
 import ForumPostPage from "@/pages/ForumPostPage";
+import ForumAdmin from "@/pages/admin/ForumAdmin";
 
 const queryClient = new QueryClient();
 
@@ -111,6 +112,9 @@ const App = () => (
               <Route path="import" element={<BulkImport />} />
               <Route path="templates" element={<Templates />} />
             </Route>
+
+            {/* Forum Admin Route */}
+            <Route path="/admin/forum" element={<ProtectedRoute><ForumAdmin /></ProtectedRoute>} />
 
             {/* Auth Routes */}
             <Route path="/auth/login" element={<LoginPage />} />
