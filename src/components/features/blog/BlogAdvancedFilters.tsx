@@ -83,7 +83,6 @@ export function BlogAdvancedFilters({
               <SelectValue placeholder="Toate categoriile" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toate categoriile</SelectItem>
               <SelectItem value="călătorii">Călătorii</SelectItem>
               <SelectItem value="cultură">Cultură</SelectItem>
               <SelectItem value="istorie">Istorie</SelectItem>
