@@ -19,6 +19,8 @@ import BlogArticle from "@/pages/BlogArticle";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 import AdminDashboard from "@/pages/admin/Dashboard";
+import ObjectivesAdmin from "@/pages/admin/ObjectivesAdmin";
+import ObjectiveForm from "@/pages/admin/ObjectiveForm";
 import LoginPage from "@/pages/auth/Login";
 import NotFound from "@/pages/NotFound";
 import TestDatabase from "@/pages/TestDatabase";
@@ -48,6 +50,8 @@ const App = () => (
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
+              <Route path="obiective" element={<ObjectivesAdmin />} />
+              <Route path="obiective/:id" element={<ObjectiveForm />} />
             </Route>
 
             {/* Auth Routes */}
