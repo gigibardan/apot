@@ -13,6 +13,7 @@ import { ObjectiveCard } from "@/components/features/objectives/ObjectiveCard";
 import { CircuitCard } from "@/components/features/circuits/CircuitCard";
 import { ArticleCard } from "@/components/features/blog/ArticleCard";
 import { NewsletterSignup } from "@/components/features/newsletter/NewsletterSignup";
+import { FeaturedGuides } from "@/components/features/guides/FeaturedGuides";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { seoDefaults } from "@/lib/constants/seo-defaults";
 import { getContinents } from "@/lib/supabase/queries/taxonomies";
@@ -557,6 +558,9 @@ export default function HomePage() {
           </div>
         </Container>
       </Section>
+
+      {/* Featured Guides Section */}
+      <FeaturedGuides limit={6} />
 
       {/* Final CTA Section */}
       <Section className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10">
