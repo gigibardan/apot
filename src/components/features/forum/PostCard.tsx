@@ -6,6 +6,7 @@ import { MessageSquare, Eye, ThumbsUp, Pin, Lock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
 import type { ForumPost } from "@/types/forum";
+import { ReputationBadge } from "./ReputationBadge";
 
 interface PostCardProps {
   post: ForumPost;
@@ -49,6 +50,7 @@ export function PostCard({ post, categorySlug }: PostCardProps) {
               {/* Meta info */}
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-2">
                 <span>de {authorName}</span>
+                {post.author?.id && <ReputationBadge userId={post.author.id} showPoints={false} />}
                 <span>•</span>
                 <span>
                   {formatDistanceToNow(new Date(post.created_at), {

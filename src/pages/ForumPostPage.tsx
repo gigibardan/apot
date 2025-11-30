@@ -26,6 +26,8 @@ import { ro } from "date-fns/locale";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { MarkdownContent } from "@/components/features/forum/MarkdownContent";
+import { ReputationBadge } from "@/components/features/forum/ReputationBadge";
+import { SubscribeButton } from "@/components/features/forum/SubscribeButton";
 import { 
   getPostBySlug, 
   getRepliesForPost,
@@ -192,6 +194,7 @@ export default function ForumPostPage() {
               </div>
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <span>de {authorName}</span>
+                {post.author?.id && <ReputationBadge userId={post.author.id} />}
                 <span>•</span>
                 <span>
                   {formatDistanceToNow(new Date(post.created_at), {
@@ -259,6 +262,10 @@ export default function ForumPostPage() {
               <Eye className="h-3 w-3 mr-1" />
               {post.views_count} vizualizări
             </Badge>
+
+            <div className="ml-auto">
+              <SubscribeButton postId={post.id} />
+            </div>
 
             {!isOwner && user && (
               <Button size="sm" variant="ghost">
