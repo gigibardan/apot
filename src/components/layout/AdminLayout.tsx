@@ -37,8 +37,9 @@ const sidebarLinks = [
   { name: "Blog", href: ADMIN_ROUTES.blog, icon: FileText, showDrafts: true },
   { name: "Circuite", href: ADMIN_ROUTES.circuits, icon: Bus },
   { name: "Ghizi", href: ADMIN_ROUTES.guides, icon: Users },
-  { name: "Recenzii", href: "/admin/recenzii", icon: MessageCircle },
+  { name: "Forum", href: ADMIN_ROUTES.forum, icon: MessageCircle },
   { name: "Media", href: ADMIN_ROUTES.media, icon: Image },
+  { name: "Newsletter", href: ADMIN_ROUTES.newsletter, icon: FileText },
   { name: "Setări", href: ADMIN_ROUTES.settings, icon: Settings },
 ];
 
