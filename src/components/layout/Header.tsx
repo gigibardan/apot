@@ -187,6 +187,48 @@ export function Header() {
                 </Link>
               ))}
 
+              {/* Community Links - Mobile */}
+              <div className="px-4 py-2">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">COMMUNITY</p>
+                <div className="space-y-2">
+                  <Link
+                    to="/feed"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  >
+                    Activity Feed
+                  </Link>
+                  <Link
+                    to="/journals"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  >
+                    Travel Journals
+                  </Link>
+                  <Link
+                    to="/contests"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  >
+                    Photo Contests
+                  </Link>
+                  <Link
+                    to="/challenges"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  >
+                    Challenges
+                  </Link>
+                  <Link
+                    to="/leaderboards"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  >
+                    Leaderboards
+                  </Link>
+                </div>
+              </div>
+
               {user && (
                 <button
                   onClick={() => {

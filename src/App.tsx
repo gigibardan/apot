@@ -68,6 +68,8 @@ import ContestSingle from "@/pages/ContestSingle";
 import CommunityChallenges from "@/pages/CommunityChallenges";
 import SuggestObjective from "@/pages/SuggestObjective";
 import SuggestionsAdmin from "@/pages/admin/SuggestionsAdmin";
+import ContestsAdmin from "@/pages/admin/ContestsAdmin";
+import ChallengesAdmin from "@/pages/admin/ChallengesAdmin";
 
 const queryClient = new QueryClient();
 
@@ -147,6 +149,8 @@ const App = () => (
               <Route path="import" element={<BulkImport />} />
               <Route path="templates" element={<Templates />} />
               <Route path="suggestions" element={<SuggestionsAdmin />} />
+              <Route path="contests" element={<ContestsAdmin />} />
+              <Route path="challenges" element={<ChallengesAdmin />} />
             </Route>
 
             {/* Forum Admin Route */}
