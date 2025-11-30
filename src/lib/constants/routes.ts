@@ -18,6 +18,7 @@ export const PUBLIC_ROUTES = {
 
 export const ADMIN_ROUTES = {
   dashboard: "/admin",
+  analytics: "/admin/analytics",
   objectives: "/admin/obiective",
   objectivesCreate: "/admin/obiective/nou",
   objectivesEdit: (id: string) => `/admin/obiective/${id}`,
