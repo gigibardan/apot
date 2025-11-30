@@ -3,24 +3,55 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
+// Layouts
+import PublicLayout from "@/components/layout/PublicLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
+
+// Pages
+import HomePage from "@/pages/HomePage";
+import ObjectivesPage from "@/pages/ObjectivesPage";
+import BlogPage from "@/pages/BlogPage";
+import AboutPage from "@/pages/AboutPage";
+import ContactPage from "@/pages/ContactPage";
+import AdminDashboard from "@/pages/admin/Dashboard";
+import LoginPage from "@/pages/auth/Login";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<PublicLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="obiective" element={<ObjectivesPage />} />
+              <Route path="blog" element={<BlogPage />} />
+              <Route path="despre" element={<AboutPage />} />
+              <Route path="contact" element={<ContactPage />} />
+            </Route>
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+            </Route>
+
+            {/* Auth Routes */}
+            <Route path="/auth/login" element={<LoginPage />} />
+
+            {/* Catch All */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

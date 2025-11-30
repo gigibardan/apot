@@ -1,73 +1,113 @@
-# Welcome to your Lovable project
+# APOT.RO - Tourism Platform
 
-## Project info
+## 🌍 Overview
 
-**URL**: https://lovable.dev/projects/055d8f0c-0c2b-4491-8887-3cabf81e0a40
+APOT (Asociația pentru Protejarea Obiectivelor Turistice) is an enterprise-grade web platform for discovering tourist attractions worldwide. Built with React, TypeScript, Tailwind CSS, and React Router.
 
-## How can I edit this code?
+## 🚀 Quick Start
 
-There are several ways of editing your application.
+```bash
+# Install dependencies
+npm install
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/055d8f0c-0c2b-4491-8887-3cabf81e0a40) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📁 Project Structure
 
-**Use GitHub Codespaces**
+```
+src/
+├── components/
+│   ├── ui/              # shadcn/ui components
+│   ├── layout/          # Header, Footer, Container, Section, Layouts
+│   └── providers/       # ThemeProvider
+├── pages/               # Page components (Home, Objectives, Blog, etc.)
+├── lib/
+│   ├── config/          # Site configuration
+│   ├── constants/       # Routes, SEO defaults
+│   └── utils.ts         # Utility functions
+├── types/               # TypeScript types
+└── index.css           # Design system & Tailwind
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎨 Design System
 
-## What technologies are used for this project?
+### Colors
+- **Primary:** Orange `#F97316`
+- **Accent:** Red `#DC2626`
+- **Neutral:** Slate palette
 
-This project is built with:
+### Typography
+- **Display (headings):** Montserrat (Google Fonts)
+- **Body:** Inter (Google Fonts)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Features
+- ✅ Dark/Light/System mode
+- ✅ Fully responsive (mobile-first)
+- ✅ Accessible (WCAG AA)
+- ✅ TypeScript strict mode
+- ✅ SEO optimized
 
-## How can I deploy this project?
+## 🛠️ Tech Stack
 
-Simply open [Lovable](https://lovable.dev/projects/055d8f0c-0c2b-4491-8887-3cabf81e0a40) and click on Share -> Publish.
+- **Frontend:** React 18 + Vite
+- **Routing:** React Router v6
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Language:** TypeScript (strict)
+- **State:** React Query
+- **Theme:** next-themes
 
-## Can I connect a custom domain to my Lovable project?
+## 📝 Available Scripts
 
-Yes, you can!
+```bash
+npm run dev          # Development server
+npm run build        # Production build
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🔄 Development Phases
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### ✅ Phase 1 (Current)
+- Project setup & architecture
+- Design system foundation
+- Layout components (Header, Footer, Container, Section)
+- Public routes (Home, Objectives, Blog, About, Contact)
+- Admin panel structure
+- Dark mode support
+
+### 🔄 Phase 2 (Next)
+- Lovable Cloud integration
+- Database schema
+- Authentication system
+- Media upload functionality
+
+### 📅 Future Phases
+- CRUD tourist objectives
+- Blog management
+- Advanced search & filters
+- SEO optimization
+- AI features
+- Multi-language support
+
+## 📚 Documentation
+
+See `/docs` folder for detailed documentation:
+- `README.md` - Project overview
+- `ARCHITECTURE.md` - Complete architecture guide (to be added)
+
+## 🤝 Contributing
+
+Project in active development. Contributing guidelines coming soon.
+
+## 📄 License
+
+All rights reserved © APOT
+
+---
+
+**Version:** 1.0.0  
+**Last Updated:** [Date]
