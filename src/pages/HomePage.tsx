@@ -4,15 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
+import { SEO } from "@/components/seo/SEO";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
+import { seoDefaults } from "@/lib/constants/seo-defaults";
 
 /**
  * Homepage
  * Main landing page with hero, features preview, and CTAs
  */
 export default function HomePage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "APOT",
+    url: "https://apot.ro",
+    description: seoDefaults.defaultDescription,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://apot.ro/obiective?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <>
+      <SEO
+        title="Acasă"
+        description={seoDefaults.defaultDescription}
+        canonical="/"
+        structuredData={structuredData}
+      />
       {/* Hero Section */}
       <Section className="hero-gradient">
         <Container className="text-center">

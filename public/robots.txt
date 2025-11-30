@@ -1,14 +1,15 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# APOT - Tourist Objectives Platform
+# Robots.txt configuration
 
 User-agent: *
 Allow: /
+
+# Disallow admin area
+Disallow: /admin
+Disallow: /auth
+
+# Sitemap location (edge function)
+Sitemap: https://apot.ro/sitemap
+
+# Crawl-delay (optional, for aggressive bots)
+Crawl-delay: 1
