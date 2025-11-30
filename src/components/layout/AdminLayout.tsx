@@ -1,6 +1,19 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { LayoutDashboard, MapPin, FileText, Image, Settings, Bus, ExternalLink, LogOut, Menu, X } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  LayoutDashboard,
+  MapPin,
+  FileText,
+  Bus,
+  Image,
+  Settings,
+  Users,
+  Menu,
+  X,
+  LogOut,
+  Eye,
+} from "lucide-react";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +21,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getDashboardStats } from "@/lib/supabase/queries/admin";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
   { name: "Dashboard", href: ADMIN_ROUTES.dashboard, icon: LayoutDashboard },
@@ -30,11 +46,21 @@ const sidebarLinks = [
  */
 export default function AdminLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, userRole, signOut, isAdmin } = useAuth();
+  const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [draftCounts, setDraftCounts] = useState<{ objectives: number; articles: number }>({
     objectives: 0,
     articles: 0,
   });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // All sidebar links including conditional Users link for admins
+  const allSidebarLinks = [
+    ...sidebarLinks,
+    ...(isAdmin ? [{ name: "Utilizatori", href: "/admin/utilizatori", icon: Users, showDrafts: false }] : []),
+  ];
 
   useEffect(() => {
     loadDraftCounts();
@@ -56,6 +82,47 @@ export default function AdminLayout() {
     if (linkName === "Obiective") return draftCounts.objectives;
     if (linkName === "Blog") return draftCounts.articles;
     return 0;
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      toast({
+        title: "Deconectat cu succes",
+        description: "Ai fost deconectat din contul tău",
+      });
+      navigate("/auth/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        variant: "destructive",
+        title: "Eroare",
+        description: "Nu s-a putut deconecta. Încearcă din nou.",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const getUserInitials = () => {
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return "U";
+  };
+
+  const getUserRoleLabel = () => {
+    switch (userRole) {
+      case "admin":
+        return "Administrator";
+      case "editor":
+        return "Editor";
+      case "contributor":
+        return "Contributor";
+      default:
+        return "Utilizator";
+    }
   };
 
   return (
@@ -92,7 +159,7 @@ export default function AdminLayout() {
           </Button>
         </div>
         <nav className="space-y-1 p-4">
-          {sidebarLinks.map((link) => {
+          {allSidebarLinks.map((link) => {
             const Icon = link.icon;
             const isActive =
               location.pathname === link.href ||
@@ -147,34 +214,42 @@ export default function AdminLayout() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback>AD</AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {getUserInitials()}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <div className="flex items-center justify-start gap-2 p-2">
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">Admin User</p>
-                    <p className="text-xs text-muted-foreground">Administrator</p>
+                    <p className="text-sm font-medium leading-none">{user?.email}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {getUserRoleLabel()}
+                    </p>
                   </div>
-                </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <a href={PUBLIC_ROUTES.home} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-2 h-4 w-4" />
+                  <a href={PUBLIC_ROUTES.home} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                    <Eye className="mr-2 h-4 w-4" />
                     Vezi Site-ul
                   </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to={ADMIN_ROUTES.settings}>
+                  <Link to={ADMIN_ROUTES.settings} className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     Setări
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+                  {isLoggingOut ? "Se deconectează..." : "Deconectare"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

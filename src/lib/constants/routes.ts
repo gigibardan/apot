@@ -26,6 +26,7 @@ export const ADMIN_ROUTES = {
   circuitsEdit: (id: string) => `/admin/circuite/${id}/edit`,
   media: "/admin/media",
   settings: "/admin/setari",
+  users: "/admin/utilizatori",
 } as const;
 
 export const AUTH_ROUTES = {
