@@ -17,34 +17,43 @@ export type Database = {
       activity_logs: {
         Row: {
           action: string
+          changes_data: Json | null
           created_at: string
           entity_id: string | null
           entity_type: string | null
           id: string
           ip_address: unknown
           metadata: Json | null
+          session_id: string | null
+          severity: string | null
           user_agent: string | null
           user_id: string | null
         }
         Insert: {
           action: string
+          changes_data?: Json | null
           created_at?: string
           entity_id?: string | null
           entity_type?: string | null
           id?: string
           ip_address?: unknown
           metadata?: Json | null
+          session_id?: string | null
+          severity?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
         Update: {
           action?: string
+          changes_data?: Json | null
           created_at?: string
           entity_id?: string | null
           entity_type?: string | null
           id?: string
           ip_address?: unknown
           metadata?: Json | null
+          session_id?: string | null
+          severity?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -310,6 +319,39 @@ export type Database = {
           updated_at?: string | null
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      content_revisions: {
+        Row: {
+          change_summary: string | null
+          changed_at: string
+          changed_by: string
+          content_snapshot: Json
+          entity_id: string
+          entity_type: string
+          id: string
+          revision_number: number
+        }
+        Insert: {
+          change_summary?: string | null
+          changed_at?: string
+          changed_by: string
+          content_snapshot: Json
+          entity_id: string
+          entity_type: string
+          id?: string
+          revision_number: number
+        }
+        Update: {
+          change_summary?: string | null
+          changed_at?: string
+          changed_by?: string
+          content_snapshot?: Json
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          revision_number?: number
         }
         Relationships: []
       }
@@ -2158,6 +2200,125 @@ export type Database = {
           },
         ]
       }
+      scheduled_actions: {
+        Row: {
+          action_type: Database["public"]["Enums"]["scheduled_action_type"]
+          created_at: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          error_message: string | null
+          executed_at: string | null
+          id: string
+          metadata: Json | null
+          scheduled_for: string
+          status: Database["public"]["Enums"]["scheduled_action_status"]
+          updated_at: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["scheduled_action_type"]
+          created_at?: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          scheduled_for: string
+          status?: Database["public"]["Enums"]["scheduled_action_status"]
+          updated_at?: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["scheduled_action_type"]
+          created_at?: string
+          created_by?: string
+          entity_id?: string
+          entity_type?: string
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          scheduled_for?: string
+          status?: Database["public"]["Enums"]["scheduled_action_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      seo_audit_issues: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          fix_suggestion: string | null
+          id: string
+          issue_type: string
+          message: string
+          report_id: string
+          severity: Database["public"]["Enums"]["seo_issue_severity"]
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          fix_suggestion?: string | null
+          id?: string
+          issue_type: string
+          message: string
+          report_id: string
+          severity: Database["public"]["Enums"]["seo_issue_severity"]
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          fix_suggestion?: string | null
+          id?: string
+          issue_type?: string
+          message?: string
+          report_id?: string
+          severity?: Database["public"]["Enums"]["seo_issue_severity"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_audit_issues_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "seo_audit_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_audit_reports: {
+        Row: {
+          created_by: string
+          id: string
+          issues_count: number
+          metadata: Json | null
+          overall_score: number
+          scanned_at: string
+          total_pages: number
+        }
+        Insert: {
+          created_by: string
+          id?: string
+          issues_count: number
+          metadata?: Json | null
+          overall_score: number
+          scanned_at?: string
+          total_pages: number
+        }
+        Update: {
+          created_by?: string
+          id?: string
+          issues_count?: number
+          metadata?: Json | null
+          overall_score?: number
+          scanned_at?: string
+          total_pages?: number
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           description: string | null
@@ -2307,6 +2468,45 @@ export type Database = {
           badge_name?: string
           earned_at?: string
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_bans: {
+        Row: {
+          ban_type: string
+          banned_at: string
+          banned_by: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          ban_type: string
+          banned_at?: string
+          banned_by: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          ban_type?: string
+          banned_at?: string
+          banned_by?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          reason?: string
           user_id?: string
         }
         Relationships: []
@@ -2508,7 +2708,21 @@ export type Database = {
         Returns: undefined
       }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
+      expire_suspensions: { Args: never; Returns: undefined }
       has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
+      is_user_banned: { Args: { _user_id: string }; Returns: boolean }
+      log_activity: {
+        Args: {
+          p_action: string
+          p_changes_data?: Json
+          p_entity_id: string
+          p_entity_type: string
+          p_metadata?: Json
+          p_severity?: string
+          p_user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       activity_type:
@@ -2537,6 +2751,14 @@ export type Database = {
       contest_status: "upcoming" | "active" | "voting" | "ended"
       difficulty_level: "easy" | "moderate" | "difficult" | "extreme"
       reward_type: "badge" | "points" | "both"
+      scheduled_action_status: "pending" | "executed" | "cancelled" | "failed"
+      scheduled_action_type:
+        | "publish"
+        | "unpublish"
+        | "feature"
+        | "unfeature"
+        | "archive"
+      seo_issue_severity: "critical" | "warning" | "info"
       suggestion_status: "pending" | "approved" | "rejected"
       user_role_type: "admin" | "editor" | "contributor" | "user"
     }
@@ -2695,6 +2917,15 @@ export const Constants = {
       contest_status: ["upcoming", "active", "voting", "ended"],
       difficulty_level: ["easy", "moderate", "difficult", "extreme"],
       reward_type: ["badge", "points", "both"],
+      scheduled_action_status: ["pending", "executed", "cancelled", "failed"],
+      scheduled_action_type: [
+        "publish",
+        "unpublish",
+        "feature",
+        "unfeature",
+        "archive",
+      ],
+      seo_issue_severity: ["critical", "warning", "info"],
       suggestion_status: ["pending", "approved", "rejected"],
       user_role_type: ["admin", "editor", "contributor", "user"],
     },

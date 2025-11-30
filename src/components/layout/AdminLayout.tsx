@@ -14,6 +14,9 @@ import {
   LogOut,
   Eye,
   MessageCircle,
+  Activity,
+  ShieldOff,
+  CalendarClock,
 } from "lucide-react";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { Button } from "@/components/ui/button";
@@ -44,6 +47,9 @@ const sidebarLinks = [
   { name: "Sugestii", href: "/admin/suggestions", icon: FileText },
   { name: "Contests", href: "/admin/contests", icon: FileText },
   { name: "Challenges", href: "/admin/challenges", icon: FileText },
+  { name: "Activity Logs", href: "/admin/activity-logs", icon: Activity },
+  { name: "Bans", href: "/admin/user-bans", icon: ShieldOff },
+  { name: "Scheduled", href: "/admin/scheduled", icon: CalendarClock },
   { name: "Setări", href: ADMIN_ROUTES.settings, icon: Settings },
 ];
 
