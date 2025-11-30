@@ -18,6 +18,7 @@ import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReviewForm } from "@/components/features/guides/ReviewForm";
 import { ReviewList } from "@/components/features/guides/ReviewList";
+import { useTranslatedGuide } from "@/hooks/useTranslatedContent";
 
 export default function GuideSinglePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -27,11 +28,14 @@ export default function GuideSinglePage() {
   const [reviewsPage, setReviewsPage] = useState(1);
   const reviewsPerPage = 10;
 
-  const { data: guide, isLoading, error } = useQuery({
+  const { data: guideData, isLoading, error } = useQuery({
     queryKey: ["guide", slug],
     queryFn: () => getGuideBySlug(slug!),
     enabled: !!slug,
   });
+
+  // Get translated content
+  const { content: guide, isLoading: translationLoading } = useTranslatedGuide(guideData);
 
   const {
     data: reviewsData,
@@ -55,7 +59,7 @@ export default function GuideSinglePage() {
     enabled: !!guide?.id && isAuthenticated,
   });
 
-  if (isLoading) {
+  if (isLoading || translationLoading) {
     return <LoadingSpinner />;
   }
 

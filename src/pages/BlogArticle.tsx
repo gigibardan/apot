@@ -24,14 +24,18 @@ import type { BlogArticle } from "@/types/database.types";
 import { Calendar, Clock, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { ro } from "date-fns/locale";
+import { useTranslatedBlogArticle } from "@/hooks/useTranslatedContent";
 
 export default function BlogArticle() {
   const { slug } = useParams<{ slug: string }>();
-  const [article, setArticle] = useState<BlogArticle | null>(null);
+  const [articleData, setArticleData] = useState<BlogArticle | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<BlogArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Get translated content
+  const { content: article, isLoading: translationLoading } = useTranslatedBlogArticle(articleData);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -43,7 +47,7 @@ export default function BlogArticle() {
 
       try {
         const data = await getBlogArticleBySlug(slug);
-        setArticle(data);
+        setArticleData(data);
 
         // Increment views
         incrementArticleViews(data.id).catch(console.error);
@@ -137,7 +141,7 @@ export default function BlogArticle() {
   const readingTime = article?.reading_time || (article?.content ? calculateReadingTime(article.content) : 0);
 
   // Loading state
-  if (loading) {
+  if (loading || translationLoading) {
     return (
       <>
         <SEO title="Se încarcă..." />
