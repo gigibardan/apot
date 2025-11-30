@@ -13,6 +13,7 @@ import {
   X,
   LogOut,
   Eye,
+  MessageCircle,
 } from "lucide-react";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ const sidebarLinks = [
   { name: "Blog", href: ADMIN_ROUTES.blog, icon: FileText, showDrafts: true },
   { name: "Circuite", href: ADMIN_ROUTES.circuits, icon: Bus },
   { name: "Ghizi", href: ADMIN_ROUTES.guides, icon: Users },
+  { name: "Recenzii", href: "/admin/recenzii", icon: MessageCircle },
   { name: "Media", href: ADMIN_ROUTES.media, icon: Image },
   { name: "Setări", href: ADMIN_ROUTES.settings, icon: Settings },
 ];

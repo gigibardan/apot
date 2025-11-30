@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { SEO } from "@/components/seo/SEO";
@@ -6,17 +7,48 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGuideBySlug } from "@/lib/supabase/queries/guides";
+import { getGuideReviews } from "@/lib/supabase/queries/reviews";
+import { canReviewGuide, getUserReview } from "@/lib/supabase/mutations/reviews";
 import { Star, Shield, MapPin, Languages, Mail, Phone, Globe, MessageCircle, Calendar } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { ReviewForm } from "@/components/features/guides/ReviewForm";
+import { ReviewList } from "@/components/features/guides/ReviewList";
 
 export default function GuideSinglePage() {
   const { slug } = useParams<{ slug: string }>();
+  const { isAuthenticated, user } = useAuth();
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const reviewsPerPage = 10;
 
   const { data: guide, isLoading, error } = useQuery({
     queryKey: ["guide", slug],
     queryFn: () => getGuideBySlug(slug!),
     enabled: !!slug,
+  });
+
+  const {
+    data: reviewsData,
+    isLoading: reviewsLoading,
+    refetch: refetchReviews,
+  } = useQuery({
+    queryKey: ["guide-reviews", guide?.id, reviewsPage],
+    queryFn: () => getGuideReviews(guide!.id, reviewsPerPage, (reviewsPage - 1) * reviewsPerPage),
+    enabled: !!guide?.id,
+  });
+
+  const { data: canReview } = useQuery({
+    queryKey: ["can-review-guide", guide?.id, user?.id],
+    queryFn: () => canReviewGuide(guide!.id),
+    enabled: !!guide?.id && isAuthenticated,
+  });
+
+  const { data: userReview, refetch: refetchUserReview } = useQuery({
+    queryKey: ["user-review-guide", guide?.id, user?.id],
+    queryFn: () => getUserReview(guide!.id),
+    enabled: !!guide?.id && isAuthenticated,
   });
 
   if (isLoading) {
@@ -228,57 +260,86 @@ export default function GuideSinglePage() {
               </Card>
             )}
 
-            {/* Reviews */}
-            {guide.reviews && guide.reviews.length > 0 && (
+            {/* Review Form */}
+            {isAuthenticated && canReview && !showReviewForm && !userReview && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Recenzii ({guide.reviews_count})</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {guide.reviews.map((review: any) => (
-                    <div key={review.id}>
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className="flex items-center gap-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? "fill-yellow-400 text-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span className="font-semibold">{review.user?.full_name}</span>
-                          </div>
-                          {review.title && (
-                            <div className="font-medium mb-1">{review.title}</div>
-                          )}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {formatDate(review.created_at)}
-                        </div>
-                      </div>
-                      {review.comment && <p className="text-muted-foreground">{review.comment}</p>}
-                      {review.travel_date && (
-                        <div className="text-sm text-muted-foreground mt-1">
-                          Călătorie: {formatDate(review.travel_date)}
-                        </div>
-                      )}
-                      {review.guide_response && (
-                        <div className="mt-3 ml-6 p-3 bg-muted rounded-lg">
-                          <div className="font-semibold text-sm mb-1">Răspuns de la ghid:</div>
-                          <p className="text-sm">{review.guide_response}</p>
-                        </div>
-                      )}
-                      <Separator className="mt-6" />
-                    </div>
-                  ))}
+                <CardContent className="py-6 text-center">
+                  <p className="text-muted-foreground mb-4">
+                    Ai călătorit cu {guide.full_name}? Lasă o recenzie!
+                  </p>
+                  <Button onClick={() => setShowReviewForm(true)}>Scrie o Recenzie</Button>
                 </CardContent>
               </Card>
+            )}
+
+            {isAuthenticated && userReview && !showReviewForm && (
+              <Card>
+                <CardContent className="py-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Recenzia ta</h3>
+                    <Button variant="outline" size="sm" onClick={() => setShowReviewForm(true)}>
+                      Editează
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-1 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${
+                          i < userReview.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  {userReview.title && <p className="font-medium mb-1">{userReview.title}</p>}
+                  {userReview.comment && <p className="text-muted-foreground">{userReview.comment}</p>}
+                  {!userReview.approved && (
+                    <Badge variant="secondary" className="mt-2">
+                      În așteptare de aprobare
+                    </Badge>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {showReviewForm && (
+              <ReviewForm
+                guideId={guide.id}
+                guideName={guide.full_name}
+                existingReview={userReview || undefined}
+                onSuccess={() => {
+                  setShowReviewForm(false);
+                  refetchReviews();
+                  refetchUserReview();
+                }}
+                onCancel={() => setShowReviewForm(false)}
+              />
+            )}
+
+            {!isAuthenticated && (
+              <Card>
+                <CardContent className="py-6 text-center">
+                  <p className="text-muted-foreground mb-4">
+                    Conectează-te pentru a lăsa o recenzie
+                  </p>
+                  <Button asChild>
+                    <Link to="/auth/login">Conectare</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Reviews List */}
+            {reviewsData && reviewsData.reviews && reviewsData.reviews.length > 0 && (
+              <ReviewList
+                reviews={reviewsData.reviews}
+                totalCount={reviewsData.count || 0}
+                currentPage={reviewsPage}
+                pageSize={reviewsPerPage}
+                onPageChange={setReviewsPage}
+              />
             )}
           </div>
 
