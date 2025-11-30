@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Eye, Trash2, Loader2, FileText, Copy } from "lucide-react";
+import { Plus, Search, Pencil, Eye, Trash2, Loader2, FileText, Copy, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,9 @@ export default function BlogAdmin() {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<string>("");
+  const [bulkLoading, setBulkLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     id: string;
@@ -114,6 +117,95 @@ export default function BlogAdmin() {
     }
   }
 
+  function handleSelectAll(checked: boolean) {
+    if (checked) {
+      setSelectedIds(articles.map(art => art.id));
+    } else {
+      setSelectedIds([]);
+    }
+  }
+
+  function handleSelectOne(id: string, checked: boolean) {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(i => i !== id));
+    }
+  }
+
+  async function handleBulkAction() {
+    if (!bulkAction || selectedIds.length === 0) return;
+
+    setBulkLoading(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      if (bulkAction === "publish" || bulkAction === "unpublish") {
+        const published = bulkAction === "publish";
+        for (const id of selectedIds) {
+          try {
+            await toggleArticlePublish(id, published);
+            successCount++;
+          } catch (error) {
+            errorCount++;
+          }
+        }
+        toast.success(`${successCount} articole ${published ? "publicate" : "nepublicate"}`);
+      } else if (bulkAction === "delete") {
+        for (const id of selectedIds) {
+          try {
+            await deleteBlogArticle(id);
+            successCount++;
+          } catch (error) {
+            errorCount++;
+          }
+        }
+        toast.success(`${successCount} articole șterse`);
+      } else if (bulkAction === "export") {
+        exportToCSV();
+        toast.success("Export CSV inițiat");
+      }
+
+      if (errorCount > 0) {
+        toast.error(`${errorCount} operațiuni eșuate`);
+      }
+
+      setSelectedIds([]);
+      setBulkAction("");
+      loadData();
+    } catch (error) {
+      console.error("Bulk action error:", error);
+      toast.error("Eroare la executarea acțiunii în masă");
+    } finally {
+      setBulkLoading(false);
+    }
+  }
+
+  function exportToCSV() {
+    const selectedArts = articles.filter(art => selectedIds.includes(art.id));
+    const csv = [
+      ["ID", "Titlu", "Slug", "Categorie", "Status", "Featured", "Vizualizări"].join(","),
+      ...selectedArts.map(art => [
+        art.id,
+        `"${art.title}"`,
+        art.slug,
+        art.category || "",
+        art.published ? "Publicat" : "Draft",
+        art.featured ? "Da" : "Nu",
+        art.views_count || 0
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `articole_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   // Get unique categories from articles
   const categories = Array.from(
     new Set(articles.map((a) => a.category).filter(Boolean))
@@ -140,6 +232,42 @@ export default function BlogAdmin() {
           </Link>
         </Button>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedIds.length > 0 && (
+        <div className="sticky top-0 z-10 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="font-medium">{selectedIds.length} selectate</span>
+            <Select value={bulkAction} onValueChange={setBulkAction}>
+              <SelectTrigger className="w-48 bg-primary-foreground text-foreground">
+                <SelectValue placeholder="Alege acțiune" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="publish">Publică</SelectItem>
+                <SelectItem value="unpublish">Nepublică</SelectItem>
+                <SelectItem value="delete">Șterge</SelectItem>
+                <SelectItem value="export">Exportă CSV</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleBulkAction}
+              disabled={!bulkAction || bulkLoading}
+              variant="secondary"
+            >
+              {bulkLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Aplică
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedIds([])}
+            className="text-primary-foreground hover:text-primary-foreground/80"
+          >
+            Anulează
+          </Button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -213,6 +341,12 @@ export default function BlogAdmin() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedIds.length === articles.length && articles.length > 0}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
                 <TableHead className="w-20">Imagine</TableHead>
                 <TableHead>Titlu</TableHead>
                 <TableHead>Categorie</TableHead>
@@ -225,6 +359,12 @@ export default function BlogAdmin() {
             <TableBody>
               {articles.map((article) => (
                 <TableRow key={article.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.includes(article.id)}
+                      onCheckedChange={(checked) => handleSelectOne(article.id, checked === true)}
+                    />
+                  </TableCell>
                   <TableCell>
                     {article.featured_image ? (
                       <img
