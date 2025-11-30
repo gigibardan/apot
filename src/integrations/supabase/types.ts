@@ -1296,15 +1296,20 @@ export type Database = {
       }
       jinfotours_circuits: {
         Row: {
+          badge_color: string | null
+          badge_text: string | null
           countries: string[] | null
           created_at: string
           description: string | null
+          discount_percentage: number | null
+          discount_until: string | null
           duration_days: number | null
           external_url: string
           featured: boolean | null
           highlights: string[] | null
           id: string
           order_index: number
+          original_price: number | null
           price_from: number | null
           slug: string
           thumbnail_url: string | null
@@ -1312,15 +1317,20 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          badge_color?: string | null
+          badge_text?: string | null
           countries?: string[] | null
           created_at?: string
           description?: string | null
+          discount_percentage?: number | null
+          discount_until?: string | null
           duration_days?: number | null
           external_url: string
           featured?: boolean | null
           highlights?: string[] | null
           id?: string
           order_index?: number
+          original_price?: number | null
           price_from?: number | null
           slug: string
           thumbnail_url?: string | null
@@ -1328,15 +1338,20 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          badge_color?: string | null
+          badge_text?: string | null
           countries?: string[] | null
           created_at?: string
           description?: string | null
+          discount_percentage?: number | null
+          discount_until?: string | null
           duration_days?: number | null
           external_url?: string
           featured?: boolean | null
           highlights?: string[] | null
           id?: string
           order_index?: number
+          original_price?: number | null
           price_from?: number | null
           slug?: string
           thumbnail_url?: string | null

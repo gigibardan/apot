@@ -119,7 +119,7 @@ export function trackCircuitClick(
   circuitId: string,
   circuitName: string,
   destination: string,
-  source: "homepage" | "listing" | "objective_page" = "homepage"
+  source: "homepage" | "listing" | "objective_page" | "circuits-page" = "homepage"
 ) {
   trackEvent({
     eventType: "circuit_click",

@@ -1,8 +1,9 @@
-import { ExternalLink, MapPin, Clock, Euro } from "lucide-react";
+import { ExternalLink, MapPin, Clock, Euro, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { trackJinfoursClick } from "@/lib/supabase/queries/jinfotours";
 import type { JinfoursCircuit } from "@/types/database.types";
 
 interface CircuitCardProps {
@@ -12,19 +13,41 @@ interface CircuitCardProps {
 }
 
 /**
+ * Check if discount is still valid
+ */
+function isDiscountValid(discountUntil?: string | null): boolean {
+  if (!discountUntil) return false;
+  return new Date(discountUntil) > new Date();
+}
+
+/**
  * CircuitCard Component
  * Display Jinfotours partner circuits with commercial styling
- * Tracks clicks for affiliate analytics
+ * Tracks clicks for affiliate analytics and shows promotional badges
  */
 export function CircuitCard({
   circuit,
   onCtaClick,
   className,
 }: CircuitCardProps) {
-  const handleClick = () => {
+  const hasDiscount = circuit.discount_percentage && circuit.discount_percentage > 0 && isDiscountValid(circuit.discount_until);
+  const finalPrice = hasDiscount && circuit.original_price
+    ? circuit.original_price * (1 - circuit.discount_percentage / 100)
+    : circuit.price_from;
+
+  const handleClick = async () => {
+    // Track click
+    await trackJinfoursClick(circuit.id, {
+      sourceUrl: window.location.href,
+    });
+
+    // Call optional callback
     if (onCtaClick) {
       onCtaClick(circuit.id);
     }
+
+    // Open external link
+    window.open(circuit.external_url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -55,10 +78,32 @@ export function CircuitCard({
           </div>
         )}
 
-        {/* Featured Badge */}
-        {circuit.featured && (
-          <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground border-0">
-            Circuit Organizat
+        {/* Badges - Top Left */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {circuit.featured && (
+            <Badge className="bg-accent text-accent-foreground border-0">
+              Circuit Organizat
+            </Badge>
+          )}
+          {circuit.badge_text && (
+            <Badge 
+              style={{
+                backgroundColor: circuit.badge_color === 'destructive' ? 'hsl(var(--destructive))' : 
+                                circuit.badge_color === 'secondary' ? 'hsl(var(--secondary))' : 
+                                'hsl(var(--accent))',
+                color: 'hsl(var(--accent-foreground))'
+              }}
+            >
+              {circuit.badge_text}
+            </Badge>
+          )}
+        </div>
+
+        {/* Discount Badge - Top Right */}
+        {hasDiscount && (
+          <Badge className="absolute top-3 right-3 bg-destructive text-destructive-foreground flex items-center gap-1">
+            <TrendingDown className="w-3 h-3" />
+            -{circuit.discount_percentage}%
           </Badge>
         )}
       </div>
@@ -107,37 +152,49 @@ export function CircuitCard({
           )}
 
           {/* Price */}
-          {circuit.price_from && (
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Euro className="w-3 h-3" />
-                <span>De la</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Euro className="w-3 h-3" />
+              <span>De la</span>
+            </div>
+            {hasDiscount && circuit.original_price ? (
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground line-through">
+                  {circuit.original_price}€
+                </span>
+                <span className="text-sm font-bold text-destructive">
+                  {finalPrice?.toFixed(0)}€
+                </span>
               </div>
+            ) : (
               <span className="text-sm font-medium">
                 {circuit.price_from}€
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        {/* Discount validity */}
+        {hasDiscount && circuit.discount_until && (
+          <p className="text-xs text-destructive pt-2 border-t">
+            ⏰ Ofertă valabilă până la {new Date(circuit.discount_until).toLocaleDateString('ro-RO', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
+          </p>
+        )}
       </CardContent>
 
       {/* CTA */}
       <CardFooter className="p-5 pt-0">
         <Button
-          asChild
           variant="default"
           className="w-full bg-accent hover:bg-accent/90"
           onClick={handleClick}
         >
-          <a
-            href={circuit.external_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2"
-          >
-            <span>Vezi pe Jinfotours</span>
-            <ExternalLink className="w-4 h-4" />
-          </a>
+          <span>Vezi pe Jinfotours</span>
+          <ExternalLink className="w-4 h-4 ml-2" />
         </Button>
       </CardFooter>
     </Card>

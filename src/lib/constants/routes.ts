@@ -10,6 +10,7 @@ export const PUBLIC_ROUTES = {
   guides: "/ghizi",
   guideDetail: (slug: string) => `/ghid/${slug}`,
   authorizedGuidesList: "/ghizi-autorizati",
+  circuits: "/circuite",
   blog: "/blog",
   blogPost: (slug: string) => `/blog/${slug}`,
   about: "/despre",
