@@ -1,12 +1,15 @@
 "use client";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Heart } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/layout/Container";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
+import { useAuth } from "@/contexts/AuthContext";
+import { getFavoritesCount } from "@/lib/supabase/queries/favorites";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -25,10 +28,13 @@ const navigation = [
  */
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const pathname = location.pathname;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +44,23 @@ export function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadFavoritesCount();
+    } else {
+      setFavoritesCount(0);
+    }
+  }, [user, pathname]);
+
+  const loadFavoritesCount = async () => {
+    try {
+      const count = await getFavoritesCount();
+      setFavoritesCount(count);
+    } catch (error) {
+      console.error("Error loading favorites count:", error);
+    }
+  };
 
   return (
     <header
@@ -62,7 +85,7 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
+          <div className="hidden md:flex md:items-center md:space-x-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -77,6 +100,25 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+            {user && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/favorite")}
+                className="relative"
+              >
+                <Heart className="h-4 w-4 mr-2" />
+                Favorite
+                {favoritesCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {favoritesCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
           </div>
 
           {/* Theme Toggle & Mobile Menu Button */}
@@ -129,6 +171,26 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
+
+              {user && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/favorite");
+                  }}
+                  className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <Heart className="h-5 w-5" />
+                    Favorite
+                  </span>
+                  {favoritesCount > 0 && (
+                    <Badge variant="destructive" className="h-5 px-2 text-xs">
+                      {favoritesCount}
+                    </Badge>
+                  )}
+                </button>
+              )}
 
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
