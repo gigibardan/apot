@@ -4,6 +4,7 @@ import { SEO } from "@/components/seo/SEO";
 import { Card } from "@/components/ui/card";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { siteConfig } from "@/lib/config/site.config";
+import { ContactForm } from "@/components/features/contact/ContactForm";
 
 export default function ContactPage() {
   const structuredData = {
@@ -72,9 +73,12 @@ export default function ContactPage() {
             </div>
 
             <Card className="p-8">
-              <p className="text-center text-muted-foreground">
-                Formular de contact funcțional va fi implementat în fazele următoare
-              </p>
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-2xl font-display font-bold mb-6 text-center">
+                  Trimite-ne un mesaj
+                </h2>
+                <ContactForm />
+              </div>
             </Card>
           </div>
         </Container>
