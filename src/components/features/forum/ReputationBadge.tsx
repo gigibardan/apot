@@ -9,10 +9,15 @@ interface ReputationBadgeProps {
 }
 
 export function ReputationBadge({ userId, showPoints = true }: ReputationBadgeProps) {
-  const { data: reputation } = useQuery({
+  const { data: reputation, isLoading } = useQuery({
     queryKey: ['user-reputation', userId],
     queryFn: () => getUserReputation(userId),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+
+  if (isLoading) {
+    return <Badge variant="secondary" className="gap-1 animate-pulse">...</Badge>;
+  }
 
   if (!reputation) {
     return null;

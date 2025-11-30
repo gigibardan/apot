@@ -18,6 +18,7 @@ export function SubscribeButton({ postId }: SubscribeButtonProps) {
     queryKey: ['thread-subscription', postId, user?.id],
     queryFn: () => isSubscribedToThread(postId),
     enabled: !!user,
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 
   const subscribeMutation = useMutation({
