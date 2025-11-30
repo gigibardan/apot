@@ -28,6 +28,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   );
 
+  // Detect language from URL changes
+  useEffect(() => {
+    const pathParts = location.pathname.split("/").filter(Boolean);
+    const langFromPath = pathParts[0] as SupportedLanguage;
+    
+    if (Object.keys(SUPPORTED_LANGUAGES).includes(langFromPath)) {
+      if (langFromPath !== currentLanguage) {
+        setCurrentLanguage(langFromPath);
+      }
+    } else if (currentLanguage !== DEFAULT_LANGUAGE) {
+      setCurrentLanguage(DEFAULT_LANGUAGE);
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     // Sync i18n with current language
     if (i18n.language !== currentLanguage) {

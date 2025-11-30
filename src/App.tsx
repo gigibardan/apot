@@ -69,8 +69,8 @@ const App = () => (
             <BrowserRouter>
               <LanguageProvider>
                 <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<PublicLayout />}>
+            {/* Public Routes - with optional language prefix */}
+            <Route path="/:lang?" element={<PublicLayout />}>
               <Route index element={<HomePage />} />
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
