@@ -14,7 +14,734 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      blog_articles: {
+        Row: {
+          author_id: string | null
+          category: Database["public"]["Enums"]["blog_category"] | null
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          featured: boolean | null
+          featured_image: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          published: boolean | null
+          published_at: string | null
+          reading_time: number | null
+          schema_data: Json | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          category?: Database["public"]["Enums"]["blog_category"] | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured?: boolean | null
+          featured_image?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          reading_time?: number | null
+          schema_data?: Json | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: Database["public"]["Enums"]["blog_category"] | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured?: boolean | null
+          featured_image?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          reading_time?: number | null
+          schema_data?: Json | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
+      continents: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          order_index: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          order_index?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          order_index?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      countries: {
+        Row: {
+          capital: string | null
+          continent_id: string
+          created_at: string
+          currency: string | null
+          description: string | null
+          flag_emoji: string | null
+          id: string
+          image_url: string | null
+          language: string | null
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          order_index: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          capital?: string | null
+          continent_id: string
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          flag_emoji?: string | null
+          id?: string
+          image_url?: string | null
+          language?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          order_index?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          capital?: string | null
+          continent_id?: string
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          flag_emoji?: string | null
+          id?: string
+          image_url?: string | null
+          language?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          order_index?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "countries_continent_id_fkey"
+            columns: ["continent_id"]
+            isOneToOne: false
+            referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jinfotours_circuits: {
+        Row: {
+          countries: string[] | null
+          created_at: string
+          description: string | null
+          duration_days: number | null
+          external_url: string
+          featured: boolean | null
+          highlights: string[] | null
+          id: string
+          order_index: number
+          price_from: number | null
+          slug: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          countries?: string[] | null
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          external_url: string
+          featured?: boolean | null
+          highlights?: string[] | null
+          id?: string
+          order_index?: number
+          price_from?: number | null
+          slug: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          countries?: string[] | null
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          external_url?: string
+          featured?: boolean | null
+          highlights?: string[] | null
+          id?: string
+          order_index?: number
+          price_from?: number | null
+          slug?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      jinfotours_clicks: {
+        Row: {
+          circuit_id: string | null
+          clicked_at: string
+          id: string
+          ip_address: unknown
+          source_url: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          circuit_id?: string | null
+          clicked_at?: string
+          id?: string
+          ip_address?: unknown
+          source_url?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          circuit_id?: string | null
+          clicked_at?: string
+          id?: string
+          ip_address?: unknown
+          source_url?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jinfotours_clicks_circuit_id_fkey"
+            columns: ["circuit_id"]
+            isOneToOne: false
+            referencedRelation: "jinfotours_circuits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_library: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string
+          file_path: string
+          file_size: number
+          file_type: string
+          file_url: string
+          filename: string
+          height: number | null
+          id: string
+          mime_type: string
+          original_filename: string
+          uploaded_by: string | null
+          used_in: string[] | null
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          file_path: string
+          file_size: number
+          file_type: string
+          file_url: string
+          filename: string
+          height?: number | null
+          id?: string
+          mime_type: string
+          original_filename: string
+          uploaded_by?: string | null
+          used_in?: string[] | null
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          file_path?: string
+          file_size?: number
+          file_type?: string
+          file_url?: string
+          filename?: string
+          height?: number | null
+          id?: string
+          mime_type?: string
+          original_filename?: string
+          uploaded_by?: string | null
+          used_in?: string[] | null
+          width?: number | null
+        }
+        Relationships: []
+      }
+      objective_types: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          order_index: number
+          slug: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          order_index?: number
+          slug: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          slug?: string
+        }
+        Relationships: []
+      }
+      objectives: {
+        Row: {
+          accessibility_info: string | null
+          best_season: string | null
+          booking_url: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          continent_id: string | null
+          country_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          difficulty_level:
+            | Database["public"]["Enums"]["difficulty_level"]
+            | null
+          entrance_fee: string | null
+          excerpt: string | null
+          featured: boolean | null
+          featured_image: string | null
+          featured_until: string | null
+          gallery_images: Json | null
+          google_maps_url: string | null
+          google_place_id: string | null
+          id: string
+          latitude: number | null
+          likes_count: number | null
+          location_text: string | null
+          longitude: number | null
+          meta_description: string | null
+          meta_title: string | null
+          opening_hours: string | null
+          published: boolean | null
+          published_at: string | null
+          schema_data: Json | null
+          slug: string
+          title: string
+          unesco_site: boolean | null
+          unesco_year: number | null
+          updated_at: string
+          updated_by: string | null
+          video_urls: Json | null
+          views_count: number | null
+          visit_duration: string | null
+          website_url: string | null
+        }
+        Insert: {
+          accessibility_info?: string | null
+          best_season?: string | null
+          booking_url?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          continent_id?: string | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?:
+            | Database["public"]["Enums"]["difficulty_level"]
+            | null
+          entrance_fee?: string | null
+          excerpt?: string | null
+          featured?: boolean | null
+          featured_image?: string | null
+          featured_until?: string | null
+          gallery_images?: Json | null
+          google_maps_url?: string | null
+          google_place_id?: string | null
+          id?: string
+          latitude?: number | null
+          likes_count?: number | null
+          location_text?: string | null
+          longitude?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          opening_hours?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          schema_data?: Json | null
+          slug: string
+          title: string
+          unesco_site?: boolean | null
+          unesco_year?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          video_urls?: Json | null
+          views_count?: number | null
+          visit_duration?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          accessibility_info?: string | null
+          best_season?: string | null
+          booking_url?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          continent_id?: string | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?:
+            | Database["public"]["Enums"]["difficulty_level"]
+            | null
+          entrance_fee?: string | null
+          excerpt?: string | null
+          featured?: boolean | null
+          featured_image?: string | null
+          featured_until?: string | null
+          gallery_images?: Json | null
+          google_maps_url?: string | null
+          google_place_id?: string | null
+          id?: string
+          latitude?: number | null
+          likes_count?: number | null
+          location_text?: string | null
+          longitude?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          opening_hours?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          schema_data?: Json | null
+          slug?: string
+          title?: string
+          unesco_site?: boolean | null
+          unesco_year?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          video_urls?: Json | null
+          views_count?: number | null
+          visit_duration?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objectives_continent_id_fkey"
+            columns: ["continent_id"]
+            isOneToOne: false
+            referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "objectives_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      objectives_types_relations: {
+        Row: {
+          created_at: string
+          id: string
+          objective_id: string
+          type_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          objective_id: string
+          type_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          objective_id?: string
+          type_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objectives_types_relations_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "objectives_types_relations_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "objective_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_views: {
+        Row: {
+          id: string
+          ip_address: unknown
+          page_title: string | null
+          page_url: string
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: unknown
+          page_title?: string | null
+          page_url: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          ip_address?: unknown
+          page_title?: string | null
+          page_url?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          viewed_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          approved: boolean | null
+          comment: string | null
+          created_at: string
+          helpful_count: number | null
+          id: string
+          objective_id: string
+          rating: number
+          title: string | null
+          updated_at: string
+          user_id: string
+          visit_date: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          comment?: string | null
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          objective_id: string
+          rating: number
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          visit_date?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          comment?: string | null
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          objective_id?: string
+          rating?: number
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          visit_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          objective_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          objective_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          objective_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +750,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      blog_category:
+        | "călătorii"
+        | "cultură"
+        | "istorie"
+        | "natură"
+        | "gastronomie"
+        | "aventură"
+      difficulty_level: "easy" | "moderate" | "difficult" | "extreme"
+      user_role_type: "admin" | "editor" | "contributor" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +885,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      blog_category: [
+        "călătorii",
+        "cultură",
+        "istorie",
+        "natură",
+        "gastronomie",
+        "aventură",
+      ],
+      difficulty_level: ["easy", "moderate", "difficult", "extreme"],
+      user_role_type: ["admin", "editor", "contributor", "user"],
+    },
   },
 } as const
