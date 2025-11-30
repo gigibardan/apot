@@ -13,6 +13,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 // Pages
 import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
+import ObjectiveSingle from "@/pages/ObjectiveSingle";
 import BlogPage from "@/pages/BlogPage";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/" element={<PublicLayout />}>
               <Route index element={<HomePage />} />
               <Route path="obiective" element={<ObjectivesPage />} />
+              <Route path="obiective/:slug" element={<ObjectiveSingle />} />
               <Route path="blog" element={<BlogPage />} />
               <Route path="despre" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
