@@ -608,6 +608,99 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_campaigns: {
+        Row: {
+          click_count: number | null
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          open_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          sent_count: number | null
+          status: string
+          subject: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          click_count?: number | null
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          open_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          click_count?: number | null
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          open_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          confirm_token: string | null
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          metadata: Json | null
+          source: string | null
+          status: string
+          subscribed_at: string
+          unsubscribed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          confirm_token?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          status?: string
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          confirm_token?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          status?: string
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       objective_types: {
         Row: {
           color: string | null
