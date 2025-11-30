@@ -60,6 +60,8 @@ export default function AdminLayout() {
   const allSidebarLinks = [
     ...sidebarLinks,
     ...(isAdmin ? [{ name: "Utilizatori", href: "/admin/utilizatori", icon: Users, showDrafts: false }] : []),
+    { name: "Import", href: "/admin/import", icon: FileText, showDrafts: false },
+    { name: "Template-uri", href: "/admin/templates", icon: FileText, showDrafts: false },
   ];
 
   useEffect(() => {
