@@ -50,6 +50,51 @@ export type Database = {
         }
         Relationships: []
       }
+      authorized_guides: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          languages: string[] | null
+          license_active: boolean | null
+          license_expiry_date: string | null
+          license_number: string | null
+          phone: string | null
+          region: string | null
+          specialization: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          languages?: string[] | null
+          license_active?: boolean | null
+          license_expiry_date?: string | null
+          license_number?: string | null
+          phone?: string | null
+          region?: string | null
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          languages?: string[] | null
+          license_active?: boolean | null
+          license_expiry_date?: string | null
+          license_number?: string | null
+          phone?: string | null
+          region?: string | null
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       blog_articles: {
         Row: {
           author_id: string | null
@@ -213,6 +258,203 @@ export type Database = {
             columns: ["continent_id"]
             isOneToOne: false
             referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_reviews: {
+        Row: {
+          approved: boolean | null
+          comment: string | null
+          created_at: string | null
+          guide_id: string
+          guide_response: string | null
+          guide_response_date: string | null
+          helpful_count: number | null
+          id: string
+          rating: number
+          title: string | null
+          travel_date: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          comment?: string | null
+          created_at?: string | null
+          guide_id: string
+          guide_response?: string | null
+          guide_response_date?: string | null
+          helpful_count?: number | null
+          id?: string
+          rating: number
+          title?: string | null
+          travel_date?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          comment?: string | null
+          created_at?: string | null
+          guide_id?: string
+          guide_response?: string | null
+          guide_response_date?: string | null
+          helpful_count?: number | null
+          id?: string
+          rating?: number
+          title?: string | null
+          travel_date?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_reviews_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guides: {
+        Row: {
+          active: boolean | null
+          availability_calendar_url: string | null
+          bio: string | null
+          contact_count: number | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          featured: boolean | null
+          full_name: string
+          geographical_areas: string[] | null
+          id: string
+          languages: string[] | null
+          meta_description: string | null
+          meta_title: string | null
+          phone: string | null
+          price_per_day: number | null
+          price_per_group: number | null
+          profile_image: string | null
+          rating_average: number | null
+          reviews_count: number | null
+          short_description: string | null
+          slug: string
+          specializations: string[] | null
+          updated_at: string | null
+          updated_by: string | null
+          verification_date: string | null
+          verification_notes: string | null
+          verified: boolean | null
+          views_count: number | null
+          website_url: string | null
+          whatsapp: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          availability_calendar_url?: string | null
+          bio?: string | null
+          contact_count?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          featured?: boolean | null
+          full_name: string
+          geographical_areas?: string[] | null
+          id?: string
+          languages?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
+          phone?: string | null
+          price_per_day?: number | null
+          price_per_group?: number | null
+          profile_image?: string | null
+          rating_average?: number | null
+          reviews_count?: number | null
+          short_description?: string | null
+          slug: string
+          specializations?: string[] | null
+          updated_at?: string | null
+          updated_by?: string | null
+          verification_date?: string | null
+          verification_notes?: string | null
+          verified?: boolean | null
+          views_count?: number | null
+          website_url?: string | null
+          whatsapp?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          availability_calendar_url?: string | null
+          bio?: string | null
+          contact_count?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          featured?: boolean | null
+          full_name?: string
+          geographical_areas?: string[] | null
+          id?: string
+          languages?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
+          phone?: string | null
+          price_per_day?: number | null
+          price_per_group?: number | null
+          profile_image?: string | null
+          rating_average?: number | null
+          reviews_count?: number | null
+          short_description?: string | null
+          slug?: string
+          specializations?: string[] | null
+          updated_at?: string | null
+          updated_by?: string | null
+          verification_date?: string | null
+          verification_notes?: string | null
+          verified?: boolean | null
+          views_count?: number | null
+          website_url?: string | null
+          whatsapp?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
+      guides_objectives_relations: {
+        Row: {
+          created_at: string | null
+          guide_id: string
+          id: string
+          objective_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          guide_id: string
+          id?: string
+          objective_id: string
+        }
+        Update: {
+          created_at?: string | null
+          guide_id?: string
+          id?: string
+          objective_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guides_objectives_relations_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guides_objectives_relations_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
             referencedColumns: ["id"]
           },
         ]

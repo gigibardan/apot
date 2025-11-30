@@ -16,6 +16,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
 import ObjectiveSingle from "@/pages/ObjectiveSingle";
+import GuidesPage from "@/pages/GuidesPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogArticle from "@/pages/BlogArticle";
 import AboutPage from "@/pages/AboutPage";
@@ -23,6 +24,8 @@ import ContactPage from "@/pages/ContactPage";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import ObjectivesAdmin from "@/pages/admin/ObjectivesAdmin";
 import ObjectiveForm from "@/pages/admin/ObjectiveForm";
+import GuidesAdmin from "@/pages/admin/GuidesAdmin";
+import AuthorizedGuidesAdmin from "@/pages/admin/AuthorizedGuidesAdmin";
 import BlogAdmin from "@/pages/admin/BlogAdmin";
 import BlogArticleForm from "@/pages/admin/BlogArticleForm";
 import CircuitsAdmin from "@/pages/admin/CircuitsAdmin";
@@ -54,6 +57,7 @@ const App = () => (
               <Route index element={<HomePage />} />
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
+              <Route path="ghizi" element={<GuidesPage />} />
               <Route path="blog" element={<BlogPage />} />
               <Route path="blog/:slug" element={<BlogArticle />} />
               <Route path="despre" element={<AboutPage />} />
@@ -66,6 +70,8 @@ const App = () => (
               <Route path="obiective" element={<ObjectivesAdmin />} />
               <Route path="obiective/nou" element={<ObjectiveForm />} />
               <Route path="obiective/:id" element={<ObjectiveForm />} />
+              <Route path="ghizi" element={<GuidesAdmin />} />
+              <Route path="ghizi-autorizati" element={<AuthorizedGuidesAdmin />} />
               <Route path="blog" element={<BlogAdmin />} />
               <Route path="blog/nou" element={<BlogArticleForm />} />
               <Route path="blog/:id" element={<BlogArticleForm />} />
