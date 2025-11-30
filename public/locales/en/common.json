@@ -16,9 +16,40 @@
   },
   "hero": {
     "title": "Discover Tourist Destinations Worldwide",
-    "subtitle": "Explore monuments, museums, natural parks and UNESCO sites",
+    "subtitle": "Association for the Protection of Tourist Objectives",
+    "description": "Explore thousands of monuments, museums, natural parks and UNESCO sites. Detailed information for each destination.",
     "searchPlaceholder": "Search tourist destinations...",
     "exploreButton": "Explore Destinations"
+  },
+  "home": {
+    "continents": {
+      "title": "Explore by Continents",
+      "subtitle": "Discover tourist destinations from every corner of the world"
+    },
+    "featuredObjectives": {
+      "title": "Popular Tourist Destinations",
+      "subtitle": "The most visited and appreciated destinations",
+      "viewAll": "View All Destinations"
+    },
+    "circuits": {
+      "title": "Complete Tours Worldwide",
+      "subtitle": "Explore organized tours by our partner Jinfotours",
+      "partnership": "In partnership with"
+    },
+    "blog": {
+      "title": "Latest Articles",
+      "subtitle": "Travel guides, tips and adventure stories",
+      "viewAll": "View All Articles"
+    },
+    "newsletter": {
+      "title": "Receive Travel Guides by Email",
+      "subtitle": "Discover fascinating tourist destinations, practical tips and exclusive offers"
+    },
+    "guides": {
+      "title": "Verified Professional Guides",
+      "subtitle": "Find certified local guides for your travels",
+      "viewAll": "View All Guides"
+    }
   },
   "common": {
     "readMore": "Read more",
@@ -37,7 +68,11 @@
     "loading": "Loading...",
     "noResults": "No results found",
     "showMore": "Show more",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "theme": "Theme",
+    "error": "Error",
+    "success": "Success",
+    "tryAgain": "Try again"
   },
   "filters": {
     "continent": "Continent",
@@ -139,5 +174,20 @@
     "continueWithGoogle": "Continue with Google",
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?"
+  },
+  "errors": {
+    "loadContinents": "Could not load continents",
+    "loadObjectives": "Could not load objectives",
+    "loadCircuits": "Could not load circuits",
+    "loadArticles": "Could not load articles",
+    "loadGuides": "Could not load guides"
+  },
+  "empty": {
+    "objectivesComingSoon": "Tourist destinations will be added soon",
+    "objectivesDescription": "Our team is working on creating the first fascinating destinations. Come back soon to discover extraordinary places!",
+    "circuitsComingSoon": "Tours will be added soon",
+    "circuitsDescription": "We are preparing the most interesting tourist tours in collaboration with Jinfotours",
+    "articlesComingSoon": "The first article will be published soon",
+    "articlesDescription": "We are preparing complete guides about the most fascinating destinations from around the world"
   }
 }

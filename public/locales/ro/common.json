@@ -16,9 +16,40 @@
   },
   "hero": {
     "title": "Descoperă Obiective Turistice din Întreaga Lume",
-    "subtitle": "Explorează monumente, muzee, parcuri naturale și situri UNESCO",
+    "subtitle": "Asociația pentru Protejarea Obiectivelor Turistice",
+    "description": "Explorează mii de monumente, muzee, parcuri naturale și situri UNESCO. Informații detaliate pentru fiecare destinație.",
     "searchPlaceholder": "Caută obiective turistice...",
-    "exploreButton": "Explorează Obiectivele"
+    "exploreButton": "Explorează Obiective"
+  },
+  "home": {
+    "continents": {
+      "title": "Explorează pe Continente",
+      "subtitle": "Descoperă obiective turistice din fiecare colț al lumii"
+    },
+    "featuredObjectives": {
+      "title": "Obiective Turistice Populare",
+      "subtitle": "Cele mai vizitate și apreciate destinații",
+      "viewAll": "Vezi Toate Obiectivele"
+    },
+    "circuits": {
+      "title": "Circuite Complete în Toată Lumea",
+      "subtitle": "Explorează circuite organizate de partenerul nostru Jinfotours",
+      "partnership": "În parteneriat cu"
+    },
+    "blog": {
+      "title": "Ultimele Articole",
+      "subtitle": "Ghiduri de călătorie, sfaturi și povești de aventură",
+      "viewAll": "Vezi Toate Articolele"
+    },
+    "newsletter": {
+      "title": "Primește Ghiduri de Călătorie în Email",
+      "subtitle": "Descoperă obiective turistice fascinante, sfaturi practice și oferte exclusive"
+    },
+    "guides": {
+      "title": "Ghizi Profesioniști Verificați",
+      "subtitle": "Găsește ghizi locali certificați pentru călătoriile tale",
+      "viewAll": "Vezi Toți Ghizii"
+    }
   },
   "common": {
     "readMore": "Citește mai mult",
@@ -37,7 +68,11 @@
     "loading": "Se încarcă...",
     "noResults": "Nu au fost găsite rezultate",
     "showMore": "Arată mai mult",
-    "showLess": "Arată mai puțin"
+    "showLess": "Arată mai puțin",
+    "theme": "Temă",
+    "error": "Eroare",
+    "success": "Succes",
+    "tryAgain": "Încearcă din nou"
   },
   "filters": {
     "continent": "Continent",
@@ -139,5 +174,20 @@
     "continueWithGoogle": "Continuă cu Google",
     "alreadyHaveAccount": "Ai deja cont?",
     "dontHaveAccount": "Nu ai cont?"
+  },
+  "errors": {
+    "loadContinents": "Nu am putut încărca continentele",
+    "loadObjectives": "Nu am putut încărca obiectivele",
+    "loadCircuits": "Nu am putut încărca circuitele",
+    "loadArticles": "Nu am putut încărca articolele",
+    "loadGuides": "Nu am putut încărca ghizii"
+  },
+  "empty": {
+    "objectivesComingSoon": "Obiectivele turistice vor fi adăugate în curând",
+    "objectivesDescription": "Echipa noastră lucrează la crearea primelor destinații fascinante. Revino în curând pentru a descoperi locuri extraordinare!",
+    "circuitsComingSoon": "Circuitele vor fi adăugate în curând",
+    "circuitsDescription": "Pregătim cele mai interesante circuite turistice în colaborare cu Jinfotours",
+    "articlesComingSoon": "Primul articol va fi publicat în curând",
+    "articlesDescription": "Pregătim ghiduri complete despre cele mai fascinante destinații din întreaga lume"
   }
 }

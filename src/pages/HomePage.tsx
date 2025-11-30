@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, MapPin, Heart, Globe } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/layout/Container";
@@ -30,6 +31,7 @@ import type { Continent, ObjectiveWithRelations, JinfoursCircuit, BlogArticle } 
  */
 export default function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   
   // Data state
@@ -141,7 +143,7 @@ export default function HomePage() {
   return (
     <>
       <SEO
-        title="Acasă"
+        title={t("nav.home")}
         description={seoDefaults.defaultDescription}
         canonical="/"
         structuredData={structuredData}
@@ -151,14 +153,13 @@ export default function HomePage() {
         <Container className="text-center">
           <div className="mx-auto max-w-3xl space-y-8 animate-fade-in">
             <h1 className="text-4xl font-display font-bold tracking-tight sm:text-5xl lg:text-6xl text-white">
-              Descoperă Obiective Turistice din Toată Lumea
+              {t("hero.title")}
             </h1>
             <p className="text-lg sm:text-xl text-white/90">
-              Asociația pentru Protejarea Obiectivelor Turistice
+              {t("hero.subtitle")}
             </p>
             <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto">
-              Explorează mii de monumente, muzee, parcuri naturale și situri
-              UNESCO. Informații detaliate pentru fiecare destinație.
+              {t("hero.description", "Explorează mii de monumente, muzee, parcuri naturale și situri UNESCO. Informații detaliate pentru fiecare destinație.")}
             </p>
 
             {/* Search Bar */}
@@ -167,15 +168,15 @@ export default function HomePage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Caută obiective turistice..."
+                  placeholder={t("hero.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 bg-white/90 border-0"
-                  aria-label="Caută obiective turistice"
+                  aria-label={t("hero.searchPlaceholder")}
                 />
               </div>
               <Button size="lg" type="submit" className="bg-accent hover:bg-accent/90">
-                Caută
+                {t("common.search")}
               </Button>
             </form>
 
@@ -188,7 +189,7 @@ export default function HomePage() {
                 className="text-lg px-8 py-6"
               >
                 <Link to={PUBLIC_ROUTES.objectives}>
-                  Explorează Obiective
+                  {t("hero.exploreButton")}
                 </Link>
               </Button>
             </div>
