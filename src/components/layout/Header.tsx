@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { name: "Acasă", href: PUBLIC_ROUTES.home },
   { name: "Obiective", href: PUBLIC_ROUTES.objectives },
+  { name: "Ghizi", href: PUBLIC_ROUTES.guides },
   { name: "Blog", href: PUBLIC_ROUTES.blog },
   { name: "Despre", href: PUBLIC_ROUTES.about },
   { name: "Contact", href: PUBLIC_ROUTES.contact },

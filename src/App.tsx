@@ -17,6 +17,7 @@ import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
 import ObjectiveSingle from "@/pages/ObjectiveSingle";
 import GuidesPage from "@/pages/GuidesPage";
+import GuideSinglePage from "@/pages/GuideSinglePage";
 import BlogPage from "@/pages/BlogPage";
 import BlogArticle from "@/pages/BlogArticle";
 import AboutPage from "@/pages/AboutPage";
@@ -25,6 +26,7 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import ObjectivesAdmin from "@/pages/admin/ObjectivesAdmin";
 import ObjectiveForm from "@/pages/admin/ObjectiveForm";
 import GuidesAdmin from "@/pages/admin/GuidesAdmin";
+import GuideForm from "@/pages/admin/GuideForm";
 import AuthorizedGuidesAdmin from "@/pages/admin/AuthorizedGuidesAdmin";
 import BlogAdmin from "@/pages/admin/BlogAdmin";
 import BlogArticleForm from "@/pages/admin/BlogArticleForm";
@@ -58,6 +60,7 @@ const App = () => (
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
               <Route path="ghizi" element={<GuidesPage />} />
+              <Route path="ghid/:slug" element={<GuideSinglePage />} />
               <Route path="blog" element={<BlogPage />} />
               <Route path="blog/:slug" element={<BlogArticle />} />
               <Route path="despre" element={<AboutPage />} />
@@ -71,6 +74,8 @@ const App = () => (
               <Route path="obiective/nou" element={<ObjectiveForm />} />
               <Route path="obiective/:id" element={<ObjectiveForm />} />
               <Route path="ghizi" element={<GuidesAdmin />} />
+              <Route path="ghizi/nou" element={<GuideForm />} />
+              <Route path="ghizi/:id/edit" element={<GuideForm />} />
               <Route path="ghizi-autorizati" element={<AuthorizedGuidesAdmin />} />
               <Route path="blog" element={<BlogAdmin />} />
               <Route path="blog/nou" element={<BlogArticleForm />} />
