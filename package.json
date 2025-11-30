@@ -65,6 +65,7 @@
     "vaul": "^0.9.9",
     "vite-plugin-image-optimizer": "^2.0.3",
     "vite-plugin-sitemap": "^0.8.2",
+    "yet-another-react-lightbox": "^3.25.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
