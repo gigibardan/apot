@@ -31,6 +31,7 @@ import {
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import CharacterCounter from "@/components/admin/CharacterCounter";
+import { AIContentHelper } from "@/components/features/ai/AIContentHelper";
 import { ADMIN_ROUTES } from "@/lib/constants/routes";
 
 export default function ObjectiveForm() {
@@ -202,19 +203,21 @@ export default function ObjectiveForm() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div>
-        <Button variant="ghost" asChild className="mb-4">
-          <Link to={ADMIN_ROUTES.objectives}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Înapoi la obiective
-          </Link>
-        </Button>
-        <h2 className="text-3xl font-display font-bold tracking-tight">
-          {isEdit ? `Editează: ${formData.title}` : "Adaugă Obiectiv Nou"}
-        </h2>
-      </div>
+    <div className="flex gap-6 max-w-7xl mx-auto">
+      {/* Main Content */}
+      <div className="flex-1 space-y-6">
+        {/* Header */}
+        <div>
+          <Button variant="ghost" asChild className="mb-4">
+            <Link to={ADMIN_ROUTES.objectives}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Înapoi la obiective
+            </Link>
+          </Button>
+          <h2 className="text-3xl font-display font-bold tracking-tight">
+            {isEdit ? `Editează: ${formData.title}` : "Adaugă Obiectiv Nou"}
+          </h2>
+        </div>
 
       {/* Form Tabs */}
       <Tabs defaultValue="basic" className="space-y-6">
@@ -737,6 +740,28 @@ export default function ObjectiveForm() {
             )}
             Publică
           </Button>
+        </div>
+      </div>
+      </div>
+
+      {/* AI Sidebar */}
+      <div className="w-80 flex-shrink-0">
+        <div className="sticky top-6">
+          <AIContentHelper
+            title={formData.title}
+            description={formData.excerpt || formData.description}
+            content={formData.description}
+            onApplyTags={(tags) => {
+              toast.info("Sugestie: " + tags.join(", "));
+            }}
+            onApplyKeywords={(keywords) => {
+              toast.info("Keywords: " + keywords.join(", "));
+            }}
+            onApplyMetaDescription={(desc) => {
+              handleChange("meta_description", desc);
+              toast.success("Meta description aplicată!");
+            }}
+          />
         </div>
       </div>
     </div>

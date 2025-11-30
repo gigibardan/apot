@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import CharacterCounter from "@/components/admin/CharacterCounter";
+import { AIContentHelper } from "@/components/features/ai/AIContentHelper";
 import { toast } from "sonner";
 import { ADMIN_ROUTES } from "@/lib/constants/routes";
 import { createBlogArticle, updateBlogArticle } from "@/lib/supabase/mutations/blog";
@@ -167,13 +168,15 @@ export default function BlogArticleForm() {
   }
 
   return (
-    <div className="max-w-5xl">
-      <Breadcrumbs
-        items={[
-          { label: "Blog", href: ADMIN_ROUTES.blog },
-          { label: id ? "Editează" : "Articol Nou" },
-        ]}
-      />
+    <div className="flex gap-6 max-w-7xl">
+      {/* Main Content */}
+      <div className="flex-1">
+        <Breadcrumbs
+          items={[
+            { label: "Blog", href: ADMIN_ROUTES.blog },
+            { label: id ? "Editează" : "Articol Nou" },
+          ]}
+        />
       
       <div className="mb-6">
         <h2 className="text-3xl font-display font-bold">
@@ -453,6 +456,29 @@ export default function BlogArticleForm() {
           </div>
         </div>
       </form>
+      </div>
+
+      {/* AI Sidebar */}
+      <div className="w-80 flex-shrink-0">
+        <div className="sticky top-6">
+          <AIContentHelper
+            title={title || ""}
+            description={excerpt || ""}
+            content={content || ""}
+            onApplyTags={(suggestedTags) => {
+              setValue("tags", [...new Set([...tags, ...suggestedTags])]);
+              toast.success("Tag-uri aplicate!");
+            }}
+            onApplyKeywords={(keywords) => {
+              toast.info("Keywords: " + keywords.join(", "));
+            }}
+            onApplyMetaDescription={(desc) => {
+              setValue("meta_description", desc);
+              toast.success("Meta description aplicată!");
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
