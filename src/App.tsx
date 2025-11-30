@@ -70,6 +70,7 @@ import SuggestObjective from "@/pages/SuggestObjective";
 import SuggestionsAdmin from "@/pages/admin/SuggestionsAdmin";
 import ContestsAdmin from "@/pages/admin/ContestsAdmin";
 import ChallengesAdmin from "@/pages/admin/ChallengesAdmin";
+import { AIChatbot } from "@/components/features/ai/AIChatbot";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <AnalyticsTracker />
+              <AIChatbot />
               <LanguageProvider>
                 <Routes>
             {/* Public Routes - with optional language prefix */}
