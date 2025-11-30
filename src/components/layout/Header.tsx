@@ -1,9 +1,8 @@
-"use client";
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Menu, X, Sun, Moon, Heart } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/layout/Container";
@@ -11,22 +10,9 @@ import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFavoritesCount } from "@/lib/supabase/queries/favorites";
 import { NotificationBell } from "@/components/features/forum/NotificationBell";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { cn } from "@/lib/utils";
 
-const navigation = [
-  { name: "Acasă", href: PUBLIC_ROUTES.home },
-  { name: "Obiective", href: PUBLIC_ROUTES.objectives },
-  { name: "Ghizi", href: PUBLIC_ROUTES.guides },
-  { name: "Blog", href: PUBLIC_ROUTES.blog },
-  { name: "Despre", href: PUBLIC_ROUTES.about },
-  { name: "Contact", href: PUBLIC_ROUTES.contact },
-];
-
-/**
- * Header Component
- * Sticky navigation with mobile menu and theme toggle
- * Includes backdrop blur effect on scroll
- */
 export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,6 +22,16 @@ export function Header() {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
+  const { t } = useTranslation();
+
+  const navigation = [
+    { name: t("nav.home"), href: PUBLIC_ROUTES.home },
+    { name: t("nav.objectives"), href: PUBLIC_ROUTES.objectives },
+    { name: t("nav.guides"), href: PUBLIC_ROUTES.guides },
+    { name: t("nav.blog"), href: PUBLIC_ROUTES.blog },
+    { name: t("nav.about"), href: PUBLIC_ROUTES.about },
+    { name: t("nav.contact"), href: PUBLIC_ROUTES.contact },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,15 +97,14 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
-            {user && (
-              <Button
+                <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/favorite")}
                 className="relative"
               >
                 <Heart className="h-4 w-4 mr-2" />
-                Favorite
+                {t("nav.favorites")}
                 {favoritesCount > 0 && (
                   <Badge 
                     variant="destructive" 
@@ -119,12 +114,12 @@ export function Header() {
                   </Badge>
                 )}
               </Button>
-            )}
           </div>
 
           {/* Theme Toggle & Mobile Menu Button */}
           <div className="flex items-center space-x-2">
             {user && <NotificationBell />}
+            <LanguageSwitcher />
             <Button
               variant="ghost"
               size="icon"
@@ -184,7 +179,7 @@ export function Header() {
                 >
                   <span className="flex items-center gap-2">
                     <Heart className="h-5 w-5" />
-                    Favorite
+                    {t("nav.favorites")}
                   </span>
                   {favoritesCount > 0 && (
                     <Badge variant="destructive" className="h-5 px-2 text-xs">
@@ -198,7 +193,7 @@ export function Header() {
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
               >
-                <span>Temă</span>
+                <span>{t("common.theme", "Temă")}</span>
                 {theme === "dark" ? (
                   <Moon className="h-5 w-5" />
                 ) : (

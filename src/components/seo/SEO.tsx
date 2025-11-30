@@ -1,6 +1,8 @@
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { siteConfig } from "@/lib/config/site.config";
 import { seoDefaults } from "@/lib/constants/seo-defaults";
+import { SUPPORTED_LANGUAGES, type SupportedLanguage } from "@/lib/i18n/config";
 
 interface SEOProps {
   title?: string;
@@ -16,13 +18,9 @@ interface SEOProps {
   };
   noindex?: boolean;
   structuredData?: object;
+  alternateLanguages?: boolean; // Enable hreflang tags
 }
 
-/**
- * SEO Component
- * Manages meta tags, Open Graph, structured data for each page
- * Uses React Helmet Async for dynamic head management
- */
 export function SEO({
   title,
   description = seoDefaults.defaultDescription,
@@ -32,14 +30,18 @@ export function SEO({
   article,
   noindex = false,
   structuredData,
+  alternateLanguages = true,
 }: SEOProps) {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language as SupportedLanguage;
+  
   const pageTitle = title
     ? `${title} | ${siteConfig.name}`
     : seoDefaults.defaultTitle;
 
-  const fullCanonical = canonical
-    ? `${siteConfig.url}${canonical}`
-    : siteConfig.url;
+  // Remove language prefix from canonical if present
+  const cleanPath = canonical?.replace(/^\/(ro|en)/, "") || "";
+  const fullCanonical = `${siteConfig.url}${cleanPath}`;
 
   const fullOgImage = ogImage.startsWith("http")
     ? ogImage
@@ -48,10 +50,32 @@ export function SEO({
   return (
     <Helmet>
       {/* Primary Meta Tags */}
+      <html lang={currentLang} />
       <title>{pageTitle}</title>
       <meta name="title" content={pageTitle} />
       <meta name="description" content={description} />
       <link rel="canonical" href={fullCanonical} />
+
+      {/* Alternate Language Links (hreflang) */}
+      {alternateLanguages && Object.keys(SUPPORTED_LANGUAGES).map((lng) => {
+        const langPath = lng === "ro" ? cleanPath : `/${lng}${cleanPath}`;
+        return (
+          <link
+            key={lng}
+            rel="alternate"
+            hrefLang={lng}
+            href={`${siteConfig.url}${langPath}`}
+          />
+        );
+      })}
+      {/* x-default for language fallback */}
+      {alternateLanguages && (
+        <link
+          rel="alternate"
+          hrefLang="x-default"
+          href={`${siteConfig.url}${cleanPath}`}
+        />
+      )}
 
       {/* Keywords */}
       <meta name="keywords" content={seoDefaults.keywords.join(", ")} />
