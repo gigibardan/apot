@@ -7,6 +7,9 @@ import { SEO } from "@/components/seo/SEO";
 import { Breadcrumbs, type BreadcrumbItem } from "@/components/features/objectives/Breadcrumbs";
 import { ObjectiveSidebar } from "@/components/features/objectives/ObjectiveSidebar";
 import { ObjectiveCard } from "@/components/features/objectives/ObjectiveCard";
+import { ObjectiveGallery } from "@/components/features/objectives/ObjectiveGallery";
+import { ObjectiveMap } from "@/components/features/objectives/ObjectiveMap";
+import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -379,28 +382,43 @@ export default function ObjectiveSingle() {
                 </section>
               )}
 
-              {/* Gallery Placeholder */}
+              {/* Gallery Section */}
               <section>
                 <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">Galerie Foto</h2>
-                <div className="bg-muted/50 rounded-lg p-12 text-center">
-                  <p className="text-muted-foreground">Galeria foto va fi disponibilă în curând</p>
-                </div>
+                <ObjectiveGallery
+                  images={
+                    objective.gallery_images && objective.gallery_images.length > 0
+                      ? objective.gallery_images
+                      : objective.featured_image
+                      ? [{ url: objective.featured_image, alt: objective.title }]
+                      : []
+                  }
+                  objectiveTitle={objective.title}
+                />
               </section>
 
-              {/* Location Placeholder */}
+              {/* Location Section */}
               <section>
                 <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">Locație</h2>
-                {objective.location_text && (
-                  <p className="text-muted-foreground mb-4">{objective.location_text}</p>
+                {objective.latitude && objective.longitude ? (
+                  <ObjectiveMap
+                    latitude={objective.latitude}
+                    longitude={objective.longitude}
+                    title={objective.title}
+                    locationText={objective.location_text || undefined}
+                  />
+                ) : (
+                  <div className="space-y-4">
+                    {objective.location_text && (
+                      <p className="text-muted-foreground">{objective.location_text}</p>
+                    )}
+                    <div className="bg-muted/50 rounded-lg p-12 text-center">
+                      <p className="text-muted-foreground">
+                        Coordonatele GPS vor fi adăugate în curând
+                      </p>
+                    </div>
+                  </div>
                 )}
-                {objective.latitude && objective.longitude && (
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Coordonate: {objective.latitude}, {objective.longitude}
-                  </p>
-                )}
-                <div className="bg-muted/50 rounded-lg p-12 text-center">
-                  <p className="text-muted-foreground">Harta interactivă va fi disponibilă în curând</p>
-                </div>
               </section>
 
               {/* Similar Objectives */}
@@ -425,6 +443,9 @@ export default function ObjectiveSingle() {
           </div>
         </Container>
       </Section>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </>
   );
 }

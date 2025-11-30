@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ShareButtons } from "./ShareButtons";
 import type { ObjectiveWithRelations } from "@/types/database.types";
-import { MapPin, Eye, Award, Star, Share2 } from "lucide-react";
+import { MapPin, Eye, Award, Star } from "lucide-react";
 import { trackJinfoursClick } from "@/lib/analytics/events";
 
 interface ObjectiveSidebarProps {
@@ -13,14 +14,9 @@ interface ObjectiveSidebarProps {
 export function ObjectiveSidebar({ objective }: ObjectiveSidebarProps) {
   const handleJinfoursClick = () => {
     if (objective.country) {
-      trackJinfoursClick("homepage-sidebar", objective.country.name, "sidebar-cta");
+      trackJinfoursClick("objective-sidebar", objective.country.name, "sidebar-cta");
       window.open("https://jinfotours.ro", "_blank", "noopener,noreferrer");
     }
-  };
-
-  const handleShare = () => {
-    // Will implement Web Share API in next session
-    console.log("Share clicked");
   };
 
   return (
@@ -138,13 +134,11 @@ export function ObjectiveSidebar({ objective }: ObjectiveSidebarProps) {
           <CardTitle className="text-lg">Distribuie</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button onClick={handleShare} variant="outline" className="w-full" size="lg">
-            <Share2 className="w-4 h-4 mr-2" />
-            Distribuie Obiectivul
-          </Button>
-          <p className="text-xs text-muted-foreground text-center mt-2">
-            Funcționalitate completă în curând
-          </p>
+          <ShareButtons
+            title={objective.title}
+            description={objective.excerpt || undefined}
+            url={typeof window !== "undefined" ? window.location.href : ""}
+          />
         </CardContent>
       </Card>
     </div>
