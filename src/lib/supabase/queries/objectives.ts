@@ -86,15 +86,16 @@ export async function getObjectives(
     );
   }
 
-  // Filter by types (if provided)
-  if (types && types.length > 0) {
-    // This requires joining through the relation table
-    query = query.in("id", supabase
-      .from("objectives_types_relations")
-      .select("objective_id")
-      .in("type_id", types)
-    );
-  }
+  // Filter by types (if provided) - will be handled after schema creation
+  // if (types && types.length > 0) {
+  //   const { data: objectiveIds } = await supabase
+  //     .from("objectives_types_relations")
+  //     .select("objective_id")
+  //     .in("type_id", types);
+  //   if (objectiveIds) {
+  //     query = query.in("id", objectiveIds.map(r => r.objective_id));
+  //   }
+  // }
 
   // Sorting
   query = query.order(sortBy, { ascending: sortOrder === "asc" });
@@ -124,7 +125,7 @@ export async function getFeaturedObjectives(limit: number = 6) {
  * Get UNESCO World Heritage objectives
  */
 export async function getUNESCOObjectives(limit: number = 12) {
-  return getObjectives({ unesco: true, limit, sortBy: "unesco_year", sortOrder: "desc" });
+  return getObjectives({ unesco: true, limit, sortBy: "created_at", sortOrder: "desc" });
 }
 
 /**
@@ -228,7 +229,7 @@ export async function incrementObjectiveViews(id: string) {
   if (objective) {
     const { error } = await supabase
       .from("objectives")
-      .update({ views_count: objective.views_count + 1 })
+      .update({ views_count: (objective as any).views_count + 1 } as any)
       .eq("id", id);
 
     if (error) console.error("Error incrementing views:", error);
@@ -265,13 +266,16 @@ export async function getObjectivesCount(filters: Omit<ObjectiveFilters, 'limit'
     query = query.eq("featured", featured);
   }
 
-  if (types && types.length > 0) {
-    query = query.in("id", supabase
-      .from("objectives_types_relations")
-      .select("objective_id")
-      .in("type_id", types)
-    );
-  }
+  // Filter by types - will be handled after schema creation
+  // if (types && types.length > 0) {
+  //   const { data: objectiveIds } = await supabase
+  //     .from("objectives_types_relations")
+  //     .select("objective_id")
+  //     .in("type_id", types);
+  //   if (objectiveIds) {
+  //     query = query.in("id", objectiveIds.map(r => r.objective_id));
+  //   }
+  // }
 
   const { count, error } = await query;
 

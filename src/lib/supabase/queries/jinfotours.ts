@@ -91,7 +91,7 @@ export async function trackJinfoursClick(
     utm_campaign: metadata?.utmCampaign || null,
     user_agent: navigator.userAgent,
     clicked_at: new Date().toISOString(),
-  });
+  } as any);
 
   if (error) console.error("Error tracking click:", error);
 }

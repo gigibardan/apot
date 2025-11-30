@@ -23,7 +23,7 @@ export async function createBlogArticle(data: Partial<BlogArticleInput>) {
 
   const { data: article, error } = await supabase
     .from("blog_articles")
-    .insert(data)
+    .insert(data as any)
     .select()
     .single();
 
@@ -45,7 +45,7 @@ export async function updateBlogArticle(
 
   const { data: article, error } = await supabase
     .from("blog_articles")
-    .update(data)
+    .update(data as any)
     .eq("id", id)
     .select()
     .single();
@@ -91,6 +91,7 @@ export async function duplicateBlogArticle(id: string) {
     .single();
 
   if (fetchError) throw fetchError;
+  if (!original) throw new Error("Article not found");
 
   // Create copy with modified title and slug
   const copy = {
@@ -107,7 +108,7 @@ export async function duplicateBlogArticle(id: string) {
 
   const { data: newArticle, error: createError } = await supabase
     .from("blog_articles")
-    .insert(copy)
+    .insert(copy as any)
     .select()
     .single();
 

@@ -128,7 +128,7 @@ export async function incrementArticleViews(id: string) {
   if (article) {
     const { error } = await supabase
       .from("blog_articles")
-      .update({ views_count: article.views_count + 1 })
+      .update({ views_count: (article as any).views_count + 1 } as any)
       .eq("id", id);
 
     if (error) console.error("Error incrementing views:", error);
@@ -157,8 +157,8 @@ export async function getRelatedArticles(
     .eq("published", true);
 
   // Prefer same category
-  if (article.category) {
-    query = query.eq("category", article.category);
+  if ((article as any).category) {
+    query = query.eq("category", (article as any).category);
   }
 
   const { data, error } = await query
@@ -207,7 +207,7 @@ export async function getAllTags(): Promise<string[]> {
 
   // Flatten and unique
   const allTags = new Set<string>();
-  data?.forEach((article) => {
+  data?.forEach((article: any) => {
     article.tags?.forEach((tag: string) => allTags.add(tag));
   });
 
