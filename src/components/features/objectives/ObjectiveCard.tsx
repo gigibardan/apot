@@ -4,6 +4,7 @@ import { MapPin, Award } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { FavoriteButton } from "./FavoriteButton";
 import type { ObjectiveWithRelations } from "@/types/database.types";
 
 interface ObjectiveCardProps {
@@ -66,10 +67,19 @@ function ObjectiveCardComponent({
             </Badge>
           )}
 
-          {/* Type Badge */}
+          {/* Favorite Button */}
+          <div className="absolute top-3 right-3">
+            <FavoriteButton
+              objectiveId={objective.id}
+              variant="ghost"
+              className="bg-background/80 backdrop-blur-sm hover:bg-background/90"
+            />
+          </div>
+
+          {/* Type Badge - moved to bottom right */}
           {primaryType && (
             <Badge
-              className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm"
+              className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm"
               style={{
                 backgroundColor: primaryType.color
                   ? `${primaryType.color}20`

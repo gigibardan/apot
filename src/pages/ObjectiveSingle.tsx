@@ -12,6 +12,7 @@ import { ObjectiveMap } from "@/components/features/objectives/ObjectiveMap";
 import { ObjectiveReviewForm } from "@/components/features/objectives/ObjectiveReviewForm";
 import { ObjectiveReviewList } from "@/components/features/objectives/ObjectiveReviewList";
 import { ObjectiveReviewStats } from "@/components/features/objectives/ObjectiveReviewStats";
+import { FavoriteButton } from "@/components/features/objectives/FavoriteButton";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ReadingProgress } from "@/components/shared/ReadingProgress";
 import { MobileStickyCTA } from "@/components/shared/MobileStickyCTA";
@@ -31,8 +32,9 @@ import {
   getObjectiveReviewStats,
 } from "@/lib/supabase/queries/objective-reviews";
 import { useAuth } from "@/contexts/AuthContext";
+import { ShareButtons } from "@/components/features/objectives/ShareButtons";
 import type { ObjectiveWithRelations } from "@/types/database.types";
-import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award } from "lucide-react";
+import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function ObjectiveSingle() {

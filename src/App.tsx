@@ -16,6 +16,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
 import ObjectiveSingle from "@/pages/ObjectiveSingle";
+import FavoritesPage from "@/pages/FavoritesPage";
 import GuidesPage from "@/pages/GuidesPage";
 import GuideSinglePage from "@/pages/GuideSinglePage";
 import BlogPage from "@/pages/BlogPage";
@@ -61,6 +62,7 @@ const App = () => (
               <Route index element={<HomePage />} />
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
+              <Route path="favorite" element={<FavoritesPage />} />
               <Route path="ghizi" element={<GuidesPage />} />
               <Route path="ghid/:slug" element={<GuideSinglePage />} />
               <Route path="blog" element={<BlogPage />} />
