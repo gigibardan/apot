@@ -208,6 +208,57 @@ export type Database = {
         }
         Relationships: []
       }
+      community_challenges: {
+        Row: {
+          active: boolean | null
+          challenge_type: Database["public"]["Enums"]["challenge_type"]
+          created_at: string
+          description: string
+          end_date: string | null
+          icon: string | null
+          id: string
+          order_index: number | null
+          reward_badge_name: string | null
+          reward_points: number | null
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          start_date: string | null
+          target_value: number
+          title: string
+        }
+        Insert: {
+          active?: boolean | null
+          challenge_type: Database["public"]["Enums"]["challenge_type"]
+          created_at?: string
+          description: string
+          end_date?: string | null
+          icon?: string | null
+          id?: string
+          order_index?: number | null
+          reward_badge_name?: string | null
+          reward_points?: number | null
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          start_date?: string | null
+          target_value: number
+          title: string
+        }
+        Update: {
+          active?: boolean | null
+          challenge_type?: Database["public"]["Enums"]["challenge_type"]
+          created_at?: string
+          description?: string
+          end_date?: string | null
+          icon?: string | null
+          id?: string
+          order_index?: number | null
+          reward_badge_name?: string | null
+          reward_points?: number | null
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          start_date?: string | null
+          target_value?: number
+          title?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           admin_notes: string | null
@@ -261,6 +312,92 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      contest_submissions: {
+        Row: {
+          contest_id: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          objective_id: string | null
+          title: string
+          user_id: string
+          votes_count: number | null
+          winner_rank: number | null
+        }
+        Insert: {
+          contest_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          objective_id?: string | null
+          title: string
+          user_id: string
+          votes_count?: number | null
+          winner_rank?: number | null
+        }
+        Update: {
+          contest_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          objective_id?: string | null
+          title?: string
+          user_id?: string
+          votes_count?: number | null
+          winner_rank?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contest_submissions_contest_id_fkey"
+            columns: ["contest_id"]
+            isOneToOne: false
+            referencedRelation: "photo_contests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contest_votes: {
+        Row: {
+          contest_id: string
+          created_at: string
+          id: string
+          submission_id: string
+          user_id: string
+        }
+        Insert: {
+          contest_id: string
+          created_at?: string
+          id?: string
+          submission_id: string
+          user_id: string
+        }
+        Update: {
+          contest_id?: string
+          created_at?: string
+          id?: string
+          submission_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contest_votes_contest_id_fkey"
+            columns: ["contest_id"]
+            isOneToOne: false
+            referencedRelation: "photo_contests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contest_votes_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "contest_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       continent_translations: {
         Row: {
@@ -1210,6 +1347,35 @@ export type Database = {
           },
         ]
       }
+      journal_likes: {
+        Row: {
+          created_at: string
+          id: string
+          journal_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          journal_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          journal_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_likes_journal_id_fkey"
+            columns: ["journal_id"]
+            isOneToOne: false
+            referencedRelation: "travel_journals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_library: {
         Row: {
           alt_text: string | null
@@ -1421,6 +1587,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      objective_suggestions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          images: Json | null
+          latitude: number | null
+          location_city: string | null
+          location_country: string
+          longitude: number | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["suggestion_status"]
+          suggested_types: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          images?: Json | null
+          latitude?: number | null
+          location_city?: string | null
+          location_country: string
+          longitude?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["suggestion_status"]
+          suggested_types?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          images?: Json | null
+          latitude?: number | null
+          location_city?: string | null
+          location_country?: string
+          longitude?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["suggestion_status"]
+          suggested_types?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
       }
       objective_translations: {
         Row: {
@@ -1783,27 +2009,102 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_contests: {
+        Row: {
+          cover_image: string | null
+          created_at: string
+          description: string
+          end_date: string
+          id: string
+          max_submissions_per_user: number | null
+          prizes_description: string | null
+          rules: string | null
+          slug: string
+          start_date: string
+          status: Database["public"]["Enums"]["contest_status"]
+          theme: string
+          title: string
+          updated_at: string
+          voting_end_date: string
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string
+          description: string
+          end_date: string
+          id?: string
+          max_submissions_per_user?: number | null
+          prizes_description?: string | null
+          rules?: string | null
+          slug: string
+          start_date: string
+          status?: Database["public"]["Enums"]["contest_status"]
+          theme: string
+          title: string
+          updated_at?: string
+          voting_end_date: string
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string
+          description?: string
+          end_date?: string
+          id?: string
+          max_submissions_per_user?: number | null
+          prizes_description?: string | null
+          rules?: string | null
+          slug?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["contest_status"]
+          theme?: string
+          title?: string
+          updated_at?: string
+          voting_end_date?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
           full_name: string | null
           id: string
+          instagram_handle: string | null
+          is_private: boolean | null
+          location: string | null
+          twitter_handle: string | null
           updated_at: string
+          username: string | null
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          instagram_handle?: string | null
+          is_private?: boolean | null
+          location?: string | null
+          twitter_handle?: string | null
           updated_at?: string
+          username?: string | null
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          instagram_handle?: string | null
+          is_private?: boolean | null
+          location?: string | null
+          twitter_handle?: string | null
           updated_at?: string
+          username?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -1881,6 +2182,179 @@ export type Database = {
         }
         Relationships: []
       }
+      travel_journals: {
+        Row: {
+          comments_count: number | null
+          content: string
+          cover_image: string | null
+          created_at: string
+          excerpt: string | null
+          featured: boolean | null
+          gallery_images: Json | null
+          id: string
+          likes_count: number | null
+          meta_description: string | null
+          meta_title: string | null
+          published: boolean | null
+          published_at: string | null
+          slug: string
+          title: string
+          trip_end_date: string | null
+          trip_start_date: string | null
+          updated_at: string
+          user_id: string
+          views_count: number | null
+          visited_objectives: string[] | null
+        }
+        Insert: {
+          comments_count?: number | null
+          content: string
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured?: boolean | null
+          gallery_images?: Json | null
+          id?: string
+          likes_count?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          slug: string
+          title: string
+          trip_end_date?: string | null
+          trip_start_date?: string | null
+          updated_at?: string
+          user_id: string
+          views_count?: number | null
+          visited_objectives?: string[] | null
+        }
+        Update: {
+          comments_count?: number | null
+          content?: string
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured?: boolean | null
+          gallery_images?: Json | null
+          id?: string
+          likes_count?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          slug?: string
+          title?: string
+          trip_end_date?: string | null
+          trip_start_date?: string | null
+          updated_at?: string
+          user_id?: string
+          views_count?: number | null
+          visited_objectives?: string[] | null
+        }
+        Relationships: []
+      }
+      user_activity: {
+        Row: {
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: Database["public"]["Enums"]["activity_type"]
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_description: string | null
+          badge_icon: string | null
+          badge_name: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_description?: string | null
+          badge_icon?: string | null
+          badge_name: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_description?: string | null
+          badge_icon?: string | null
+          badge_name?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string
+          current_value: number | null
+          id: string
+          reward_claimed: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          id?: string
+          reward_claimed?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          id?: string
+          reward_claimed?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "community_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -1909,6 +2383,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      user_points: {
+        Row: {
+          created_at: string
+          level: number | null
+          points_to_next_level: number | null
+          total_points: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          level?: number | null
+          points_to_next_level?: number | null
+          total_points?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          level?: number | null
+          points_to_next_level?: number | null
+          total_points?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_reputation: {
         Row: {
@@ -1972,10 +2494,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      award_badge: {
+        Args: {
+          p_badge_description: string
+          p_badge_icon: string
+          p_badge_name: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      award_points: {
+        Args: { p_points: number; p_user_id: string }
+        Returns: undefined
+      }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
       has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
     }
     Enums: {
+      activity_type:
+        | "favorite_added"
+        | "review_posted"
+        | "post_created"
+        | "reply_created"
+        | "journal_published"
+        | "contest_submitted"
+        | "challenge_completed"
+        | "badge_earned"
       blog_category:
         | "călătorii"
         | "cultură"
@@ -1983,7 +2527,17 @@ export type Database = {
         | "natură"
         | "gastronomie"
         | "aventură"
+      challenge_type:
+        | "visit_count"
+        | "review_count"
+        | "favorite_count"
+        | "post_count"
+        | "continent_explorer"
+        | "unesco_hunter"
+      contest_status: "upcoming" | "active" | "voting" | "ended"
       difficulty_level: "easy" | "moderate" | "difficult" | "extreme"
+      reward_type: "badge" | "points" | "both"
+      suggestion_status: "pending" | "approved" | "rejected"
       user_role_type: "admin" | "editor" | "contributor" | "user"
     }
     CompositeTypes: {
@@ -2112,6 +2666,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_type: [
+        "favorite_added",
+        "review_posted",
+        "post_created",
+        "reply_created",
+        "journal_published",
+        "contest_submitted",
+        "challenge_completed",
+        "badge_earned",
+      ],
       blog_category: [
         "călătorii",
         "cultură",
@@ -2120,7 +2684,18 @@ export const Constants = {
         "gastronomie",
         "aventură",
       ],
+      challenge_type: [
+        "visit_count",
+        "review_count",
+        "favorite_count",
+        "post_count",
+        "continent_explorer",
+        "unesco_hunter",
+      ],
+      contest_status: ["upcoming", "active", "voting", "ended"],
       difficulty_level: ["easy", "moderate", "difficult", "extreme"],
+      reward_type: ["badge", "points", "both"],
+      suggestion_status: ["pending", "approved", "rejected"],
       user_role_type: ["admin", "editor", "contributor", "user"],
     },
   },

@@ -57,6 +57,9 @@ import ForumHomePage from "@/pages/ForumHomePage";
 import ForumCategoryPage from "@/pages/ForumCategoryPage";
 import ForumPostPage from "@/pages/ForumPostPage";
 import ForumAdmin from "@/pages/admin/ForumAdmin";
+import UserProfile from "@/pages/UserProfile";
+import ActivityFeed from "@/pages/ActivityFeed";
+import Leaderboards from "@/pages/Leaderboards";
 
 const queryClient = new QueryClient();
 
