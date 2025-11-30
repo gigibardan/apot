@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { usePageViewTracking } from "@/hooks/usePageViewTracking";
 
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -59,6 +60,12 @@ import ForumAdmin from "@/pages/admin/ForumAdmin";
 
 const queryClient = new QueryClient();
 
+// Analytics tracking component
+const AnalyticsTracker = () => {
+  usePageViewTracking();
+  return null;
+};
+
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
@@ -68,6 +75,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <AnalyticsTracker />
               <LanguageProvider>
                 <Routes>
             {/* Public Routes - with optional language prefix */}
