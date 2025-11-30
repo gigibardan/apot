@@ -39,15 +39,19 @@ import { generateObjectiveSchema, generateBreadcrumbSchema } from "@/lib/utils/s
 import type { ObjectiveWithRelations } from "@/types/database.types";
 import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award, MapPin, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslatedObjective } from "@/hooks/useTranslatedContent";
 
 export default function ObjectiveSingle() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
-  const [objective, setObjective] = useState<ObjectiveWithRelations | null>(null);
+  const [objectiveData, setObjectiveData] = useState<ObjectiveWithRelations | null>(null);
   const [similar, setSimilar] = useState<ObjectiveWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Get translated content
+  const { content: objective, isLoading: translationLoading } = useTranslatedObjective(objectiveData);
   
   // Reviews state
   const [reviews, setReviews] = useState<any[]>([]);
@@ -69,7 +73,7 @@ export default function ObjectiveSingle() {
 
       try {
         const data = await getObjectiveBySlug(slug);
-        setObjective(data);
+        setObjectiveData(data);
 
         // Increment views (fire and forget)
         incrementObjectiveViews(data.id).catch(console.error);
@@ -192,7 +196,7 @@ export default function ObjectiveSingle() {
   }, [objective?.description]);
 
   // Loading State
-  if (loading) {
+  if (loading || translationLoading) {
     return (
       <>
         <SEO title="Se încarcă..." />
