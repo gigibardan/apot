@@ -6,10 +6,12 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { GuideBookingForm } from "@/components/features/contact/GuideBookingForm";
 import { getGuideBySlug } from "@/lib/supabase/queries/guides";
 import { getGuideReviews } from "@/lib/supabase/queries/reviews";
 import { canReviewGuide, getUserReview } from "@/lib/supabase/mutations/reviews";
-import { Star, Shield, MapPin, Languages, Mail, Phone, Globe, MessageCircle, Calendar } from "lucide-react";
+import { Star, Shield, MapPin, Languages, Mail, Phone, Globe, MessageCircle, Calendar, Send } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +22,7 @@ export default function GuideSinglePage() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated, user } = useAuth();
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showBookingDialog, setShowBookingDialog] = useState(false);
   const [reviewsPage, setReviewsPage] = useState(1);
   const reviewsPerPage = 10;
 
@@ -152,8 +155,27 @@ export default function GuideSinglePage() {
 
               {/* Contact Buttons */}
               <div className="flex flex-wrap gap-3">
+                <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Send className="h-4 w-4 mr-2" />
+                      Cere Rezervare
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Rezervă cu {guide.full_name}</DialogTitle>
+                    </DialogHeader>
+                    <GuideBookingForm
+                      guideId={guide.id}
+                      guideName={guide.full_name}
+                      onSuccess={() => setShowBookingDialog(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+                
                 {guide.email && (
-                  <Button asChild>
+                  <Button variant="outline" asChild>
                     <a href={`mailto:${guide.email}`}>
                       <Mail className="h-4 w-4 mr-2" />
                       Email

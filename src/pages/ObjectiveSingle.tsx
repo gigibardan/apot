@@ -16,11 +16,13 @@ import { FavoriteButton } from "@/components/features/objectives/FavoriteButton"
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ReadingProgress } from "@/components/shared/ReadingProgress";
 import { MobileStickyCTA } from "@/components/shared/MobileStickyCTA";
+import { ObjectiveInquiryForm } from "@/components/features/contact/ObjectiveInquiryForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   getObjectiveBySlug,
   incrementObjectiveViews,
@@ -34,7 +36,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { ShareButtons } from "@/components/features/objectives/ShareButtons";
 import type { ObjectiveWithRelations } from "@/types/database.types";
-import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award, MapPin } from "lucide-react";
+import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award, MapPin, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function ObjectiveSingle() {
@@ -53,6 +55,7 @@ export default function ObjectiveSingle() {
   const [reviewsPage, setReviewsPage] = useState(1);
   const [totalReviewsPages, setTotalReviewsPages] = useState(0);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
 
   // Fetch objective data
   useEffect(() => {
@@ -414,39 +417,56 @@ export default function ObjectiveSingle() {
               )}
 
               {/* Contact & Links */}
-              {(objective.website_url || objective.contact_email || objective.contact_phone || objective.booking_url) && (
-                <section>
-                  <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
-                    Contact & Rezervări
-                  </h2>
-                  <div className="flex flex-wrap gap-3">
-                    {objective.website_url && (
-                      <Button asChild variant="outline">
-                        <a href={objective.website_url} target="_blank" rel="noopener noreferrer">
-                          🌐 Website
-                        </a>
+              <section>
+                <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
+                  Contact & Rezervări
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  <Dialog open={showInquiryDialog} onOpenChange={setShowInquiryDialog}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Pune o întrebare
                       </Button>
-                    )}
-                    {objective.contact_email && (
-                      <Button asChild variant="outline">
-                        <a href={`mailto:${objective.contact_email}`}>📧 Email</a>
-                      </Button>
-                    )}
-                    {objective.contact_phone && (
-                      <Button asChild variant="outline">
-                        <a href={`tel:${objective.contact_phone}`}>📞 Telefon</a>
-                      </Button>
-                    )}
-                    {objective.booking_url && (
-                      <Button asChild>
-                        <a href={objective.booking_url} target="_blank" rel="noopener noreferrer">
-                          🎟️ Rezervă Acum
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </section>
-              )}
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Întreabă despre {objective.title}</DialogTitle>
+                      </DialogHeader>
+                      <ObjectiveInquiryForm
+                        objectiveId={objective.id}
+                        objectiveTitle={objective.title}
+                        onSuccess={() => setShowInquiryDialog(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                  
+                  {objective.website_url && (
+                    <Button asChild variant="outline">
+                      <a href={objective.website_url} target="_blank" rel="noopener noreferrer">
+                        🌐 Website
+                      </a>
+                    </Button>
+                  )}
+                  {objective.contact_email && (
+                    <Button asChild variant="outline">
+                      <a href={`mailto:${objective.contact_email}`}>📧 Email</a>
+                    </Button>
+                  )}
+                  {objective.contact_phone && (
+                    <Button asChild variant="outline">
+                      <a href={`tel:${objective.contact_phone}`}>📞 Telefon</a>
+                    </Button>
+                  )}
+                  {objective.booking_url && (
+                    <Button asChild variant="outline">
+                      <a href={objective.booking_url} target="_blank" rel="noopener noreferrer">
+                        🎟️ Rezervă Acum
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </section>
 
               {/* Gallery Section */}
               <section>
