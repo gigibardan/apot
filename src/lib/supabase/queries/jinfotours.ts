@@ -7,9 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { JinfoursCircuit } from "@/types/database.types";
 
 /**
- * Get circuits (optionally only featured)
+ * Get circuits (optionally only featured or with search)
  */
-export async function getCircuits(featured?: boolean): Promise<JinfoursCircuit[]> {
+export async function getCircuits(featured?: boolean, search?: string): Promise<JinfoursCircuit[]> {
   let query = supabase
     .from("jinfotours_circuits")
     .select("*")
@@ -17,6 +17,10 @@ export async function getCircuits(featured?: boolean): Promise<JinfoursCircuit[]
 
   if (featured !== undefined) {
     query = query.eq("featured", featured);
+  }
+
+  if (search) {
+    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
   }
 
   const { data, error } = await query;

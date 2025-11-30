@@ -21,8 +21,11 @@ export const ADMIN_ROUTES = {
   blog: "/admin/blog",
   blogCreate: "/admin/blog/new",
   blogEdit: (id: string) => `/admin/blog/${id}/edit`,
+  circuits: "/admin/circuite",
+  circuitsCreate: "/admin/circuite/new",
+  circuitsEdit: (id: string) => `/admin/circuite/${id}/edit`,
   media: "/admin/media",
-  settings: "/admin/settings",
+  settings: "/admin/setari",
 } as const;
 
 export const AUTH_ROUTES = {
