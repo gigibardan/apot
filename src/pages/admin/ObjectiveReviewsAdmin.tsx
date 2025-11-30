@@ -404,6 +404,5 @@ export default function ObjectiveReviewsAdmin() {
           </div>
         )}
       </div>
-    </div>
   );
 }
