@@ -49,6 +49,9 @@ import LoginPage from "@/pages/auth/Login";
 import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import NotFound from "@/pages/NotFound";
 import TestDatabase from "@/pages/TestDatabase";
+import ForumHomePage from "@/pages/ForumHomePage";
+import ForumCategoryPage from "@/pages/ForumCategoryPage";
+import ForumPostPage from "@/pages/ForumPostPage";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +80,9 @@ const App = () => (
               <Route path="blog/:slug" element={<BlogArticle />} />
               <Route path="despre" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
+              <Route path="forum" element={<ForumHomePage />} />
+              <Route path="forum/:categorySlug" element={<ForumCategoryPage />} />
+              <Route path="forum/:categorySlug/:postSlug" element={<ForumPostPage />} />
             </Route>
 
             {/* Admin Routes - Protected */}
