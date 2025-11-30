@@ -98,6 +98,33 @@ export function Header() {
               </Link>
             ))}
             
+            {/* Auth Links */}
+            {user ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard")}
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/auth/login")}
+                >
+                  Autentificare
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/auth/signup")}
+                >
+                  Înregistrare
+                </Button>
+              </>
+            )}
+            
             {/* Community Dropdown - Desktop Only */}
             <div className="relative group">
               <button className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
@@ -260,6 +287,44 @@ export function Header() {
                   <Sun className="h-5 w-5" />
                 )}
               </button>
+
+              {/* Auth Buttons Mobile */}
+              {user ? (
+                <div className="px-4 py-2 space-y-2 border-t">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/dashboard");
+                    }}
+                  >
+                    Dashboard
+                  </Button>
+                </div>
+              ) : (
+                <div className="px-4 py-2 space-y-2 border-t">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/auth/login");
+                    }}
+                  >
+                    Autentificare
+                  </Button>
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/auth/signup");
+                    }}
+                  >
+                    Înregistrare
+                  </Button>
+                </div>
+              )}
             </div>
           </Container>
         </div>

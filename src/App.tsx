@@ -50,6 +50,7 @@ import Templates from "@/pages/admin/Templates";
 import NewsletterAdmin from "@/pages/admin/NewsletterAdmin";
 import ContactMessagesAdmin from "@/pages/admin/ContactMessagesAdmin";
 import LoginPage from "@/pages/auth/Login";
+import SignUpPage from "@/pages/auth/SignUp";
 import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import NotFound from "@/pages/NotFound";
 import TestDatabase from "@/pages/TestDatabase";
@@ -168,6 +169,7 @@ const App = () => (
 
             {/* Auth Routes */}
             <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/signup" element={<SignUpPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
             {/* Test Routes */}
