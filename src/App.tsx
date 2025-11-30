@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -27,7 +29,9 @@ import CircuitsAdmin from "@/pages/admin/CircuitsAdmin";
 import CircuitForm from "@/pages/admin/CircuitForm";
 import MediaLibrary from "@/pages/admin/MediaLibrary";
 import Settings from "@/pages/admin/Settings";
+import UsersPage from "@/pages/admin/Users";
 import LoginPage from "@/pages/auth/Login";
+import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import NotFound from "@/pages/NotFound";
 import TestDatabase from "@/pages/TestDatabase";
 
@@ -37,10 +41,11 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
             <Routes>
             {/* Public Routes */}
             <Route path="/" element={<PublicLayout />}>
@@ -53,8 +58,8 @@ const App = () => (
               <Route path="contact" element={<ContactPage />} />
             </Route>
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
+            {/* Admin Routes - Protected */}
+            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
               <Route path="obiective" element={<ObjectivesAdmin />} />
               <Route path="obiective/nou" element={<ObjectiveForm />} />
@@ -67,10 +72,12 @@ const App = () => (
               <Route path="circuite/:id" element={<CircuitForm />} />
               <Route path="media" element={<MediaLibrary />} />
               <Route path="setari" element={<Settings />} />
+              <Route path="utilizatori" element={<ProtectedRoute requireRole="admin"><UsersPage /></ProtectedRoute>} />
             </Route>
 
             {/* Auth Routes */}
             <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
             {/* Test Routes */}
             <Route path="/test-database" element={<TestDatabase />} />
@@ -80,7 +87,8 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
-      </ThemeProvider>
+      </AuthProvider>
+    </ThemeProvider>
     </QueryClientProvider>
   </HelmetProvider>
 );
