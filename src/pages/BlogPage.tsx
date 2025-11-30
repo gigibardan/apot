@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { SEO } from "@/components/seo/SEO";
 import { ArticleCard } from "@/components/features/blog/ArticleCard";
+import { BlogListingSidebar } from "@/components/features/blog/BlogListingSidebar";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -31,9 +32,12 @@ const CATEGORIES: { value: BlogCategory; label: string }[] = [
 
 export default function BlogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [articles, setArticles] = useState<BlogArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [categoryCounts, setCategoryCounts] = useState<{ category: BlogCategory; count: number }[]>([]);
+  const [tagCounts, setTagCounts] = useState<{ tag: string; count: number }[]>([]);
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | "all">(
     (searchParams.get("category") as BlogCategory) || "all"
@@ -43,28 +47,55 @@ export default function BlogPage() {
 
   const articlesPerPage = 6;
 
-  // Fetch articles
+  // Fetch articles and sidebar data
   useEffect(() => {
-    const fetchArticles = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await getBlogArticles({
-          category: selectedCategory === "all" ? undefined : selectedCategory,
-          search: searchQuery || undefined,
-          limit: articlesPerPage,
-          offset: (page - 1) * articlesPerPage,
-        });
+        const [articlesResult, tagsResult] = await Promise.all([
+          getBlogArticles({
+            category: selectedCategory === "all" ? undefined : selectedCategory,
+            search: searchQuery || undefined,
+            limit: articlesPerPage,
+            offset: (page - 1) * articlesPerPage,
+          }),
+          getAllTags(),
+        ]);
 
-        setArticles(result.data);
-        setTotalCount(result.count);
+        setArticles(articlesResult.data);
+        setTotalCount(articlesResult.count);
+
+        // Calculate category counts from all articles
+        const allArticlesResult = await getBlogArticles({ limit: 1000 });
+        const categoriesMap = new Map<BlogCategory, number>();
+        allArticlesResult.data.forEach((article) => {
+          if (article.category) {
+            categoriesMap.set(article.category, (categoriesMap.get(article.category) || 0) + 1);
+          }
+        });
+        setCategoryCounts(
+          Array.from(categoriesMap.entries()).map(([category, count]) => ({ category, count }))
+        );
+
+        // Process tags with counts
+        const tagsMap = new Map<string, number>();
+        tagsResult.forEach((tag) => {
+          tagsMap.set(tag, (tagsMap.get(tag) || 0) + 1);
+        });
+        setTagCounts(
+          Array.from(tagsMap.entries())
+            .map(([tag, count]) => ({ tag, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 15) // Top 15 tags
+        );
       } catch (error) {
-        console.error("Error fetching articles:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchArticles();
+    fetchData();
   }, [selectedCategory, searchQuery, sortBy, page]);
 
   // Update URL params
@@ -180,81 +211,105 @@ export default function BlogPage() {
         </Container>
       </Section>
 
-      {/* Articles Grid */}
+      {/* Articles Grid with Sidebar */}
       <Section className="py-12">
         <Container>
-          {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-[400px]" />
-              ))}
-            </div>
-          ) : articles.length === 0 ? (
-            <EmptyState
-              icon="📝"
-              title="Niciun articol găsit"
-              description={
-                searchQuery
-                  ? "Nu am găsit articole care să corespundă căutării tale"
-                  : "Primul articol va fi publicat în curând"
-              }
-              action={
-                searchQuery
-                  ? {
-                      label: "Șterge căutarea",
-                      onClick: () => setSearchQuery(""),
-                    }
-                  : {
-                      label: "Explorează Obiective",
-                      href: "/obiective",
-                    }
-              }
-            />
-          ) : (
-            <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {articles.map((article) => (
-                  <ArticleCard key={article.id} article={article} />
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-muted transition-colors"
-                  >
-                    Anterior
-                  </button>
-                  <div className="flex gap-1">
-                    {[...Array(totalPages)].map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setPage(i + 1)}
-                        className={cn(
-                          "px-3 py-1 border rounded-md transition-colors",
-                          page === i + 1
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-muted"
-                        )}
-                      >
-                        {i + 1}
-                      </button>
+          <div className="grid lg:grid-cols-[1fr_300px] gap-8">
+            {/* Main Content */}
+            <div>
+              {loading ? (
+                <div className="grid md:grid-cols-2 gap-8">
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className="h-[400px]" />
+                  ))}
+                </div>
+              ) : articles.length === 0 ? (
+                <EmptyState
+                  icon="📝"
+                  title="Niciun articol găsit"
+                  description={
+                    searchQuery
+                      ? "Nu am găsit articole care să corespundă căutării tale"
+                      : "Primul articol va fi publicat în curând"
+                  }
+                  action={
+                    searchQuery
+                      ? {
+                          label: "Șterge căutarea",
+                          onClick: () => setSearchQuery(""),
+                        }
+                      : {
+                          label: "Explorează Obiective",
+                          href: "/obiective",
+                        }
+                  }
+                />
+              ) : (
+                <>
+                  <div className="grid md:grid-cols-2 gap-8 mb-12">
+                    {articles.map((article) => (
+                      <ArticleCard key={article.id} article={article} />
                     ))}
                   </div>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-muted transition-colors"
-                  >
-                    Următorul
-                  </button>
-                </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-muted transition-colors"
+                      >
+                        Anterior
+                      </button>
+                      <div className="flex gap-1">
+                        {[...Array(totalPages)].map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setPage(i + 1)}
+                            className={cn(
+                              "px-3 py-1 border rounded-md transition-colors",
+                              page === i + 1
+                                ? "bg-primary text-primary-foreground"
+                                : "hover:bg-muted"
+                            )}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="px-4 py-2 border rounded-md disabled:opacity-50 hover:bg-muted transition-colors"
+                      >
+                        Următorul
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </div>
+
+            {/* Sidebar */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-20">
+                <BlogListingSidebar
+                  categories={categoryCounts}
+                  tags={tagCounts}
+                  selectedCategory={selectedCategory}
+                  onCategoryClick={(category) => {
+                    setSelectedCategory(category);
+                    setPage(1);
+                  }}
+                  onTagClick={(tag) => {
+                    setSearchQuery(tag);
+                    setPage(1);
+                  }}
+                />
+              </div>
+            </aside>
+          </div>
         </Container>
       </Section>
     </>

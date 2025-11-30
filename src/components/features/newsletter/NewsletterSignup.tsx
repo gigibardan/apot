@@ -11,7 +11,11 @@ import { useToast } from "@/hooks/use-toast";
  * Email capture form with GDPR compliance
  * Phase 1: UI only, backend integration later
  */
-export function NewsletterSignup() {
+interface NewsletterSignupProps {
+  variant?: "default" | "compact";
+}
+
+export function NewsletterSignup({ variant = "default" }: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,33 +99,37 @@ export function NewsletterSignup() {
     );
   }
 
+  const isCompact = variant === "compact";
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className={`space-y-4 ${!isCompact && "max-w-md mx-auto"}`}>
       {/* Email Input */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className={`flex ${isCompact ? "flex-col" : "flex-col sm:flex-row"} gap-3`}>
         <div className="relative flex-1">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          {!isCompact && (
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          )}
           <Input
             type="email"
             placeholder="adresa@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
-            className="pl-10 bg-white dark:bg-background"
+            className={`${!isCompact && "pl-10"} bg-white dark:bg-background`}
             aria-label="Adresa de email"
             required
           />
         </div>
         <Button
           type="submit"
-          size="lg"
+          size={isCompact ? "default" : "lg"}
           disabled={isSubmitting || !agreedToTerms}
           className="bg-accent hover:bg-accent/90"
         >
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Se trimite...
+              {isCompact ? "Se trimite..." : "Se trimite..."}
             </>
           ) : (
             "Abonează-te"
@@ -132,26 +140,42 @@ export function NewsletterSignup() {
       {/* GDPR Checkbox */}
       <div className="flex items-start gap-2">
         <Checkbox
-          id="terms"
+          id={`terms-${variant}`}
           checked={agreedToTerms}
           onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
           disabled={isSubmitting}
           className="mt-0.5"
         />
         <Label
-          htmlFor="terms"
+          htmlFor={`terms-${variant}`}
           className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
         >
-          Sunt de acord cu{" "}
-          <a
-            href="/politica-confidentialitate"
-            className="underline hover:text-primary"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Politica de Confidențialitate
-          </a>{" "}
-          și doresc să primesc newsletter-ul APOT
+          {isCompact ? (
+            <>
+              Accept{" "}
+              <a
+                href="/politica-confidentialitate"
+                className="underline hover:text-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Politica
+              </a>
+            </>
+          ) : (
+            <>
+              Sunt de acord cu{" "}
+              <a
+                href="/politica-confidentialitate"
+                className="underline hover:text-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Politica de Confidențialitate
+              </a>{" "}
+              și doresc să primesc newsletter-ul APOT
+            </>
+          )}
         </Label>
       </div>
     </form>

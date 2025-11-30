@@ -341,6 +341,44 @@ export default function BlogArticle() {
                   </div>
                 </div>
               )}
+
+              {/* Newsletter CTA */}
+              <div className="mt-16">
+                <div className="bg-gradient-to-br from-primary via-primary/90 to-accent p-8 md:p-12 rounded-2xl text-center text-primary-foreground">
+                  <h3 className="text-2xl md:text-3xl font-display font-bold mb-4">
+                    Nu rata niciun articol
+                  </h3>
+                  <p className="text-lg mb-6 opacity-90">
+                    Abonează-te la newsletter și primești un ghid gratuit de călătorie
+                  </p>
+                  <div className="max-w-md mx-auto">
+                    <form className="flex flex-col sm:flex-row gap-3">
+                      <input
+                        type="email"
+                        placeholder="Adresa ta de email"
+                        className="flex-1 px-4 py-3 rounded-lg bg-background text-foreground border-0 focus:outline-none focus:ring-2 focus:ring-accent"
+                      />
+                      <button
+                        type="submit"
+                        className="px-6 py-3 bg-background text-foreground font-semibold rounded-lg hover:bg-background/90 transition-colors"
+                      >
+                        Abonează-te
+                      </button>
+                    </form>
+                    <p className="text-xs mt-3 opacity-75">
+                      Îți respectăm confidențialitatea. Poți anula abonamentul oricând.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Comments Placeholder */}
+              <div className="mt-16 pt-12 border-t">
+                <h3 className="text-2xl font-display font-bold mb-4">Comentarii</h3>
+                <p className="text-muted-foreground">
+                  Secțiunea de comentarii va fi disponibilă în curând. Între timp, ne poți contacta pe rețelele sociale.
+                </p>
+              </div>
             </div>
 
             {/* Sidebar */}
