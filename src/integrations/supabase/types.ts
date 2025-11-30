@@ -95,6 +95,53 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_article_translations: {
+        Row: {
+          article_id: string
+          content: string | null
+          created_at: string | null
+          excerpt: string | null
+          id: string
+          language: string
+          meta_description: string | null
+          meta_title: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          article_id: string
+          content?: string | null
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          language: string
+          meta_description?: string | null
+          meta_title?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          article_id?: string
+          content?: string | null
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          language?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_article_translations_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "blog_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_articles: {
         Row: {
           author_id: string | null
@@ -215,6 +262,50 @@ export type Database = {
         }
         Relationships: []
       }
+      continent_translations: {
+        Row: {
+          continent_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          language: string
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          continent_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          language: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          continent_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          language?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "continent_translations_continent_id_fkey"
+            columns: ["continent_id"]
+            isOneToOne: false
+            referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       continents: {
         Row: {
           created_at: string
@@ -312,6 +403,50 @@ export type Database = {
             columns: ["continent_id"]
             isOneToOne: false
             referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      country_translations: {
+        Row: {
+          country_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          language: string
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          country_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          language: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          country_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          language?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_translations_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
             referencedColumns: ["id"]
           },
         ]
@@ -792,6 +927,53 @@ export type Database = {
           },
         ]
       }
+      guide_translations: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          full_name: string | null
+          guide_id: string
+          id: string
+          language: string
+          meta_description: string | null
+          meta_title: string | null
+          short_description: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          guide_id: string
+          id?: string
+          language: string
+          meta_description?: string | null
+          meta_title?: string | null
+          short_description?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          guide_id?: string
+          id?: string
+          language?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          short_description?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_translations_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guides: {
         Row: {
           active: boolean | null
@@ -1236,6 +1418,109 @@ export type Database = {
             columns: ["objective_id"]
             isOneToOne: false
             referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      objective_translations: {
+        Row: {
+          accessibility_info: string | null
+          best_season: string | null
+          created_at: string | null
+          description: string | null
+          entrance_fee: string | null
+          excerpt: string | null
+          id: string
+          language: string
+          location_text: string | null
+          meta_description: string | null
+          meta_title: string | null
+          objective_id: string
+          opening_hours: string | null
+          title: string
+          updated_at: string | null
+          visit_duration: string | null
+        }
+        Insert: {
+          accessibility_info?: string | null
+          best_season?: string | null
+          created_at?: string | null
+          description?: string | null
+          entrance_fee?: string | null
+          excerpt?: string | null
+          id?: string
+          language: string
+          location_text?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          objective_id: string
+          opening_hours?: string | null
+          title: string
+          updated_at?: string | null
+          visit_duration?: string | null
+        }
+        Update: {
+          accessibility_info?: string | null
+          best_season?: string | null
+          created_at?: string | null
+          description?: string | null
+          entrance_fee?: string | null
+          excerpt?: string | null
+          id?: string
+          language?: string
+          location_text?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          objective_id?: string
+          opening_hours?: string | null
+          title?: string
+          updated_at?: string | null
+          visit_duration?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objective_translations_objective_id_fkey"
+            columns: ["objective_id"]
+            isOneToOne: false
+            referencedRelation: "objectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      objective_type_translations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          language: string
+          name: string
+          type_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          language: string
+          name: string
+          type_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          language?: string
+          name?: string
+          type_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objective_type_translations_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "objective_types"
             referencedColumns: ["id"]
           },
         ]

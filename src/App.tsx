@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 // Layouts
@@ -66,7 +67,8 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-            <Routes>
+              <LanguageProvider>
+                <Routes>
             {/* Public Routes */}
             <Route path="/" element={<PublicLayout />}>
               <Route index element={<HomePage />} />
@@ -128,6 +130,7 @@ const App = () => (
             {/* Catch All */}
             <Route path="*" element={<NotFound />} />
             </Routes>
+          </LanguageProvider>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
