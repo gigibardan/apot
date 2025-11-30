@@ -19,6 +19,7 @@ import {
   getRelatedArticles,
 } from "@/lib/supabase/queries/blog";
 import { calculateReadingTime, formatReadingTime } from "@/lib/utils/reading-time";
+import { generateArticleSchema, generateBreadcrumbSchema } from "@/lib/utils/structured-data";
 import type { BlogArticle } from "@/types/database.types";
 import { Calendar, Clock, Eye } from "lucide-react";
 import { format } from "date-fns";
@@ -207,6 +208,21 @@ export default function BlogArticle() {
     ? format(new Date(article.published_at), "d MMMM yyyy", { locale: ro })
     : "";
 
+  // Generate structured data
+  const breadcrumbs = getBreadcrumbs();
+  const breadcrumbItems = breadcrumbs.map((item) => ({
+    name: item.label,
+    url: item.href,
+  }));
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      generateArticleSchema(article),
+      generateBreadcrumbSchema(breadcrumbItems),
+    ],
+  };
+
   // Success state
   return (
     <>
@@ -216,6 +232,12 @@ export default function BlogArticle() {
         canonical={`/blog/${article.slug}`}
         ogImage={article.featured_image || undefined}
         ogType="article"
+        article={{
+          publishedTime: article.published_at || article.created_at,
+          modifiedTime: article.updated_at,
+          tags: article.tags || undefined,
+        }}
+        structuredData={structuredData}
       />
 
       <ReadingProgress />

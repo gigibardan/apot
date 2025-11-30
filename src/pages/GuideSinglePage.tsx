@@ -11,6 +11,7 @@ import { GuideBookingForm } from "@/components/features/contact/GuideBookingForm
 import { getGuideBySlug } from "@/lib/supabase/queries/guides";
 import { getGuideReviews } from "@/lib/supabase/queries/reviews";
 import { canReviewGuide, getUserReview } from "@/lib/supabase/mutations/reviews";
+import { generateGuideSchema } from "@/lib/utils/structured-data";
 import { Star, Shield, MapPin, Languages, Mail, Phone, Globe, MessageCircle, Calendar, Send } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils";
@@ -69,6 +70,8 @@ export default function GuideSinglePage() {
     );
   }
 
+  const structuredData = generateGuideSchema(guide);
+
   return (
     <>
       <SEO
@@ -78,6 +81,9 @@ export default function GuideSinglePage() {
           guide.short_description ||
           `Descoperă serviciile ghidului ${guide.full_name}, expert în ${guide.specializations?.join(", ")}`
         }
+        canonical={`/ghizi/${guide.slug}`}
+        ogImage={guide.profile_image || undefined}
+        structuredData={structuredData}
       />
 
       <div className="container mx-auto px-4 py-12">
