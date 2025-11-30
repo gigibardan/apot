@@ -162,9 +162,17 @@ export async function getObjectiveBySlug(slug: string) {
     )
     .eq("slug", slug)
     .eq("published", true)
-    .single();
+    .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching objective:", error);
+    throw error;
+  }
+  
+  if (!data) {
+    throw new Error("No rows found");
+  }
+  
   return data as ObjectiveWithRelations;
 }
 
