@@ -17,6 +17,7 @@ import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
 import ObjectiveSingle from "@/pages/ObjectiveSingle";
 import FavoritesPage from "@/pages/FavoritesPage";
+import UserDashboard from "@/pages/UserDashboard";
 import NewsletterConfirm from "@/pages/NewsletterConfirm";
 import NewsletterUnsubscribe from "@/pages/NewsletterUnsubscribe";
 import GuidesPage from "@/pages/GuidesPage";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
               <Route path="favorite" element={<FavoritesPage />} />
+              <Route path="dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
               <Route path="newsletter/confirmare" element={<NewsletterConfirm />} />
               <Route path="newsletter/dezabonare" element={<NewsletterUnsubscribe />} />
               <Route path="ghizi" element={<GuidesPage />} />
