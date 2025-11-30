@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
@@ -129,6 +130,13 @@ export default function CircuitForm() {
 
   return (
     <div className="max-w-3xl">
+      <Breadcrumbs
+        items={[
+          { label: "Circuite", href: ADMIN_ROUTES.circuits },
+          { label: id ? "Editează" : "Circuit Nou" },
+        ]}
+      />
+      
       <div className="mb-6">
         <h2 className="text-3xl font-display font-bold">
           {id ? "Editează Circuit" : "Circuit Nou"}

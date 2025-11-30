@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Eye, Trash2, Loader2, MapPin } from "lucide-react";
+import { Plus, Search, Pencil, Eye, Trash2, Loader2, MapPin, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -31,7 +32,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { getObjectives } from "@/lib/supabase/queries/objectives";
-import { deleteObjective, toggleObjectivePublish } from "@/lib/supabase/mutations/objectives";
+import { deleteObjective, toggleObjectivePublish, duplicateObjective } from "@/lib/supabase/mutations/objectives";
 import { getContinents } from "@/lib/supabase/queries/taxonomies";
 import { toast } from "sonner";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
@@ -105,8 +106,21 @@ export default function ObjectivesAdmin() {
     }
   }
 
+  async function handleDuplicate(id: string) {
+    try {
+      const newObjective = await duplicateObjective(id);
+      toast.success("Obiectiv duplicat cu succes");
+      loadData();
+    } catch (error) {
+      console.error("Error duplicating objective:", error);
+      toast.error("Eroare la duplicarea obiectivului");
+    }
+  }
+
   return (
     <div className="space-y-6">
+      <Breadcrumbs items={[{ label: "Obiective" }]} />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -254,12 +268,12 @@ export default function ObjectivesAdmin() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button asChild variant="ghost" size="icon">
+                      <Button asChild variant="ghost" size="icon" title="Editează">
                         <Link to={`${ADMIN_ROUTES.objectives}/${objective.id}`}>
                           <Pencil className="h-4 w-4" />
                         </Link>
                       </Button>
-                      <Button asChild variant="ghost" size="icon">
+                      <Button asChild variant="ghost" size="icon" title="Vezi public">
                         <a
                           href={`${PUBLIC_ROUTES.objectives}/${objective.slug}`}
                           target="_blank"
@@ -271,6 +285,15 @@ export default function ObjectivesAdmin() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        title="Duplică"
+                        onClick={() => handleDuplicate(objective.id)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Șterge"
                         onClick={() =>
                           setDeleteDialog({
                             open: true,

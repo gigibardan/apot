@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Search, Pencil, Trash2, Loader2, Bus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -70,6 +71,8 @@ export default function CircuitsAdmin() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs items={[{ label: "Circuite" }]} />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

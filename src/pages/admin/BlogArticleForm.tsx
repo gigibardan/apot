@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, X } from "lucide-react";
@@ -167,6 +168,13 @@ export default function BlogArticleForm() {
 
   return (
     <div className="max-w-5xl">
+      <Breadcrumbs
+        items={[
+          { label: "Blog", href: ADMIN_ROUTES.blog },
+          { label: id ? "Editează" : "Articol Nou" },
+        ]}
+      />
+      
       <div className="mb-6">
         <h2 className="text-3xl font-display font-bold">
           {id ? "Editează Articol" : "Articol Nou"}
