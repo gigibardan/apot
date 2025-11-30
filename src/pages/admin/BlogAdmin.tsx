@@ -280,25 +280,25 @@ export default function BlogAdmin() {
             className="pl-10"
           />
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter || "all"} onValueChange={(val) => setCategoryFilter(val === "all" ? "" : val)}>
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Toate categoriile" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toate categoriile</SelectItem>
+            <SelectItem value="all">Toate categoriile</SelectItem>
             {categories.map((cat) => (
-              <SelectItem key={cat} value={cat || ""}>
+              <SelectItem key={cat} value={cat || "uncategorized"}>
                 {cat}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter || "all"} onValueChange={(val) => setStatusFilter(val === "all" ? "" : val)}>
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder="Toate" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toate</SelectItem>
+            <SelectItem value="all">Toate</SelectItem>
             <SelectItem value="published">Publicate</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
           </SelectContent>

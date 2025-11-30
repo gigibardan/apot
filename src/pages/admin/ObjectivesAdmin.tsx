@@ -279,12 +279,12 @@ export default function ObjectivesAdmin() {
             className="pl-10"
           />
         </div>
-        <Select value={continentFilter} onValueChange={setContinentFilter}>
+        <Select value={continentFilter || "all"} onValueChange={(val) => setContinentFilter(val === "all" ? "" : val)}>
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Toate continentele" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toate continentele</SelectItem>
+            <SelectItem value="all">Toate continentele</SelectItem>
             {continents.map((continent) => (
               <SelectItem key={continent.id} value={continent.id}>
                 {continent.name}
@@ -292,12 +292,12 @@ export default function ObjectivesAdmin() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter || "all"} onValueChange={(val) => setStatusFilter(val === "all" ? "" : val)}>
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder="Toate" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toate</SelectItem>
+            <SelectItem value="all">Toate</SelectItem>
             <SelectItem value="published">Publicate</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
           </SelectContent>
