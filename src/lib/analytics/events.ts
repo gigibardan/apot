@@ -160,3 +160,59 @@ export function trackSectionView(sectionName: string) {
     referrer: document.referrer,
   });
 }
+
+/**
+ * Track objectives listing page view
+ */
+export function trackObjectivesPageView(filters: {
+  continent?: string;
+  country?: string;
+  types?: string[];
+  unesco?: boolean;
+  featured?: boolean;
+  search?: string;
+  resultsCount: number;
+}) {
+  console.log("📊 Objectives Page View:", {
+    ...filters,
+    timestamp: new Date(),
+    url: window.location.href,
+  });
+}
+
+/**
+ * Track filter application
+ */
+export function trackFilterApply(filterType: string, filterValue: any) {
+  console.log("📊 Filter Applied:", {
+    filterType,
+    filterValue,
+    timestamp: new Date(),
+    url: window.location.href,
+  });
+}
+
+/**
+ * Track pagination navigation
+ */
+export function trackPaginationClick(fromPage: number, toPage: number) {
+  console.log("📊 Pagination Click:", {
+    fromPage,
+    toPage,
+    direction: toPage > fromPage ? "next" : "previous",
+    timestamp: new Date(),
+    url: window.location.href,
+  });
+}
+
+/**
+ * Track search query
+ */
+export function trackSearchQuery(query: string, resultsCount: number) {
+  console.log("📊 Search Query:", {
+    query,
+    resultsCount,
+    timestamp: new Date(),
+    url: window.location.href,
+  });
+}
