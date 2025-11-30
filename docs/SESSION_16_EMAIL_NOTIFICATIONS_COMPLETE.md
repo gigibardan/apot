@@ -14,6 +14,14 @@ Sistem complet de notificări email pentru toate formularele din aplicație:
 - **Guide Booking Requests** - Cereri rezervări ghizi
 - **Newsletter Subscriptions** - Notificări noi abonați
 
+> **⚠️ STATUS CONFIGURARE:**  
+> ✅ Cod implementat 100%  
+> ✅ Edge functions deployed  
+> ✅ Integration points configurate  
+> 🔴 **RESEND_API_KEY - NOT CONFIGURED**  
+> 
+> Toate funcționalitățile sunt implementate și funcționale. Sistemul va trimite email-uri automat odată ce se configurează cheia API Resend.
+
 ---
 
 ## 🏗️ Architecture
@@ -176,9 +184,12 @@ supabase.functions.invoke("send-admin-notification", {
 
 ## 🔐 Environment Variables Required
 
+> **⚠️ IMPORTANT:** `RESEND_API_KEY` NU A FOST CONFIGURAT ÎNCĂ  
+> Sistemul de email este implementat și functional dar necesită configurarea cheii API pentru a trimite email-uri.
+
 ### Resend API Key
 ```bash
-RESEND_API_KEY=re_xxxxxxxxxxxxx
+RESEND_API_KEY=re_xxxxxxxxxxxxx  # ⚠️ NEEDS CONFIGURATION
 ```
 
 **Setup Steps:**
@@ -186,6 +197,8 @@ RESEND_API_KEY=re_xxxxxxxxxxxxx
 2. Verifică domeniul în Resend Dashboard: https://resend.com/domains
 3. Creează API key: https://resend.com/api-keys
 4. Adaugă secret în Lovable Cloud: `RESEND_API_KEY`
+
+**Status:** 🔴 NOT CONFIGURED - Email notifications nu vor funcționa până la configurare
 
 ### Admin Email (Optional)
 ```bash
