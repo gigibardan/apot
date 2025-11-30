@@ -12,7 +12,7 @@ import { DashboardFavorites } from "@/components/features/dashboard/DashboardFav
 import { DashboardReviews } from "@/components/features/dashboard/DashboardReviews";
 import { DashboardMessages } from "@/components/features/dashboard/DashboardMessages";
 import { DashboardActivity } from "@/components/features/dashboard/DashboardActivity";
-import { User, Heart, Star, MessageSquare, Activity, Settings } from "lucide-react";
+import { User, Heart, Star, MessageSquare, Activity, Settings, Book, Trophy, Users } from "lucide-react";
 
 /**
  * User Dashboard
@@ -49,30 +49,42 @@ export default function UserDashboard() {
 
           {/* Dashboard Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 gap-2">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <Activity className="w-4 h-4" />
-                <span className="hidden sm:inline">Prezentare</span>
+                <span className="hidden sm:inline">Overview</span>
               </TabsTrigger>
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                <span className="hidden sm:inline">Profil</span>
+                <span className="hidden sm:inline">Profile</span>
               </TabsTrigger>
               <TabsTrigger value="favorites" className="flex items-center gap-2">
                 <Heart className="w-4 h-4" />
-                <span className="hidden sm:inline">Favorite</span>
+                <span className="hidden sm:inline">Favorites</span>
               </TabsTrigger>
               <TabsTrigger value="reviews" className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
-                <span className="hidden sm:inline">Recenzii</span>
+                <span className="hidden sm:inline">Reviews</span>
+              </TabsTrigger>
+              <TabsTrigger value="journals" className="flex items-center gap-2">
+                <Book className="w-4 h-4" />
+                <span className="hidden sm:inline">Journals</span>
+              </TabsTrigger>
+              <TabsTrigger value="challenges" className="flex items-center gap-2">
+                <Trophy className="w-4 h-4" />
+                <span className="hidden sm:inline">Challenges</span>
+              </TabsTrigger>
+              <TabsTrigger value="followers" className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                <span className="hidden sm:inline">Followers</span>
               </TabsTrigger>
               <TabsTrigger value="messages" className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
-                <span className="hidden sm:inline">Mesaje</span>
+                <span className="hidden sm:inline">Messages</span>
               </TabsTrigger>
               <TabsTrigger value="activity" className="flex items-center gap-2">
                 <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Activitate</span>
+                <span className="hidden sm:inline">Activity</span>
               </TabsTrigger>
             </TabsList>
 
@@ -120,6 +132,51 @@ export default function UserDashboard() {
             {/* Reviews Tab */}
             <TabsContent value="reviews">
               <DashboardReviews userId={user!.id} />
+            </TabsContent>
+
+            {/* Journals Tab */}
+            <TabsContent value="journals">
+              <Card>
+                <CardHeader>
+                  <CardTitle>My Travel Journals</CardTitle>
+                  <CardDescription>Your published travel stories</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-center py-8">
+                    Journals feature coming soon - meanwhile, visit <a href="/journals" className="text-primary hover:underline">Travel Journals</a> to create your first journal!
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Challenges Tab */}
+            <TabsContent value="challenges">
+              <Card>
+                <CardHeader>
+                  <CardTitle>My Challenges</CardTitle>
+                  <CardDescription>Track your community challenge progress</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-center py-8">
+                    Challenge progress tracking coming soon - visit <a href="/challenges" className="text-primary hover:underline">Challenges</a> to see available challenges!
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Followers Tab */}
+            <TabsContent value="followers">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Followers & Following</CardTitle>
+                  <CardDescription>Your social connections</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-center py-8">
+                    Social connections feature coming soon - visit <a href={`/user/${user?.id}`} className="text-primary hover:underline">Your Profile</a> to see your stats!
+                  </p>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             {/* Messages Tab */}
