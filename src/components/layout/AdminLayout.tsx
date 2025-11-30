@@ -41,6 +41,9 @@ const sidebarLinks = [
   { name: "Forum", href: ADMIN_ROUTES.forum, icon: MessageCircle },
   { name: "Media", href: ADMIN_ROUTES.media, icon: Image },
   { name: "Newsletter", href: ADMIN_ROUTES.newsletter, icon: FileText },
+  { name: "Sugestii", href: "/admin/suggestions", icon: FileText },
+  { name: "Contests", href: "/admin/contests", icon: FileText },
+  { name: "Challenges", href: "/admin/challenges", icon: FileText },
   { name: "Setări", href: ADMIN_ROUTES.settings, icon: Settings },
 ];
 

@@ -151,10 +151,8 @@ const App = () => (
               <Route path="suggestions" element={<SuggestionsAdmin />} />
               <Route path="contests" element={<ContestsAdmin />} />
               <Route path="challenges" element={<ChallengesAdmin />} />
+              <Route path="forum" element={<ForumAdmin />} />
             </Route>
-
-            {/* Forum Admin Route */}
-            <Route path="/admin/forum" element={<ProtectedRoute><ForumAdmin /></ProtectedRoute>} />
 
             {/* Auth Routes */}
             <Route path="/auth/login" element={<LoginPage />} />
