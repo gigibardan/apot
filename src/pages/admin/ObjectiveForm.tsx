@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ import { getObjectiveById } from "@/lib/supabase/queries/objectives";
 import {
   createObjective,
   updateObjective,
+  updateObjectiveTypes,
 } from "@/lib/supabase/mutations/objectives";
 import {
   getContinents,
@@ -29,6 +30,7 @@ import {
 } from "@/lib/supabase/queries/taxonomies";
 import ImageUpload from "@/components/admin/ImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import CharacterCounter from "@/components/admin/CharacterCounter";
 import { ADMIN_ROUTES } from "@/lib/constants/routes";
 
 export default function ObjectiveForm() {
@@ -165,13 +167,23 @@ export default function ObjectiveForm() {
         published_at: publish ? new Date().toISOString() : null,
       };
 
+      let objectiveId: string;
+
       if (isEdit) {
         await updateObjective(id!, objectiveData);
+        objectiveId = id!;
         toast.success("Obiectiv actualizat cu succes!");
       } else {
         const newObjective = await createObjective(objectiveData);
+        objectiveId = newObjective.id;
         toast.success("Obiectiv creat cu succes!");
-        navigate(`${ADMIN_ROUTES.objectives}/${newObjective.id}`);
+      }
+
+      // Update type relations
+      await updateObjectiveTypes(objectiveId, formData.selected_types);
+
+      if (!isEdit) {
+        navigate(`${ADMIN_ROUTES.objectives}/${objectiveId}`);
       }
     } catch (error: any) {
       console.error("Error saving objective:", error);
@@ -228,9 +240,7 @@ export default function ObjectiveForm() {
               placeholder="ex: Castelul Bran"
               maxLength={200}
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              {formData.title.length}/200 caractere
-            </p>
+            <CharacterCounter current={formData.title.length} max={200} className="mt-1" />
           </div>
 
           <div>
@@ -301,9 +311,7 @@ export default function ObjectiveForm() {
               maxLength={300}
               rows={3}
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              {formData.excerpt?.length || 0}/300 caractere
-            </p>
+            <CharacterCounter current={formData.excerpt?.length || 0} max={300} className="mt-1" />
           </div>
         </TabsContent>
 
@@ -335,15 +343,107 @@ export default function ObjectiveForm() {
           <div>
             <Label>Galerie Imagini (opțional)</Label>
             <p className="text-sm text-muted-foreground mb-2">
-              Pregătit pentru implementare viitoare
+              Adaugă imagini suplimentare pentru galeria foto
             </p>
+            <div className="space-y-3">
+              {(formData.gallery_images || []).map((img: any, index: number) => (
+                <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
+                  {img.url && (
+                    <img src={img.url} alt="" className="w-20 h-20 object-cover rounded" />
+                  )}
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      placeholder="URL imagine"
+                      value={img.url || ""}
+                      onChange={(e) => {
+                        const newGallery = [...(formData.gallery_images || [])];
+                        newGallery[index] = { ...newGallery[index], url: e.target.value };
+                        handleChange("gallery_images", newGallery);
+                      }}
+                    />
+                    <Input
+                      placeholder="Text alternativ (optional)"
+                      value={img.alt || ""}
+                      onChange={(e) => {
+                        const newGallery = [...(formData.gallery_images || [])];
+                        newGallery[index] = { ...newGallery[index], alt: e.target.value };
+                        handleChange("gallery_images", newGallery);
+                      }}
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const newGallery = (formData.gallery_images || []).filter(
+                        (_: any, i: number) => i !== index
+                      );
+                      handleChange("gallery_images", newGallery);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleChange("gallery_images", [
+                    ...(formData.gallery_images || []),
+                    { url: "", alt: "" },
+                  ]);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Adaugă Imagine în Galerie
+              </Button>
+            </div>
           </div>
 
           <div>
             <Label>Video URLs (YouTube/Vimeo)</Label>
             <p className="text-sm text-muted-foreground mb-2">
-              Pregătit pentru implementare viitoare
+              Adaugă link-uri către videoclipuri YouTube sau Vimeo
             </p>
+            <div className="space-y-3">
+              {(formData.video_urls || []).map((video: any, index: number) => (
+                <div key={index} className="flex items-center gap-3">
+                  <Input
+                    placeholder="https://youtube.com/watch?v=..."
+                    value={video.url || ""}
+                    onChange={(e) => {
+                      const newVideos = [...(formData.video_urls || [])];
+                      newVideos[index] = { ...newVideos[index], url: e.target.value };
+                      handleChange("video_urls", newVideos);
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const newVideos = (formData.video_urls || []).filter(
+                        (_: any, i: number) => i !== index
+                      );
+                      handleChange("video_urls", newVideos);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleChange("video_urls", [
+                    ...(formData.video_urls || []),
+                    { url: "", platform: "youtube" },
+                  ]);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Adaugă Video
+              </Button>
+            </div>
           </div>
         </TabsContent>
 
@@ -593,9 +693,7 @@ export default function ObjectiveForm() {
               placeholder="Lasă gol pentru generare automată"
               maxLength={60}
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              {formData.meta_title?.length || 0}/60 caractere (recomandat: sub 60)
-            </p>
+            <CharacterCounter current={formData.meta_title?.length || 0} max={60} className="mt-1" />
           </div>
 
           <div>
@@ -608,9 +706,7 @@ export default function ObjectiveForm() {
               maxLength={160}
               rows={3}
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              {formData.meta_description?.length || 0}/160 caractere (recomandat: sub 160)
-            </p>
+            <CharacterCounter current={formData.meta_description?.length || 0} max={160} className="mt-1" />
           </div>
         </TabsContent>
       </Tabs>

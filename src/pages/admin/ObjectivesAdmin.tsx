@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Plus, Search, Pencil, Eye, Trash2, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -30,7 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { getObjectives } from "@/lib/supabase/queries/objectives";
-import { deleteObjective } from "@/lib/supabase/mutations/objectives";
+import { deleteObjective, toggleObjectivePublish } from "@/lib/supabase/mutations/objectives";
 import { getContinents } from "@/lib/supabase/queries/taxonomies";
 import { toast } from "sonner";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
@@ -88,6 +89,19 @@ export default function ObjectivesAdmin() {
     } catch (error) {
       console.error("Error deleting objective:", error);
       toast.error("Eroare la ștergerea obiectivului");
+    }
+  }
+
+  async function handleTogglePublish(id: string, currentStatus: boolean) {
+    try {
+      await toggleObjectivePublish(id, !currentStatus);
+      toast.success(
+        currentStatus ? "Obiectiv nepublicat" : "Obiectiv publicat"
+      );
+      loadData();
+    } catch (error) {
+      console.error("Error toggling publish:", error);
+      toast.error("Eroare la actualizarea statusului");
     }
   }
 
@@ -219,13 +233,19 @@ export default function ObjectivesAdmin() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {objective.published ? (
-                        <Badge>Publicat</Badge>
-                      ) : (
-                        <Badge variant="secondary">Draft</Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={objective.published}
+                          onCheckedChange={() =>
+                            handleTogglePublish(objective.id, objective.published)
+                          }
+                        />
+                        <span className="text-sm">
+                          {objective.published ? "Publicat" : "Draft"}
+                        </span>
+                      </div>
                       {objective.featured && (
-                        <Badge variant="outline">⭐ Featured</Badge>
+                        <Badge variant="outline" className="ml-2">⭐</Badge>
                       )}
                     </div>
                   </TableCell>
