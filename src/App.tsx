@@ -15,6 +15,7 @@ import HomePage from "@/pages/HomePage";
 import ObjectivesPage from "@/pages/ObjectivesPage";
 import ObjectiveSingle from "@/pages/ObjectiveSingle";
 import BlogPage from "@/pages/BlogPage";
+import BlogArticle from "@/pages/BlogArticle";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="obiective" element={<ObjectivesPage />} />
               <Route path="obiective/:slug" element={<ObjectiveSingle />} />
               <Route path="blog" element={<BlogPage />} />
+              <Route path="blog/:slug" element={<BlogArticle />} />
               <Route path="despre" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
             </Route>
