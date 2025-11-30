@@ -1,68 +1,100 @@
-# APOT.RO - Documentație Proiect
+# APOT - Tourist Objectives Platform
 
 ## 📋 Overview
 
-APOT (Asociația pentru Protejarea Obiectivelor Turistice) este o platformă web enterprise-grade pentru obiective turistice mondiale, construită cu Next.js 15, TypeScript, Tailwind CSS și Supabase.
+APOT (Asociația pentru Protejarea Obiectivelor Turistice) is an enterprise-grade web platform for discovering and exploring tourist objectives worldwide. Built with modern web technologies and optimized for SEO, performance, and accessibility.
 
-## 🚀 Quick Start
+## 🎯 Project Goals
+
+- **Comprehensive Directory**: Thousands of tourist objectives (monuments, museums, natural parks, UNESCO sites)
+- **SEO-First**: Optimized for Google indexing and search visibility
+- **Performance**: Lightning-fast load times, excellent Core Web Vitals
+- **Accessibility**: WCAG 2.1 AA compliant
+- **Modern Design**: Beautiful, responsive, mobile-first interface
+- **Admin CMS**: Powerful content management for non-technical users
+
+## 🚀 Tech Stack
+
+### Frontend
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool & dev server
+- **Tailwind CSS** - Utility-first styling
+- **React Router** - Client-side routing
+- **React Helmet Async** - Dynamic meta tags for SEO
+
+### Backend
+- **Lovable Cloud (Supabase)** - PostgreSQL database, authentication, storage
+- **Edge Functions** - Serverless backend logic
+
+### SEO & Performance
+- **Vite Image Optimizer** - Automatic image optimization
+- **Dynamic Sitemap** - Generated via edge function
+- **Structured Data** - JSON-LD for rich snippets
+- **Lazy Loading** - Code splitting and route-based chunks
+
+## 📁 Project Structure
+
+```
+/
+├── src/
+│   ├── components/
+│   │   ├── layout/          # Layout components (Header, Footer, Container, etc.)
+│   │   ├── seo/             # SEO utilities (SEO component, meta management)
+│   │   ├── shared/          # Shared components (LoadingSpinner, ThemeToggle)
+│   │   ├── ui/              # shadcn/ui components
+│   │   └── providers/       # React context providers
+│   ├── pages/               # Route pages
+│   ├── lib/
+│   │   ├── config/          # Site configuration
+│   │   ├── constants/       # Routes, SEO defaults
+│   │   └── utils.ts         # Utility functions
+│   ├── types/               # TypeScript type definitions
+│   ├── integrations/        # Supabase integration
+│   └── hooks/               # Custom React hooks
+├── public/                  # Static assets
+├── supabase/
+│   └── functions/           # Edge functions (sitemap, etc.)
+└── docs/                    # Documentation
+```
+
+## 🛠️ Getting Started
 
 ### Prerequisites
-- Node.js 18+ și npm
-- Git
+- Node.js 18+ 
+- npm or pnpm
 
-### Instalare Locală
+### Installation
 
+1. Clone the repository
 ```bash
-# Clone repository
-git clone <repository-url>
-cd apot-ro
+git clone <repo-url>
+cd apot
+```
 
-# Install dependencies
+2. Install dependencies
+```bash
 npm install
+```
 
-# Copy environment variables
-cp .env.example .env.local
-
-# Run development server
+3. Run development server
+```bash
 npm run dev
 ```
 
-Aplicația va rula la `http://localhost:3000`
+Open `http://localhost:8080` in your browser.
 
-## 📁 Structura Proiectului
-
-```
-/app                    # Next.js App Router
-  /(public)            # Public pages (homepage, objectives, blog)
-  /(admin)             # Admin panel (protected routes)
-  /auth                # Authentication pages
-  /api                 # API routes
-
-/components
-  /ui                  # shadcn/ui components
-  /layout              # Layout components (Header, Footer, Container)
-  /providers           # React Context providers
-  /features            # Feature-specific components (coming soon)
-
-/lib
-  /config              # Site configuration
-  /constants           # App constants (routes, SEO)
-  /utils               # Utility functions
-  /supabase            # Supabase integration (coming soon)
-
-/types                 # TypeScript type definitions
-/public                # Static assets
-/docs                  # Documentation
+4. Build for production
+```bash
+npm run build
 ```
 
-Pentru detalii complete, vezi [ARCHITECTURE.md](./ARCHITECTURE.md)
-
-## 🛠️ Scripts Disponibile
+## 📝 Available Scripts
 
 ```bash
-npm run dev          # Start development server
+npm run dev          # Start Vite dev server
 npm run build        # Build for production
-npm run start        # Start production server
+npm run preview      # Preview production build
 npm run lint         # Run ESLint
 npm run lint:fix     # Fix ESLint errors
 npm run format       # Format with Prettier
@@ -71,57 +103,128 @@ npm run type-check   # TypeScript type checking
 
 ## 🎨 Design System
 
-### Culori
-- **Primary:** Orange-500 (#F97316)
-- **Accent:** Red-600 (#DC2626)
-- **Neutral:** Slate palette
+### Colors
+- **Primary**: Orange (#F97316) - Main brand color
+- **Accent**: Red (#DC2626) - Call-to-action, highlights
+- **Neutrals**: Slate palette - Backgrounds, text, borders
 
-### Tipografie
-- **Display (headings):** Montserrat
-- **Body:** Inter
+### Typography
+- **Headings**: Montserrat (weights: 400-900)
+- **Body**: Inter (weights: 300-700)
+
+### Spacing
+- Follows 4px base unit system
+- Responsive scaling via Tailwind utilities
 
 ### Dark Mode
-Aplicația suportă dark/light/system mode prin `next-themes`.
+Full dark mode support via `next-themes` (light/dark/system).
 
-## 🏗️ Faze de Dezvoltare
+## 📊 SEO Strategy
 
-### ✅ FAZA 1 (Current)
-- Setup proiect Next.js 15
-- Design system fundație
-- Structură foldere enterprise
-- Layouts (public, admin)
-- Homepage cu hero section
-- Componente layout (Header, Footer, Container, Section)
+### On-Page SEO
+- Dynamic meta tags per page (title, description, OG tags)
+- Canonical URLs
+- Structured data (JSON-LD)
+- Semantic HTML (proper heading hierarchy)
+- Alt text on all images
+- Clean, descriptive URLs
 
-### 🔄 FAZA 2 (Next)
-- Integrare Supabase
-- Database schema
-- Authentication system
-- Media upload functionality
+### Technical SEO
+- Fast load times (< 2s FCP)
+- Mobile-optimized (responsive design)
+- Sitemap.xml (auto-generated via edge function)
+- Robots.txt
+- Image optimization (WebP, lazy loading)
 
-### 📅 Faze Viitoare
-- CRUD obiective turistice
-- Blog management
+### Performance Targets
+- Lighthouse Performance: 85+
+- Lighthouse SEO: 95+
+- Lighthouse Accessibility: 95+
+- Lighthouse Best Practices: 90+
+
+## 🏗️ Development Phases
+
+### ✅ Phase 1: Foundation (Current)
+- ✅ Vite + React + TypeScript setup
+- ✅ Lovable Cloud (Supabase) integration
+- ✅ Design system with Tailwind
+- ✅ SEO infrastructure (React Helmet, sitemap, structured data)
+- ✅ Layout components (Header, Footer, Container, Section)
+- ✅ Routing structure (public/admin/auth)
+- ✅ Dark mode support
+- ✅ Responsive navigation
+- ✅ 404 error page
+
+### 🔄 Phase 2: Content Management (Next)
+- Database schema for objectives & blog
+- Admin authentication
+- CRUD operations for objectives
+- Media upload & management
+- Rich text editor for content
+
+### 📅 Future Phases
 - Advanced search & filters
-- SEO optimization
-- AI features
-- Multi-language support
+- User favorites & collections
+- Comments & ratings
+- Multi-language support (i18n)
+- AI-powered recommendations
+- Analytics dashboard
 
-## 📚 Documentație Completă
+## 🚢 Deployment
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Arhitectură detaliată
-- [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) - Schema bazei de date (coming soon)
-- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - API endpoints (coming soon)
+The platform deploys automatically via Lovable's hosting infrastructure. Edge functions deploy with code updates.
 
-## 🤝 Contribuții
+### Environment Variables
+Required environment variables are managed through Lovable Cloud and don't need manual configuration.
 
-Proiect în dezvoltare activă. Detalii despre workflow de contribuție vor fi adăugate în curând.
+## 📝 Development Guidelines
+
+### Code Style
+- TypeScript strict mode (no `any` types)
+- Functional components with hooks
+- Tailwind for styling (use semantic tokens)
+- Semantic HTML elements
+- Accessible components (ARIA labels, keyboard navigation)
+
+### Component Patterns
+- Use design system tokens from `index.css` and `tailwind.config.ts`
+- Props typed with TypeScript interfaces
+- Error boundaries for resilience
+- Loading states for async operations
+- Lazy loading for heavy components
+
+### Naming Conventions
+- Components: PascalCase
+- Functions: camelCase
+- Constants: UPPER_SNAKE_CASE
+- Files: PascalCase for components, camelCase for utilities
+
+## 🔒 Security
+
+- RLS policies on all database tables
+- CORS properly configured
+- Input validation on all forms
+- Secure authentication via Supabase Auth
+- Environment variables for sensitive data
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+1. Follow coding standards
+2. Write meaningful commit messages
+3. Test thoroughly before submitting
+4. Create pull requests for review
+
+## 📧 Contact
+
+- **Email**: contact@apot.ro
+- **Website**: https://apot.ro
 
 ## 📄 License
 
-Toate drepturile rezervate © APOT
+Copyright © 2025 APOT. All rights reserved.
 
 ---
 
-**Versiune:** 1.0.0  
-**Ultima actualizare:** [Data]
+**Version:** 1.0.0  
+**Last Updated:** 2025-01-30
