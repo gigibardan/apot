@@ -18,7 +18,7 @@ export async function createObjective(data: Partial<ObjectiveInput>) {
 
   const { data: objective, error } = await supabase
     .from("objectives")
-    .insert(data)
+    .insert(data as any)
     .select()
     .single();
 
@@ -35,7 +35,7 @@ export async function updateObjective(
 ) {
   const { data: objective, error } = await supabase
     .from("objectives")
-    .update(data)
+    .update(data as any)
     .eq("id", id)
     .select()
     .single();
@@ -92,7 +92,7 @@ export async function updateObjectiveTypes(
 
     const { error } = await supabase
       .from("objectives_types_relations")
-      .insert(relations);
+      .insert(relations as any);
 
     if (error) throw error;
   }
@@ -109,6 +109,7 @@ export async function duplicateObjective(id: string) {
     .single();
 
   if (fetchError) throw fetchError;
+  if (!original) throw new Error("Objective not found");
 
   // Create copy with modified title and slug
   const copy = {
@@ -126,11 +127,12 @@ export async function duplicateObjective(id: string) {
 
   const { data: newObjective, error: createError } = await supabase
     .from("objectives")
-    .insert(copy)
+    .insert(copy as any)
     .select()
     .single();
 
   if (createError) throw createError;
+  if (!newObjective) throw new Error("Failed to create duplicate");
 
   // Copy type relations
   const { data: relations } = await supabase
@@ -139,12 +141,12 @@ export async function duplicateObjective(id: string) {
     .eq("objective_id", id);
 
   if (relations && relations.length > 0) {
-    const newRelations = relations.map((rel) => ({
+    const newRelations = relations.map((rel: any) => ({
       objective_id: newObjective.id,
       type_id: rel.type_id,
     }));
 
-    await supabase.from("objectives_types_relations").insert(newRelations);
+    await supabase.from("objectives_types_relations").insert(newRelations as any);
   }
 
   return newObjective;
