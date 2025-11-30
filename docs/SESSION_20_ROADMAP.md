@@ -64,7 +64,7 @@
 
 ## 📋 Next Priority Features
 
-### 1. User Dashboard (Priority: HIGH) - 1-2 sesiuni
+### 1. Analytics Dashboard (Priority: HIGH) - 2-3 sesiuni
 **Status:** Planned  
 **Complexity:** Medium-High
 
