@@ -64,11 +64,29 @@ export async function getObjectives(
   }
 
   if (continent) {
-    query = query.eq("continent_id", continent);
+    // First get continent ID from slug
+    const { data: continentData } = await supabase
+      .from("continents")
+      .select("id")
+      .eq("slug", continent)
+      .single();
+    
+    if (continentData) {
+      query = query.eq("continent_id", continentData.id);
+    }
   }
 
   if (country) {
-    query = query.eq("country_id", country);
+    // First get country ID from slug
+    const { data: countryData } = await supabase
+      .from("countries")
+      .select("id")
+      .eq("slug", country)
+      .single();
+    
+    if (countryData) {
+      query = query.eq("country_id", countryData.id);
+    }
   }
 
   if (unesco !== undefined) {
@@ -251,11 +269,29 @@ export async function getObjectivesCount(filters: Omit<ObjectiveFilters, 'limit'
   }
 
   if (continent) {
-    query = query.eq("continent_id", continent);
+    // First get continent ID from slug
+    const { data: continentData } = await supabase
+      .from("continents")
+      .select("id")
+      .eq("slug", continent)
+      .single();
+    
+    if (continentData) {
+      query = query.eq("continent_id", continentData.id);
+    }
   }
 
   if (country) {
-    query = query.eq("country_id", country);
+    // First get country ID from slug
+    const { data: countryData } = await supabase
+      .from("countries")
+      .select("id")
+      .eq("slug", country)
+      .single();
+    
+    if (countryData) {
+      query = query.eq("country_id", countryData.id);
+    }
   }
 
   if (unesco !== undefined) {
