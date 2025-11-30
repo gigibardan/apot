@@ -35,7 +35,7 @@ export default function UserBanManagement() {
   const [bans, setBans] = useState<UserBan[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedUserEmail, setSelectedUserEmail] = useState("");
   const [banType, setBanType] = useState<'ban' | 'suspend'>('suspend');
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
@@ -70,7 +70,7 @@ export default function UserBanManagement() {
   }
 
   async function createBan() {
-    if (!selectedUserId || !reason.trim()) {
+    if (!selectedUserEmail || !reason.trim()) {
       toast.error("Completează toate câmpurile obligatorii");
       return;
     }
@@ -82,10 +82,24 @@ export default function UserBanManagement() {
 
     try {
       setSubmitting(true);
+      
+      // Find user by email
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', selectedUserEmail.trim())
+        .single();
+
+      if (profileError || !profile) {
+        toast.error("User cu acest email nu a fost găsit");
+        setSubmitting(false);
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       const { error } = await supabase.from('user_bans').insert({
-        user_id: selectedUserId,
+        user_id: profile.id,
         banned_by: user?.id,
         ban_type: banType,
         reason: reason.trim(),
@@ -126,7 +140,7 @@ export default function UserBanManagement() {
   }
 
   function resetForm() {
-    setSelectedUserId("");
+    setSelectedUserEmail("");
     setBanType('suspend');
     setReason("");
     setNotes("");
@@ -160,12 +174,13 @@ export default function UserBanManagement() {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="userId">User ID *</Label>
+                <Label htmlFor="userEmail">Email User *</Label>
                 <Input
-                  id="userId"
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                  placeholder="UUID user"
+                  id="userEmail"
+                  type="email"
+                  value={selectedUserEmail}
+                  onChange={(e) => setSelectedUserEmail(e.target.value)}
+                  placeholder="email@example.com"
                 />
               </div>
 
