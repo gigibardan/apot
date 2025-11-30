@@ -35,6 +35,7 @@ import {
 } from "@/lib/supabase/queries/objective-reviews";
 import { useAuth } from "@/contexts/AuthContext";
 import { ShareButtons } from "@/components/features/objectives/ShareButtons";
+import { generateObjectiveSchema, generateBreadcrumbSchema } from "@/lib/utils/structured-data";
 import type { ObjectiveWithRelations } from "@/types/database.types";
 import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award, MapPin, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -165,27 +166,18 @@ export default function ObjectiveSingle() {
   const getStructuredData = () => {
     if (!objective) return undefined;
 
+    const breadcrumbs = getBreadcrumbs();
+    const breadcrumbItems = breadcrumbs.map((item) => ({
+      name: item.label,
+      url: item.href,
+    }));
+
     return {
       "@context": "https://schema.org",
-      "@type": "TouristAttraction",
-      name: objective.title,
-      description: objective.excerpt || objective.description,
-      image: objective.featured_image,
-      address: {
-        "@type": "PostalAddress",
-        addressCountry: objective.country?.name,
-      },
-      ...(objective.latitude && objective.longitude
-        ? {
-            geo: {
-              "@type": "GeoCoordinates",
-              latitude: objective.latitude,
-              longitude: objective.longitude,
-            },
-          }
-        : {}),
-      url: `${window.location.origin}/obiective/${objective.slug}`,
-      ...(objective.opening_hours ? { openingHours: objective.opening_hours } : {}),
+      "@graph": [
+        generateObjectiveSchema(objective),
+        generateBreadcrumbSchema(breadcrumbItems),
+      ],
     };
   };
 

@@ -21,6 +21,7 @@ import { getFeaturedObjectives } from "@/lib/supabase/queries/objectives";
 import { getCircuits } from "@/lib/supabase/queries/jinfotours";
 import { getFeaturedArticles } from "@/lib/supabase/queries/blog";
 import { trackContinentClick, trackCircuitClick } from "@/lib/analytics/events";
+import { generateWebsiteSchema, generateOrganizationSchema } from "@/lib/utils/structured-data";
 import type { Continent, ObjectiveWithRelations, JinfoursCircuit, BlogArticle } from "@/types/database.types";
 
 /**
@@ -131,15 +132,10 @@ export default function HomePage() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "APOT",
-    url: "https://apot.ro",
-    description: seoDefaults.defaultDescription,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://apot.ro/obiective?search={search_term_string}",
-      "query-input": "required name=search_term_string",
-    },
+    "@graph": [
+      generateWebsiteSchema(),
+      generateOrganizationSchema(),
+    ],
   };
 
   return (

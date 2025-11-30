@@ -1,15 +1,30 @@
 # APOT - Tourist Objectives Platform
 # Robots.txt configuration
 
+# Allow all bots by default
 User-agent: *
 Allow: /
 
-# Disallow admin area
-Disallow: /admin
-Disallow: /auth
+# Disallow admin and authentication areas
+Disallow: /admin/
+Disallow: /auth/
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Disallow search result pages with parameters (to avoid duplicate content)
+Disallow: /*?search=*
+Disallow: /*?page=*
+
+# Allow specific search engines full access
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
 
 # Sitemap location (edge function)
 Sitemap: https://apot.ro/sitemap
 
-# Crawl-delay (optional, for aggressive bots)
+# Crawl-delay for well-behaved bots
 Crawl-delay: 1
