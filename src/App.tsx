@@ -70,6 +70,9 @@ import SuggestObjective from "@/pages/SuggestObjective";
 import SuggestionsAdmin from "@/pages/admin/SuggestionsAdmin";
 import ContestsAdmin from "@/pages/admin/ContestsAdmin";
 import ChallengesAdmin from "@/pages/admin/ChallengesAdmin";
+import ActivityLogs from "@/pages/admin/ActivityLogs";
+import UserBanManagement from "@/pages/admin/UserBanManagement";
+import ScheduledActions from "@/pages/admin/ScheduledActions";
 import { AIChatbot } from "@/components/features/ai/AIChatbot";
 
 const queryClient = new QueryClient();
@@ -154,6 +157,9 @@ const App = () => (
               <Route path="contests" element={<ContestsAdmin />} />
               <Route path="challenges" element={<ChallengesAdmin />} />
               <Route path="forum" element={<ForumAdmin />} />
+              <Route path="activity-logs" element={<ActivityLogs />} />
+              <Route path="user-bans" element={<UserBanManagement />} />
+              <Route path="scheduled" element={<ScheduledActions />} />
             </Route>
 
             {/* Auth Routes */}
