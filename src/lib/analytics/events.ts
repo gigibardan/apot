@@ -216,3 +216,17 @@ export function trackSearchQuery(query: string, resultsCount: number) {
     url: window.location.href,
   });
 }
+
+/**
+ * Track Jinfotours click from sidebar/CTA
+ * Simplified version for sidebar CTAs
+ */
+export function trackJinfoursClick(source: string, destination: string, context: string) {
+  console.log("📊 Jinfotours Click:", {
+    source,
+    destination,
+    context,
+    timestamp: new Date(),
+    url: window.location.href,
+  });
+}
