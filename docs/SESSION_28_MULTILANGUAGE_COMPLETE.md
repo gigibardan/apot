@@ -253,7 +253,30 @@ export function MyComponent() {
 }
 ```
 
-### 2. Changing Language Programmatically
+### 2. Auto-Translate Content
+```typescript
+import { translateObject } from '@/lib/services/translation';
+import { upsertObjectiveTranslation } from '@/lib/supabase/queries/translations';
+
+// Translate objective fields automatically
+const objective = await getObjectiveById(id);
+
+const translatedFields = await translateObject({
+  obj: objective,
+  fields: ['title', 'excerpt', 'description'],
+  targetLanguage: 'en',
+  sourceLanguage: 'ro'
+});
+
+// Save translation to database
+await upsertObjectiveTranslation({
+  objective_id: objective.id,
+  language: 'en',
+  ...translatedFields
+});
+```
+
+### 3. Changing Language Programmatically
 ```tsx
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -268,7 +291,7 @@ export function MyComponent() {
 }
 ```
 
-### 3. Getting Current Language
+### 4. Getting Current Language
 ```tsx
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -279,7 +302,7 @@ export function MyComponent() {
 }
 ```
 
-### 4. Adding New Translations
+### 5. Adding New Translations
 **Step 1: Add to JSON files**
 ```json
 // public/locales/ro/common.json
