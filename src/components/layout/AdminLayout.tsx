@@ -50,7 +50,6 @@ const sidebarLinks = [
   { name: "Contests", href: "/admin/contests", icon: FileText },
   { name: "Challenges", href: "/admin/challenges", icon: FileText },
   { name: "Activity Logs", href: "/admin/activity-logs", icon: Activity },
-  { name: "Bans", href: "/admin/user-bans", icon: ShieldOff },
   { name: "Scheduled", href: "/admin/scheduled", icon: CalendarClock },
   { name: "Revisions", href: "/admin/content-revisions", icon: History },
   { name: "SEO Audit", href: "/admin/seo-audit", icon: Search },
