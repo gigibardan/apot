@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -64,6 +65,8 @@ export default function Settings() {
 
   return (
     <div className="max-w-4xl">
+      <Breadcrumbs items={[{ label: "Setări" }]} />
+      
       <div className="mb-6">
         <h2 className="text-3xl font-display font-bold">Setări Site</h2>
         <p className="text-muted-foreground mt-2">

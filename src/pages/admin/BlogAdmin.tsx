@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Pencil, Eye, Trash2, Loader2, FileText } from "lucide-react";
+import { Plus, Search, Pencil, Eye, Trash2, Loader2, FileText, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { getBlogArticles } from "@/lib/supabase/queries/blog";
-import { deleteBlogArticle, toggleArticlePublish } from "@/lib/supabase/mutations/blog";
+import { deleteBlogArticle, toggleArticlePublish, duplicateBlogArticle } from "@/lib/supabase/mutations/blog";
 import { toast } from "sonner";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { formatDistanceToNow } from "date-fns";
@@ -102,6 +103,17 @@ export default function BlogAdmin() {
     }
   }
 
+  async function handleDuplicate(id: string) {
+    try {
+      const newArticle = await duplicateBlogArticle(id);
+      toast.success("Articol duplicat cu succes");
+      loadData();
+    } catch (error) {
+      console.error("Error duplicating article:", error);
+      toast.error("Eroare la duplicarea articolului");
+    }
+  }
+
   // Get unique categories from articles
   const categories = Array.from(
     new Set(articles.map((a) => a.category).filter(Boolean))
@@ -109,6 +121,8 @@ export default function BlogAdmin() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs items={[{ label: "Articole Blog" }]} />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -273,12 +287,12 @@ export default function BlogAdmin() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button asChild variant="ghost" size="icon">
+                      <Button asChild variant="ghost" size="icon" title="Editează">
                         <Link to={`${ADMIN_ROUTES.blog}/${article.id}`}>
                           <Pencil className="h-4 w-4" />
                         </Link>
                       </Button>
-                      <Button asChild variant="ghost" size="icon">
+                      <Button asChild variant="ghost" size="icon" title="Vezi public">
                         <a
                           href={`${PUBLIC_ROUTES.blog}/${article.slug}`}
                           target="_blank"
@@ -290,6 +304,15 @@ export default function BlogAdmin() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        title="Duplică"
+                        onClick={() => handleDuplicate(article.id)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Șterge"
                         onClick={() =>
                           setDeleteDialog({
                             open: true,

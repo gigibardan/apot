@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Upload, Search, Loader2, X, Image as ImageIcon, Copy, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -100,6 +101,8 @@ export default function MediaLibrary() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs items={[{ label: "Media" }]} />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
