@@ -60,6 +60,11 @@ import ForumAdmin from "@/pages/admin/ForumAdmin";
 import UserProfile from "@/pages/UserProfile";
 import ActivityFeed from "@/pages/ActivityFeed";
 import Leaderboards from "@/pages/Leaderboards";
+import TravelJournals from "@/pages/TravelJournals";
+import CreateJournal from "@/pages/CreateJournal";
+import PhotoContests from "@/pages/PhotoContests";
+import CommunityChallenges from "@/pages/CommunityChallenges";
+import SuggestObjective from "@/pages/SuggestObjective";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +104,14 @@ const App = () => (
               <Route path="forum" element={<ForumHomePage />} />
               <Route path="forum/:categorySlug" element={<ForumCategoryPage />} />
               <Route path="forum/:categorySlug/:postSlug" element={<ForumPostPage />} />
+              <Route path="user/:username" element={<UserProfile />} />
+              <Route path="feed" element={<ActivityFeed />} />
+              <Route path="leaderboards" element={<Leaderboards />} />
+              <Route path="journals" element={<TravelJournals />} />
+              <Route path="journals/new" element={<ProtectedRoute><CreateJournal /></ProtectedRoute>} />
+              <Route path="contests" element={<PhotoContests />} />
+              <Route path="challenges" element={<CommunityChallenges />} />
+              <Route path="suggest-objective" element={<ProtectedRoute><SuggestObjective /></ProtectedRoute>} />
             </Route>
 
             {/* Admin Routes - Protected */}

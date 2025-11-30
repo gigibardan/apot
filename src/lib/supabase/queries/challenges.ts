@@ -42,25 +42,17 @@ export async function getUserChallenges(userId: string) {
   return data || [];
 }
 
-export async function getUserChallengeProgress(
-  userId: string,
-  challengeId: string
-) {
+export async function getUserChallengeProgress() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
   const { data, error } = await supabase
     .from("user_challenge_progress")
-    .select(
-      `
-      *,
-      challenge:community_challenges(*)
-    `
-    )
-    .eq("user_id", userId)
-    .eq("challenge_id", challengeId)
-    .single();
+    .select("*")
+    .eq("user_id", user.id);
 
-  if (error && error.code !== "PGRST116") throw error;
-
-  return data;
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getChallengeLeaderboard(challengeId: string, limit = 10) {
