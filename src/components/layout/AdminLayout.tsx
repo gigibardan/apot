@@ -17,6 +17,8 @@ import {
   Activity,
   ShieldOff,
   CalendarClock,
+  History,
+  Search,
 } from "lucide-react";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { Button } from "@/components/ui/button";
@@ -50,6 +52,8 @@ const sidebarLinks = [
   { name: "Activity Logs", href: "/admin/activity-logs", icon: Activity },
   { name: "Bans", href: "/admin/user-bans", icon: ShieldOff },
   { name: "Scheduled", href: "/admin/scheduled", icon: CalendarClock },
+  { name: "Revisions", href: "/admin/content-revisions", icon: History },
+  { name: "SEO Audit", href: "/admin/seo-audit", icon: Search },
   { name: "Setări", href: ADMIN_ROUTES.settings, icon: Settings },
 ];
 

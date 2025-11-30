@@ -73,6 +73,8 @@ import ChallengesAdmin from "@/pages/admin/ChallengesAdmin";
 import ActivityLogs from "@/pages/admin/ActivityLogs";
 import UserBanManagement from "@/pages/admin/UserBanManagement";
 import ScheduledActions from "@/pages/admin/ScheduledActions";
+import ContentRevisions from "@/pages/admin/ContentRevisions";
+import SEOAudit from "@/pages/admin/SEOAudit";
 import { AIChatbot } from "@/components/features/ai/AIChatbot";
 
 const queryClient = new QueryClient();
@@ -160,6 +162,8 @@ const App = () => (
               <Route path="activity-logs" element={<ActivityLogs />} />
               <Route path="user-bans" element={<UserBanManagement />} />
               <Route path="scheduled" element={<ScheduledActions />} />
+              <Route path="content-revisions" element={<ContentRevisions />} />
+              <Route path="seo-audit" element={<SEOAudit />} />
             </Route>
 
             {/* Auth Routes */}
