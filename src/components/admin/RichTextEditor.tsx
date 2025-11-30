@@ -14,9 +14,12 @@ import {
   Heading2,
   Undo,
   Redo,
+  Code,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +27,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 
 interface RichTextEditorProps {
   content: string;
@@ -43,6 +47,8 @@ export default function RichTextEditor({
   const [imageUrl, setImageUrl] = useState("");
   const [videoDialog, setVideoDialog] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [isHtmlMode, setIsHtmlMode] = useState(false);
+  const [htmlContent, setHtmlContent] = useState("");
 
   const editor = useEditor({
     extensions: [
@@ -96,19 +102,62 @@ export default function RichTextEditor({
     }
   };
 
+  const toggleHtmlMode = () => {
+    if (!editor) return;
+
+    if (!isHtmlMode) {
+      // Switching TO HTML mode - get current HTML
+      setHtmlContent(editor.getHTML());
+    } else {
+      // Switching FROM HTML mode - sanitize and set content
+      const sanitized = DOMPurify.sanitize(htmlContent, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'code', 'pre', 'span', 'div'],
+        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel'],
+        ALLOW_DATA_ATTR: false,
+      });
+      editor.commands.setContent(sanitized);
+      onChange(sanitized);
+    }
+    setIsHtmlMode(!isHtmlMode);
+  };
+
+  const handleHtmlChange = (newHtml: string) => {
+    setHtmlContent(newHtml);
+  };
+
+  // Sync htmlContent when editor content changes in visual mode
+  useEffect(() => {
+    if (editor && !isHtmlMode) {
+      setHtmlContent(editor.getHTML());
+    }
+  }, [editor?.getHTML(), isHtmlMode]);
+
   return (
     <div className="border rounded-lg">
       {/* Toolbar */}
       <div className="border-b p-2 flex flex-wrap gap-1">
         <Button
           type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive("bold") ? "bg-muted" : ""}
+          variant={isHtmlMode ? "default" : "ghost"}
+          size="sm"
+          onClick={toggleHtmlMode}
+          className="mr-2"
         >
-          <Bold className="h-4 w-4" />
+          {isHtmlMode ? <Eye className="h-4 w-4 mr-2" /> : <Code className="h-4 w-4 mr-2" />}
+          {isHtmlMode ? "Vizual" : "HTML"}
         </Button>
+        
+        {!isHtmlMode && (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={editor.isActive("bold") ? "bg-muted" : ""}
+            >
+              <Bold className="h-4 w-4" />
+            </Button>
         <Button
           type="button"
           variant="ghost"
@@ -181,19 +230,30 @@ export default function RichTextEditor({
         >
           <Undo className="h-4 w-4" />
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
-        >
-          <Redo className="h-4 w-4" />
-        </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => editor.chain().focus().redo().run()}
+              disabled={!editor.can().redo()}
+            >
+              <Redo className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
 
-      {/* Editor */}
-      <EditorContent editor={editor} />
+      {/* Editor - Visual or HTML Mode */}
+      {isHtmlMode ? (
+        <Textarea
+          value={htmlContent}
+          onChange={(e) => handleHtmlChange(e.target.value)}
+          placeholder="<p>Scrie HTML aici... CSS inline este permis.</p>"
+          className="min-h-[400px] font-mono text-sm p-4 rounded-none border-0 focus-visible:ring-0"
+        />
+      ) : (
+        <EditorContent editor={editor} />
+      )}
 
       {/* Dialogs */}
       <Dialog open={linkDialog} onOpenChange={setLinkDialog}>
