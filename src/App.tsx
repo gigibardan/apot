@@ -19,6 +19,7 @@ import ContactPage from "@/pages/ContactPage";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import LoginPage from "@/pages/auth/Login";
 import NotFound from "@/pages/NotFound";
+import TestDatabase from "@/pages/TestDatabase";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,9 @@ const App = () => (
 
             {/* Auth Routes */}
             <Route path="/auth/login" element={<LoginPage />} />
+
+            {/* Test Routes */}
+            <Route path="/test-database" element={<TestDatabase />} />
 
             {/* Catch All */}
             <Route path="*" element={<NotFound />} />
