@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Award } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,7 +18,7 @@ interface ObjectiveCardProps {
  * Reusable card for displaying tourist objectives
  * Used across homepage, listings, and search results
  */
-export function ObjectiveCard({
+function ObjectiveCardComponent({
   objective,
   variant = "default",
   showExcerpt = true,
@@ -114,3 +115,6 @@ export function ObjectiveCard({
     </Link>
   );
 }
+
+// Memoize component for performance optimization
+export const ObjectiveCard = memo(ObjectiveCardComponent);

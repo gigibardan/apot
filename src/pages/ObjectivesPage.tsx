@@ -3,9 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { SEO } from "@/components/seo/SEO";
+import { Breadcrumbs, type BreadcrumbItem } from "@/components/features/objectives/Breadcrumbs";
 import { ObjectiveFilters, FilterValues } from "@/components/features/objectives/ObjectiveFilters";
 import { ObjectivesGrid } from "@/components/features/objectives/ObjectivesGrid";
 import { getObjectives } from "@/lib/supabase/queries/objectives";
+import { getContinents, getCountries } from "@/lib/supabase/queries/taxonomies";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { ObjectiveWithRelations } from "@/types/database.types";
@@ -22,6 +24,8 @@ export default function ObjectivesPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [continentName, setContinentName] = useState<string>("");
+  const [countryName, setCountryName] = useState<string>("");
 
   // Parse URL params into filter state
   const initialFilters: FilterValues = {
@@ -60,6 +64,44 @@ export default function ObjectivesPage() {
 
     setSearchParams(params, { replace: true });
   }, [filters, currentPage, sortBy, sortOrder, setSearchParams]);
+
+  // Fetch taxonomy names for breadcrumbs
+  useEffect(() => {
+    const fetchNames = async () => {
+      if (filters.continent) {
+        try {
+          const continents = await getContinents();
+          const continent = continents.find(c => c.slug === filters.continent);
+          setContinentName(continent?.name || filters.continent);
+        } catch (error) {
+          console.error("Error fetching continent:", error);
+        }
+      } else {
+        setContinentName("");
+      }
+
+      if (filters.country) {
+        try {
+          // Get all continents first to find the right one
+          const continents = await getContinents();
+          for (const continent of continents) {
+            const countries = await getCountries(continent.id);
+            const country = countries.find(c => c.slug === filters.country);
+            if (country) {
+              setCountryName(country.name);
+              break;
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching country:", error);
+        }
+      } else {
+        setCountryName("");
+      }
+    };
+
+    fetchNames();
+  }, [filters.continent, filters.country]);
 
   // Fetch objectives
   const fetchObjectives = async () => {
@@ -149,28 +191,69 @@ export default function ObjectivesPage() {
   const getPageTitle = () => {
     const parts: string[] = ["Obiective Turistice"];
     
-    if (filters.country) {
-      // Will need to fetch country name, for now use slug
-      parts.push(`în ${filters.country}`);
-    } else if (filters.continent) {
-      parts.push(`în ${filters.continent}`);
+    if (countryName) {
+      parts.push(`în ${countryName}`);
+    } else if (continentName) {
+      parts.push(`în ${continentName}`);
     }
     
     if (filters.unesco) {
       parts.push("UNESCO");
     }
     
-    parts.push("| APOT");
     return parts.join(" ");
   };
 
   const getPageDescription = () => {
     if (totalCount > 0) {
       return `Descoperă ${totalCount} obiective turistice${
-        filters.continent ? ` în ${filters.continent}` : ""
+        countryName ? ` în ${countryName}` : continentName ? ` în ${continentName}` : ""
       }. Informații detaliate, fotografii și sfaturi practice pentru fiecare destinație.`;
     }
     return "Descoperă obiective turistice din întreaga lume. Informații detaliate despre monumente, muzee, parcuri naturale și destinații de vis.";
+  };
+
+  // Generate structured data for ItemList
+  const getStructuredData = () => {
+    if (objectives.length === 0) return undefined;
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": getPageTitle(),
+      "numberOfItems": totalCount,
+      "itemListElement": objectives.map((objective, index) => ({
+        "@type": "ListItem",
+        "position": (currentPage - 1) * PAGE_SIZE + index + 1,
+        "item": {
+          "@type": "TouristAttraction",
+          "name": objective.title,
+          "description": objective.excerpt || undefined,
+          "url": `${window.location.origin}/obiective/${objective.slug}`,
+          "image": objective.featured_image || undefined,
+        },
+      })),
+    };
+  };
+
+  // Generate breadcrumbs
+  const getBreadcrumbs = (): BreadcrumbItem[] => {
+    const items: BreadcrumbItem[] = [{ label: "Obiective Turistice", href: "/obiective" }];
+    
+    if (continentName) {
+      items.push({
+        label: continentName,
+        href: `/obiective?continent=${filters.continent}`,
+      });
+    }
+    
+    if (countryName) {
+      items.push({
+        label: countryName,
+      });
+    }
+    
+    return items;
   };
 
   return (
@@ -179,17 +262,27 @@ export default function ObjectivesPage() {
         title={getPageTitle()}
         description={getPageDescription()}
         canonical="/obiective"
+        structuredData={getStructuredData()}
       />
 
       <Section className="py-8">
         <Container>
+          {/* Breadcrumbs */}
+          <Breadcrumbs items={getBreadcrumbs()} className="mb-6" />
+
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-display font-bold tracking-tight mb-2">
-              Obiective Turistice
+              {countryName
+                ? `Obiective Turistice în ${countryName}`
+                : continentName
+                ? `Obiective Turistice în ${continentName}`
+                : "Obiective Turistice"}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Descoperă obiective turistice fascinante din întreaga lume
+              {totalCount > 0
+                ? `${totalCount} obiective turistice fascinante`
+                : "Descoperă obiective turistice din întreaga lume"}
             </p>
           </div>
 
