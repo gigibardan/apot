@@ -97,23 +97,41 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
-                <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/favorite")}
-                className="relative"
-              >
-                <Heart className="h-4 w-4 mr-2" />
-                {t("nav.favorites")}
-                {favoritesCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {favoritesCount}
-                  </Badge>
-                )}
-              </Button>
+            
+            {/* Community Dropdown - Desktop Only */}
+            <div className="relative group">
+              <button className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
+                Community
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute left-0 mt-2 w-48 bg-background border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <Link to="/feed" className="block px-4 py-2 text-sm hover:bg-muted">Activity Feed</Link>
+                <Link to="/journals" className="block px-4 py-2 text-sm hover:bg-muted">Travel Journals</Link>
+                <Link to="/contests" className="block px-4 py-2 text-sm hover:bg-muted">Photo Contests</Link>
+                <Link to="/challenges" className="block px-4 py-2 text-sm hover:bg-muted">Challenges</Link>
+                <Link to="/leaderboards" className="block px-4 py-2 text-sm hover:bg-muted">Leaderboards</Link>
+              </div>
+            </div>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/favorite")}
+              className="relative"
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              {t("nav.favorites")}
+              {favoritesCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {favoritesCount}
+                </Badge>
+              )}
+            </Button>
           </div>
 
           {/* Theme Toggle & Mobile Menu Button */}

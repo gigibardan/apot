@@ -14,6 +14,17 @@ export const PUBLIC_ROUTES = {
   blogPost: (slug: string) => `/blog/${slug}`,
   about: "/despre",
   contact: "/contact",
+  // Social Routes
+  userProfile: (username: string) => `/user/${username}`,
+  activityFeed: "/feed",
+  leaderboards: "/leaderboards",
+  journals: "/journals",
+  createJournal: "/journals/new",
+  journalSingle: (slug: string) => `/journals/${slug}`,
+  contests: "/contests",
+  contestSingle: (slug: string) => `/contests/${slug}`,
+  challenges: "/challenges",
+  suggestObjective: "/suggest-objective",
 } as const;
 
 export const ADMIN_ROUTES = {
