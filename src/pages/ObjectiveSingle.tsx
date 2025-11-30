@@ -9,11 +9,15 @@ import { ObjectiveSidebar } from "@/components/features/objectives/ObjectiveSide
 import { ObjectiveCard } from "@/components/features/objectives/ObjectiveCard";
 import { ObjectiveGallery } from "@/components/features/objectives/ObjectiveGallery";
 import { ObjectiveMap } from "@/components/features/objectives/ObjectiveMap";
+import { ObjectiveReviewForm } from "@/components/features/objectives/ObjectiveReviewForm";
+import { ObjectiveReviewList } from "@/components/features/objectives/ObjectiveReviewList";
+import { ObjectiveReviewStats } from "@/components/features/objectives/ObjectiveReviewStats";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ReadingProgress } from "@/components/shared/ReadingProgress";
 import { MobileStickyCTA } from "@/components/shared/MobileStickyCTA";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import {
@@ -21,18 +25,34 @@ import {
   incrementObjectiveViews,
   getSimilarObjectives,
 } from "@/lib/supabase/queries/objectives";
+import {
+  getObjectiveReviews,
+  getUserObjectiveReview,
+  getObjectiveReviewStats,
+} from "@/lib/supabase/queries/objective-reviews";
+import { useAuth } from "@/contexts/AuthContext";
 import type { ObjectiveWithRelations } from "@/types/database.types";
 import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function ObjectiveSingle() {
   const { slug } = useParams<{ slug: string }>();
+  const { user } = useAuth();
   const [objective, setObjective] = useState<ObjectiveWithRelations | null>(null);
   const [similar, setSimilar] = useState<ObjectiveWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  
+  // Reviews state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewStats, setReviewStats] = useState<any>(null);
+  const [userReview, setUserReview] = useState<any>(null);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const [totalReviewsPages, setTotalReviewsPages] = useState(0);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
+  // Fetch objective data
   useEffect(() => {
     const fetchObjective = async () => {
       if (!slug) return;
@@ -51,6 +71,18 @@ export default function ObjectiveSingle() {
         // Fetch similar objectives
         const similarData = await getSimilarObjectives(data.id, 3);
         setSimilar(similarData);
+
+        // Fetch reviews data
+        const [reviewsData, statsData, userReviewData] = await Promise.all([
+          getObjectiveReviews(data.id, reviewsPage),
+          getObjectiveReviewStats(data.id),
+          user ? getUserObjectiveReview(data.id) : Promise.resolve(null),
+        ]);
+
+        setReviews(reviewsData.reviews);
+        setTotalReviewsPages(reviewsData.pages);
+        setReviewStats(statsData);
+        setUserReview(userReviewData);
       } catch (err: any) {
         if (err.message?.includes("No rows")) {
           setNotFound(true);
@@ -63,7 +95,31 @@ export default function ObjectiveSingle() {
     };
 
     fetchObjective();
-  }, [slug]);
+  }, [slug, reviewsPage, user]);
+
+  // Handle review page change
+  const handleReviewPageChange = (page: number) => {
+    setReviewsPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Handle review success
+  const handleReviewSuccess = async () => {
+    if (!objective) return;
+    setShowReviewForm(false);
+    
+    // Refresh reviews
+    const [reviewsData, statsData, userReviewData] = await Promise.all([
+      getObjectiveReviews(objective.id, reviewsPage),
+      getObjectiveReviewStats(objective.id),
+      user ? getUserObjectiveReview(objective.id) : Promise.resolve(null),
+    ]);
+
+    setReviews(reviewsData.reviews);
+    setTotalReviewsPages(reviewsData.pages);
+    setReviewStats(statsData);
+    setUserReview(userReviewData);
+  };
 
   // Generate breadcrumbs
   const getBreadcrumbs = (): BreadcrumbItem[] => {
@@ -427,6 +483,63 @@ export default function ObjectiveSingle() {
                     </div>
                   </div>
                 )}
+              </section>
+
+              {/* Reviews Section */}
+              <section>
+                <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
+                  Recenzii
+                </h2>
+
+                <div className="space-y-8">
+                  {/* Review Stats */}
+                  {reviewStats && <ObjectiveReviewStats stats={reviewStats} />}
+
+                  {/* Review Form */}
+                  {user && !userReview && !showReviewForm && (
+                    <Button onClick={() => setShowReviewForm(true)} size="lg" className="w-full">
+                      Scrie o Recenzie
+                    </Button>
+                  )}
+
+                  {user && userReview && !showReviewForm && (
+                    <div className="flex gap-3">
+                      <Button onClick={() => setShowReviewForm(true)} variant="outline" className="flex-1">
+                        Editează Recenzia Ta
+                      </Button>
+                    </div>
+                  )}
+
+                  {showReviewForm && objective && (
+                    <ObjectiveReviewForm
+                      objectiveId={objective.id}
+                      objectiveTitle={objective.title}
+                      existingReview={userReview || undefined}
+                      onSuccess={handleReviewSuccess}
+                      onCancel={() => setShowReviewForm(false)}
+                    />
+                  )}
+
+                  {!user && !showReviewForm && (
+                    <Card className="p-6 text-center">
+                      <p className="text-muted-foreground mb-4">
+                        Trebuie să fii autentificat pentru a lăsa o recenzie
+                      </p>
+                      <Button asChild>
+                        <Link to="/auth/login">Autentificare</Link>
+                      </Button>
+                    </Card>
+                  )}
+
+                  {/* Reviews List */}
+                  <ObjectiveReviewList
+                    reviews={reviews}
+                    totalReviews={reviewStats?.totalReviews || 0}
+                    currentPage={reviewsPage}
+                    totalPages={totalReviewsPages}
+                    onPageChange={handleReviewPageChange}
+                  />
+                </div>
               </section>
 
               {/* Similar Objectives */}
