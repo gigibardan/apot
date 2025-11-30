@@ -113,7 +113,6 @@ export function GuideAdvancedFilters({
               <SelectValue placeholder="Toate regiunile" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toate regiunile</SelectItem>
               <SelectItem value="transilvania">Transilvania</SelectItem>
               <SelectItem value="muntenia">Muntenia</SelectItem>
               <SelectItem value="moldova">Moldova</SelectItem>
@@ -138,7 +137,6 @@ export function GuideAdvancedFilters({
               <SelectValue placeholder="Toate specializările" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toate specializările</SelectItem>
               <SelectItem value="istorie">Istorie</SelectItem>
               <SelectItem value="natura">Natură</SelectItem>
               <SelectItem value="cultura">Cultură</SelectItem>
@@ -162,7 +160,6 @@ export function GuideAdvancedFilters({
               <SelectValue placeholder="Toate limbile" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toate limbile</SelectItem>
               <SelectItem value="romana">Română</SelectItem>
               <SelectItem value="engleza">Engleză</SelectItem>
               <SelectItem value="franceza">Franceză</SelectItem>
