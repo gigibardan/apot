@@ -162,8 +162,11 @@ export default function ObjectiveForm() {
     setSaving(true);
 
     try {
-      const objectiveData = {
-        ...formData,
+      // Extract selected_types before sending to database
+      const { selected_types, ...objectiveData } = formData;
+      
+      const dataToSave = {
+        ...objectiveData,
         published: publish,
         published_at: publish ? new Date().toISOString() : null,
       };
@@ -171,17 +174,17 @@ export default function ObjectiveForm() {
       let objectiveId: string;
 
       if (isEdit) {
-        await updateObjective(id!, objectiveData);
+        await updateObjective(id!, dataToSave);
         objectiveId = id!;
         toast.success("Obiectiv actualizat cu succes!");
       } else {
-        const newObjective = await createObjective(objectiveData);
+        const newObjective = await createObjective(dataToSave);
         objectiveId = newObjective.id;
         toast.success("Obiectiv creat cu succes!");
       }
 
       // Update type relations
-      await updateObjectiveTypes(objectiveId, formData.selected_types);
+      await updateObjectiveTypes(objectiveId, selected_types);
 
       if (!isEdit) {
         navigate(`${ADMIN_ROUTES.objectives}/${objectiveId}`);
