@@ -2175,9 +2175,9 @@ export type Database = {
           objective_id: string
           rating: number
           title: string | null
+          travel_date: string | null
           updated_at: string
           user_id: string
-          visit_date: string | null
         }
         Insert: {
           approved?: boolean | null
@@ -2188,9 +2188,9 @@ export type Database = {
           objective_id: string
           rating: number
           title?: string | null
+          travel_date?: string | null
           updated_at?: string
           user_id: string
-          visit_date?: string | null
         }
         Update: {
           approved?: boolean | null
@@ -2201,9 +2201,9 @@ export type Database = {
           objective_id?: string
           rating?: number
           title?: string | null
+          travel_date?: string | null
           updated_at?: string
           user_id?: string
-          visit_date?: string | null
         }
         Relationships: [
           {
