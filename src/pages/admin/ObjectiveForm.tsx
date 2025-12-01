@@ -114,9 +114,13 @@ export default function ObjectiveForm() {
   async function loadObjective() {
     try {
       const data = await getObjectiveById(id!);
+      
+      // Extract only database fields, remove nested objects
+      const { continent, country, types, ...cleanData } = data;
+      
       setFormData({
-        ...data,
-        selected_types: data.types?.map((t: any) => t.id) || [],
+        ...cleanData,
+        selected_types: types?.map((t: any) => t.type.id) || [],
       });
     } catch (error) {
       console.error("Error loading objective:", error);
@@ -162,8 +166,8 @@ export default function ObjectiveForm() {
     setSaving(true);
 
     try {
-      // Extract selected_types before sending to database
-      const { selected_types, ...objectiveData } = formData;
+      // Extract selected_types and any nested objects before sending to database
+      const { selected_types, continent, country, types, ...objectiveData } = formData;
       
       const dataToSave = {
         ...objectiveData,
@@ -294,16 +298,27 @@ export default function ObjectiveForm() {
                 disabled={!formData.continent_id}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selectează țară" />
+                  <SelectValue placeholder={countries.length === 0 ? "Selectează mai întâi continentul" : "Selectează țară"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem key={country.id} value={country.id}>
-                      {country.flag_emoji} {country.name}
+                  {countries.length === 0 ? (
+                    <SelectItem value="no-countries" disabled>
+                      Nu există țări pentru acest continent
                     </SelectItem>
-                  ))}
+                  ) : (
+                    countries.map((country) => (
+                      <SelectItem key={country.id} value={country.id}>
+                        {country.flag_emoji} {country.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
+              {formData.continent_id && countries.length === 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Nu există țări în baza de date pentru acest continent. Contactează administratorul.
+                </p>
+              )}
             </div>
           </div>
 
