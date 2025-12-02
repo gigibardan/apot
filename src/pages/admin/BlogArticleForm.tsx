@@ -34,14 +34,9 @@ const articleSchema = z.object({
   tags: z.array(z.string()).optional(),
   content: z.string().optional(),
   featured_image: z.string().min(1, "Imaginea principală este obligatorie"),
-  gallery_images: z.array(z.object({ url: z.string(), alt: z.string().optional() })).optional(),
-  author_name: z.string().optional(),
-  author_avatar: z.string().optional(),
   featured: z.boolean().optional(),
-  featured_until: z.string().optional().nullable(),
   meta_title: z.string().max(60).optional(),
   meta_description: z.string().max(160).optional(),
-  canonical_url: z.string().url().optional().or(z.literal("")),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -52,7 +47,6 @@ export default function BlogArticleForm() {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(!!id);
   const [tagInput, setTagInput] = useState("");
-  const [galleryImages, setGalleryImages] = useState<Array<{ url: string; alt: string }>>([]);
 
   const {
     register,
@@ -65,7 +59,6 @@ export default function BlogArticleForm() {
     defaultValues: {
       featured: false,
       tags: [],
-      gallery_images: [],
     },
   });
 
@@ -96,12 +89,17 @@ export default function BlogArticleForm() {
     try {
       const data = await getBlogArticleById(id!);
       if (data) {
-        Object.keys(data).forEach((key) => {
-          setValue(key as any, (data as any)[key]);
-        });
-        if ((data as any).gallery_images) {
-          setGalleryImages((data as any).gallery_images);
-        }
+        // Only set fields that exist in the form schema
+        setValue("title", data.title);
+        setValue("slug", data.slug);
+        setValue("excerpt", data.excerpt || "");
+        setValue("category", data.category || "");
+        setValue("tags", data.tags || []);
+        setValue("content", data.content || "");
+        setValue("featured_image", data.featured_image || "");
+        setValue("featured", data.featured || false);
+        setValue("meta_title", data.meta_title || "");
+        setValue("meta_description", data.meta_description || "");
       }
     } catch (error) {
       console.error("Error loading article:", error);
@@ -114,11 +112,20 @@ export default function BlogArticleForm() {
   async function onSubmit(data: ArticleFormData, published: boolean) {
     setLoading(true);
     try {
+      // Clean data - only include fields that exist in database
       const articleData = {
-        ...data,
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt || null,
+        category: data.category || null,
+        tags: data.tags || [],
+        content: data.content || null,
+        featured_image: data.featured_image,
+        featured: data.featured || false,
+        meta_title: data.meta_title || null,
+        meta_description: data.meta_description || null,
         published,
         published_at: published ? new Date().toISOString() : null,
-        gallery_images: galleryImages.length > 0 ? galleryImages : null,
       };
 
       if (id) {
@@ -151,13 +158,6 @@ export default function BlogArticleForm() {
     );
   }
 
-  function addGalleryImage(url: string) {
-    setGalleryImages([...galleryImages, { url, alt: "" }]);
-  }
-
-  function removeGalleryImage(index: number) {
-    setGalleryImages(galleryImages.filter((_, i) => i !== index));
-  }
 
   if (loadingData) {
     return (
@@ -319,54 +319,12 @@ export default function BlogArticleForm() {
                   </p>
                 )}
               </div>
-
-              <div>
-                <Label>Galerie Imagini (Opțional)</Label>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Pentru articole cu galerie foto
-                </p>
-                <ImageUpload
-                  bucket="blog-images"
-                  value=""
-                  onChange={addGalleryImage}
-                />
-                <div className="grid grid-cols-4 gap-4 mt-4">
-                  {galleryImages.map((img, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={img.url}
-                        alt={img.alt || "Gallery"}
-                        className="w-full h-32 object-cover rounded"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeGalleryImage(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </Card>
           </TabsContent>
 
-          {/* TAB 4: SEO & CLASIFICARE */}
+          {/* TAB 4: SEO */}
           <TabsContent value="seo">
             <Card className="p-6 space-y-6">
-              <div>
-                <Label htmlFor="author_name">Nume Autor</Label>
-                <Input
-                  id="author_name"
-                  {...register("author_name")}
-                  placeholder="Echipa APOT"
-                  className="mt-2"
-                />
-              </div>
-
               <div className="flex items-center space-x-2">
                 <Switch
                   id="featured"
@@ -375,18 +333,6 @@ export default function BlogArticleForm() {
                 />
                 <Label htmlFor="featured">Featured (Afișează pe homepage)</Label>
               </div>
-
-              {featured && (
-                <div>
-                  <Label htmlFor="featured_until">Featured Până La</Label>
-                  <Input
-                    id="featured_until"
-                    type="date"
-                    {...register("featured_until")}
-                    className="mt-2"
-                  />
-                </div>
-              )}
 
               <div>
                 <Label htmlFor="meta_title">Meta Title (Override)</Label>
@@ -409,19 +355,6 @@ export default function BlogArticleForm() {
                   className="mt-2"
                 />
                 <CharacterCounter current={metaDescription?.length || 0} max={160} />
-              </div>
-
-              <div>
-                <Label htmlFor="canonical_url">URL Canonical (Avansat)</Label>
-                <Input
-                  id="canonical_url"
-                  {...register("canonical_url")}
-                  placeholder="Pentru conținut republicat"
-                  className="mt-2"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Lasă gol pentru articole originale
-                </p>
               </div>
             </Card>
           </TabsContent>
