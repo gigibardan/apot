@@ -33,7 +33,7 @@ export async function getBlogArticles(
     tags,
     featured,
     search,
-    published = true,
+    published,
     limit = 6,
     offset = 0,
   } = filters;
@@ -42,6 +42,7 @@ export async function getBlogArticles(
     .from("blog_articles")
     .select("*", { count: "exact" });
 
+  // Only filter by published if explicitly set
   if (published !== undefined) {
     query = query.eq("published", published);
   }

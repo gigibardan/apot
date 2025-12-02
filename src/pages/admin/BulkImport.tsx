@@ -270,12 +270,37 @@ export default function BulkImport() {
   };
 
   const importArticle = async (data: any) => {
+    // Normalize category to match enum values (remove diacritics)
+    let normalizedCategory = null;
+    if (data.category) {
+      const categoryMap: Record<string, string> = {
+        "călătorii": "calatorii",
+        "călători": "calatorii", 
+        "calatorii": "calatorii",
+        "călăuzire": "calauze",
+        "călăuze": "calauze",
+        "calauze": "calauze",
+        "povești": "povesti",
+        "povestiri": "povesti",
+        "povesti": "povesti",
+        "tips": "tips",
+        "ghiduri": "ghiduri",
+        "ghid": "ghiduri",
+        "destinații": "destinatii",
+        "destinatii": "destinatii",
+        "inspiratie": "inspiratie",
+        "inspirație": "inspiratie"
+      };
+      const lower = data.category.toLowerCase().trim();
+      normalizedCategory = categoryMap[lower] || lower;
+    }
+
     const { error } = await supabase
       .from("blog_articles")
       .insert({
         title: data.title,
         slug: data.slug,
-        category: data.category,
+        category: normalizedCategory,
         excerpt: data.excerpt,
         content: data.content,
         tags: data.tags ? data.tags.split(",").map((s: string) => s.trim()) : [],
