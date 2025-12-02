@@ -135,10 +135,12 @@ export function Header() {
               </button>
               <div className="absolute left-0 mt-2 w-48 bg-background border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                 <Link to="/feed" className="block px-4 py-2 text-sm hover:bg-muted">Activity Feed</Link>
+                <Link to="/forum" className="block px-4 py-2 text-sm hover:bg-muted">Forum</Link>
                 <Link to="/journals" className="block px-4 py-2 text-sm hover:bg-muted">Travel Journals</Link>
                 <Link to="/contests" className="block px-4 py-2 text-sm hover:bg-muted">Photo Contests</Link>
                 <Link to="/challenges" className="block px-4 py-2 text-sm hover:bg-muted">Challenges</Link>
                 <Link to="/leaderboards" className="block px-4 py-2 text-sm hover:bg-muted">Leaderboards</Link>
+                <Link to="/suggest-objective" className="block px-4 py-2 text-sm hover:bg-muted border-t">Sugerează Obiectiv</Link>
               </div>
             </div>
             
@@ -226,6 +228,13 @@ export function Header() {
                     Activity Feed
                   </Link>
                   <Link
+                    to="/forum"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  >
+                    Forum
+                  </Link>
+                  <Link
                     to="/journals"
                     onClick={() => setMobileMenuOpen(false)}
                     className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
@@ -252,6 +261,13 @@ export function Header() {
                     className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
                   >
                     Leaderboards
+                  </Link>
+                  <Link
+                    to="/suggest-objective"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md border-t mt-2 pt-2"
+                  >
+                    Sugerează Obiectiv
                   </Link>
                 </div>
               </div>
