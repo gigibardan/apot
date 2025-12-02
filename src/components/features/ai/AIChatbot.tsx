@@ -130,7 +130,7 @@ export function AIChatbot() {
       {/* Chat Window */}
       {isOpen && (
         <Card className="fixed bottom-6 right-6 w-96 h-[600px] shadow-2xl z-50 flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
             <CardTitle className="text-lg font-semibold">
               🤖 Asistent Călătorie
             </CardTitle>
@@ -142,9 +142,9 @@ export function AIChatbot() {
               <X className="h-4 w-4" />
             </Button>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col p-0">
-            <ScrollArea className="flex-1 px-4" ref={scrollRef}>
-              <div className="space-y-4 pb-4">
+          <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+            <ScrollArea className="flex-1 px-4 overflow-y-auto" ref={scrollRef}>
+              <div className="space-y-4 py-4">
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
@@ -155,7 +155,7 @@ export function AIChatbot() {
                   >
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-lg px-4 py-2",
+                        "max-w-[80%] rounded-lg px-4 py-2 break-words",
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
@@ -175,7 +175,7 @@ export function AIChatbot() {
               </div>
             </ScrollArea>
 
-            <div className="p-4 border-t">
+            <div className="p-4 border-t flex-shrink-0 bg-background">
               <div className="flex gap-2">
                 <Input
                   value={input}
