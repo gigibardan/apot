@@ -268,7 +268,7 @@ export default function ObjectiveForm() {
       
       setFormData({
         ...cleanData,
-        country_name: country?.name || cleanData.country_name || "",
+        country_name: country?.name || (cleanData as any).country_name || "",
         selected_types: types?.map((t: any) => t.type.id) || [],
       });
     } catch (error) {
@@ -645,7 +645,6 @@ export default function ObjectiveForm() {
                             newGallery[index] = { ...newGallery[index], url: "" };
                             handleChange("gallery_images", newGallery);
                           }}
-                          compact
                         />
                       </div>
                       <div>
@@ -1041,13 +1040,9 @@ export default function ObjectiveForm() {
 
       {/* AI Helper */}
       <AIContentHelper
-        contentType="objective"
-        currentContent={{
-          title: formData.title,
-          excerpt: formData.excerpt,
-          description: formData.description,
-        }}
-        onSuggestion={(field, value) => handleChange(field, value)}
+        title={formData.title || ""}
+        description={formData.excerpt || ""}
+        content={formData.description || ""}
       />
       </div>
 
