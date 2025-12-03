@@ -30,7 +30,7 @@ export async function getObjectiveReviews(
     .from("reviews")
     .select(`
       *,
-      profiles:user_id (
+      profiles!reviews_user_id_fkey (
         full_name,
         avatar_url
       )
@@ -128,11 +128,11 @@ export async function getAllObjectiveReviews(filters: ObjectiveReviewFilters = {
     .from("reviews")
     .select(`
       *,
-      objectives:objective_id (
+      objectives!reviews_objective_id_fkey (
         title,
         slug
       ),
-      profiles:user_id (
+      profiles!reviews_user_id_fkey (
         full_name,
         avatar_url
       )

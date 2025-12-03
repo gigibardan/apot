@@ -24,6 +24,7 @@ const circuitSchema = z.object({
   slug: z.string().min(1, "Slug-ul este obligatoriu"),
   description: z.string().max(500).optional(),
   countries: z.string().optional(),
+  highlights: z.string().optional(),
   duration_days: z.number().min(1, "Durata este obligatorie"),
   price_from: z.number().min(0, "Prețul este obligatoriu"),
   thumbnail_url: z.string().min(1, "Imaginea este obligatorie"),
@@ -88,6 +89,8 @@ export default function CircuitForm() {
         Object.keys(circuit).forEach((key) => {
           if (key === "countries" && Array.isArray(circuit.countries)) {
             setValue("countries", circuit.countries.join(", "));
+          } else if (key === "highlights" && Array.isArray(circuit.highlights)) {
+            setValue("highlights", circuit.highlights.join(", "));
           } else {
             setValue(key as any, circuit[key as keyof typeof circuit]);
           }
@@ -109,9 +112,15 @@ export default function CircuitForm() {
         ? data.countries.split(",").map((c) => c.trim()).filter(Boolean)
         : [];
 
+      // Convert highlights string to array
+      const highlightsArray = data.highlights
+        ? data.highlights.split(",").map((h) => h.trim()).filter(Boolean)
+        : [];
+
       const circuitData = {
         ...data,
         countries: countriesArray,
+        highlights: highlightsArray,
       };
 
       if (id) {
@@ -203,6 +212,20 @@ export default function CircuitForm() {
               placeholder="ex: Egipt, Cairo, Giza"
               className="mt-2"
             />
+          </div>
+
+          <div>
+            <Label htmlFor="highlights">Highlights (separate prin virgulă)</Label>
+            <Textarea
+              id="highlights"
+              {...register("highlights")}
+              placeholder="ex: Croazieră Nil, Piramidele Giza, Muzeul Egiptean"
+              rows={2}
+              className="mt-2"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Punctele forte ale circuitului
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

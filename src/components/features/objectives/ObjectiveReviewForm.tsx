@@ -23,7 +23,7 @@ const reviewSchema = z.object({
   rating: z.number().min(1, "Rating is required").max(5),
   title: z.string().min(5, "Title must be at least 5 characters").max(100),
   comment: z.string().min(20, "Comment must be at least 20 characters").max(1000),
-  visit_date: z.string().optional(),
+  travel_date: z.string().optional(),
 });
 
 type ReviewFormData = z.infer<typeof reviewSchema>;
@@ -36,7 +36,7 @@ interface ObjectiveReviewFormProps {
     rating: number;
     title?: string;
     comment?: string;
-    visit_date?: string;
+    travel_date?: string;
   };
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -64,7 +64,7 @@ export function ObjectiveReviewForm({
       rating: existingReview?.rating || 0,
       title: existingReview?.title || "",
       comment: existingReview?.comment || "",
-      visit_date: existingReview?.visit_date || "",
+      travel_date: existingReview?.travel_date || "",
     },
   });
 
@@ -84,7 +84,7 @@ export function ObjectiveReviewForm({
           rating: data.rating,
           title: data.title,
           comment: data.comment,
-          visit_date: data.visit_date,
+          travel_date: data.travel_date,
         });
       }
       onSuccess?.();
@@ -167,11 +167,11 @@ export function ObjectiveReviewForm({
 
           {/* Visit Date */}
           <div className="space-y-2">
-            <Label htmlFor="visit_date">Date of Visit (optional)</Label>
+            <Label htmlFor="travel_date">Date of Visit (optional)</Label>
             <Input
-              id="visit_date"
+              id="travel_date"
               type="date"
-              {...register("visit_date")}
+              {...register("travel_date")}
             />
           </div>
 
