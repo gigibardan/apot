@@ -1846,6 +1846,7 @@ export type Database = {
           accessibility_info: string | null
           best_season: string | null
           booking_url: string | null
+          city: string | null
           contact_email: string | null
           contact_phone: string | null
           continent_id: string | null
@@ -1890,6 +1891,7 @@ export type Database = {
           accessibility_info?: string | null
           best_season?: string | null
           booking_url?: string | null
+          city?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           continent_id?: string | null
@@ -1934,6 +1936,7 @@ export type Database = {
           accessibility_info?: string | null
           best_season?: string | null
           booking_url?: string | null
+          city?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           continent_id?: string | null
