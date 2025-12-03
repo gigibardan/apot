@@ -27,6 +27,30 @@ function ObjectiveCardComponent({
 }: ObjectiveCardProps) {
   const primaryType = objective.types?.[0];
 
+  // Build location string: Continent - Country - City
+  const getLocationString = () => {
+    const parts: string[] = [];
+    
+    if (objective.continent?.name) {
+      parts.push(objective.continent.name);
+    }
+    
+    if (objective.country?.name) {
+      parts.push(objective.country.name);
+    } else if ((objective as any).country_name) {
+      parts.push((objective as any).country_name);
+    }
+    
+    if ((objective as any).city) {
+      parts.push((objective as any).city);
+    }
+    
+    return parts.join(" - ");
+  };
+
+  const locationString = getLocationString();
+  const flagEmoji = objective.country?.flag_emoji || "🌍";
+
   return (
     <Link
       to={`/obiective/${objective.slug}`}
@@ -94,13 +118,13 @@ function ObjectiveCardComponent({
 
         {/* Content */}
         <CardContent className={cn("p-5 space-y-3", variant === "compact" && "p-4 space-y-2")}>
-          {/* Location */}
-          {objective.country && (
+          {/* Location - Continent - Country - City */}
+          {locationString && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="text-base" aria-hidden="true">
-                {objective.country.flag_emoji || "🌍"}
+              <span className="text-base flex-shrink-0" aria-hidden="true">
+                {flagEmoji}
               </span>
-              <span>{objective.country.name}</span>
+              <span className="truncate">{locationString}</span>
             </div>
           )}
 

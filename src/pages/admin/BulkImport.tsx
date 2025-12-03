@@ -33,14 +33,14 @@ export default function BulkImport() {
 
     if (type === "obiective") {
       headers = [
-        "title", "slug", "continent_slug", "country_slug", "excerpt", "description",
+        "title", "slug", "continent_slug", "country_name", "city", "excerpt", "description",
         "location_text", "latitude", "longitude", "visit_duration", "best_season",
         "difficulty_level", "entrance_fee", "opening_hours", "website_url",
         "unesco_site", "featured", "types_slugs", "featured_image_url"
       ];
       sampleData = [
         [
-          "Castelul Bran", "castelul-bran", "europa", "romania",
+          "Castelul Bran", "castelul-bran", "europa", "România", "Brașov",
           "Castelul legendar al lui Dracula", "Descriere completă...",
           "Brașov, România", "45.5152", "25.3674", "2-3 ore", "Mai-Octombrie",
           "easy", "50 RON", "09:00-18:00", "https://bran-castle.com",
@@ -132,7 +132,7 @@ export default function BulkImport() {
 
     if (type === "obiective") {
       if (!row.continent_slug?.trim()) errors.push("Continent lipsă");
-      if (!row.country_slug?.trim()) errors.push("Țară lipsă");
+      // country_name is now optional
       if (row.latitude && isNaN(parseFloat(row.latitude))) {
         errors.push("Latitudine invalidă");
       }
@@ -199,23 +199,46 @@ export default function BulkImport() {
     });
   };
 
+  // Helper to format name (First letter uppercase)
+  const formatName = (name: string): string => {
+    if (!name) return "";
+    return name
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
   const importObjective = async (data: any) => {
-    // Resolve continent and country IDs
+    // Resolve continent ID
     const { data: continent } = await supabase
       .from("continents")
       .select("id")
       .eq("slug", data.continent_slug)
       .single();
 
-    const { data: country } = await supabase
-      .from("countries")
-      .select("id")
-      .eq("slug", data.country_slug)
-      .single();
-
-    if (!continent || !country) {
-      throw new Error("Continent sau țară invalidă");
+    if (!continent) {
+      throw new Error("Continent invalid");
     }
+
+    // Country is now optional - try to find by name if provided
+    let countryId = null;
+    const countryName = data.country_name ? formatName(data.country_name) : null;
+    
+    if (countryName) {
+      // Try to find existing country in DB
+      const { data: country } = await supabase
+        .from("countries")
+        .select("id")
+        .ilike("name", countryName)
+        .maybeSingle();
+      
+      if (country) {
+        countryId = country.id;
+      }
+    }
+
+    // Format city name
+    const cityName = data.city ? formatName(data.city) : null;
 
     // Insert objective
     const { data: objective, error } = await supabase
@@ -224,7 +247,9 @@ export default function BulkImport() {
         title: data.title,
         slug: data.slug,
         continent_id: continent.id,
-        country_id: country.id,
+        country_id: countryId,
+        country_name: countryName,
+        city: cityName,
         excerpt: data.excerpt,
         description: data.description,
         location_text: data.location_text,
