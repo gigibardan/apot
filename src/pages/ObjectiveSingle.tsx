@@ -284,7 +284,7 @@ export default function ObjectiveSingle() {
       {objective.country && <MobileStickyCTA countryName={objective.country.name} />}
 
       {/* Breadcrumbs */}
-      <Section className="py-4 bg-muted/30">
+      <Section className="!py-4 md:!py-8 bg-muted/30">
         <Container>
           <Breadcrumbs items={getBreadcrumbs()} />
         </Container>
