@@ -77,14 +77,17 @@ export function ObjectiveReviewForm({
     setIsSubmitting(true);
     try {
       if (existingReview) {
-        await updateObjectiveReview(existingReview.id, data);
+        await updateObjectiveReview(existingReview.id, {
+          ...data,
+          travel_date: data.travel_date?.trim() || null,
+        });
       } else {
         await createObjectiveReview({
           objective_id: objectiveId,
           rating: data.rating,
           title: data.title,
           comment: data.comment,
-          travel_date: data.travel_date,
+          travel_date: data.travel_date?.trim() || null,
         });
       }
       onSuccess?.();
