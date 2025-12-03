@@ -26,10 +26,10 @@ export function ProtectedRoute({
         navigate(`${redirectTo}?returnUrl=${encodeURIComponent(returnUrl)}`, {
           replace: true,
         });
-      } else if (requireRole && userRole !== requireRole && userRole !== "admin") {
-        // If specific role required and user doesn't have it (admins bypass all checks)
-        navigate("/admin", { replace: true });
-      }
+    } else if (requireRole && userRole !== requireRole && userRole !== "admin") {
+      // If specific role required and user doesn't have it (admins bypass all checks)
+      navigate("/", { replace: true });
+    }
     }
   }, [loading, isAuthenticated, userRole, requireRole, navigate, redirectTo, location]);
 

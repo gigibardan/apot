@@ -139,8 +139,8 @@ const App = () => (
               <Route path="cookies" element={<CookiePolicyPage />} />
             </Route>
 
-            {/* Admin Routes - Protected */}
-            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+            {/* Admin Routes - Protected (Admin only) */}
+            <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="obiective" element={<ObjectivesAdmin />} />
