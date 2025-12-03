@@ -129,7 +129,7 @@ export function AIChatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-96 h-[600px] shadow-2xl z-50 flex flex-col">
+        <Card className="fixed inset-x-2 bottom-2 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-96 h-[calc(100vh-1rem)] sm:h-[600px] max-h-[600px] shadow-2xl z-50 flex flex-col">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
             <CardTitle className="text-lg font-semibold">
               🤖 Asistent Călătorie
@@ -142,20 +142,20 @@ export function AIChatbot() {
               <X className="h-4 w-4" />
             </Button>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-            <ScrollArea className="flex-1 px-4 overflow-y-auto" ref={scrollRef}>
+          <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
+            <ScrollArea className="flex-1 px-4" ref={scrollRef}>
               <div className="space-y-4 py-4">
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
                     className={cn(
-                      "flex",
+                      "flex w-full",
                       msg.role === "user" ? "justify-end" : "justify-start"
                     )}
                   >
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-lg px-4 py-2 break-words",
+                        "max-w-[85%] rounded-lg px-3 py-2 break-words",
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
@@ -167,7 +167,7 @@ export function AIChatbot() {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-4 py-2">
+                    <div className="bg-muted rounded-lg px-3 py-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export function AIChatbot() {
               </div>
             </ScrollArea>
 
-            <div className="p-4 border-t flex-shrink-0 bg-background">
+            <div className="p-3 sm:p-4 border-t flex-shrink-0 bg-background">
               <div className="flex gap-2">
                 <Input
                   value={input}
@@ -183,11 +183,13 @@ export function AIChatbot() {
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Întreabă ceva..."
                   disabled={isLoading}
+                  className="text-base sm:text-sm"
                 />
                 <Button
                   onClick={handleSend}
                   disabled={isLoading || !input.trim()}
                   size="icon"
+                  className="flex-shrink-0"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
