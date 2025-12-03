@@ -1,10 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon, Heart } from "lucide-react";
+import { Menu, X, Sun, Moon, Heart, LogOut, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Container } from "@/components/layout/Container";
 import { PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +28,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
   const navigation = [
@@ -57,6 +64,11 @@ export function Header() {
     } catch (error) {
       console.error("Error loading favorites count:", error);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
   };
 
   return (
@@ -98,33 +110,6 @@ export function Header() {
               </Link>
             ))}
             
-            {/* Auth Links */}
-            {user ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-              >
-                Dashboard
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/auth/login")}
-                >
-                  Autentificare
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => navigate("/auth/signup")}
-                >
-                  Înregistrare
-                </Button>
-              </>
-            )}
-            
             {/* Community Dropdown - Desktop Only */}
             <div className="relative group">
               <button className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
@@ -161,9 +146,48 @@ export function Header() {
                 </Badge>
               )}
             </Button>
+
+            {/* Auth - Desktop */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="h-4 w-4" />
+                    Contul meu
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <User className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Deconectare
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/auth/login")}
+                >
+                  Autentificare
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/auth/signup")}
+                >
+                  Înregistrare
+                </Button>
+              </>
+            )}
           </div>
 
-          {/* Theme Toggle & Mobile Menu Button */}
+          {/* Right side icons */}
           <div className="flex items-center space-x-2">
             {user && <NotificationBell />}
             <LanguageSwitcher />
@@ -200,6 +224,71 @@ export function Header() {
         <div className="md:hidden border-t animate-fade-in">
           <Container>
             <div className="py-4 space-y-2">
+              {/* Auth Buttons Mobile - At Top */}
+              {user ? (
+                <div className="flex items-center justify-between px-4 py-3 bg-muted/50 rounded-md mb-4">
+                  <span className="text-sm font-medium">Bine ai venit!</span>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/dashboard");
+                      }}
+                    >
+                      <User className="h-4 w-4 mr-1" />
+                      Dashboard
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-2 px-4 py-3 bg-muted/50 rounded-md mb-4">
+                  <Button
+                    className="flex-1"
+                    variant="outline"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/auth/login");
+                    }}
+                  >
+                    Autentificare
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/auth/signup");
+                    }}
+                  >
+                    Înregistrare
+                  </Button>
+                </div>
+              )}
+
+              {/* Theme Toggle - Mobile */}
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
+              >
+                <span>{theme === "dark" ? "Mod luminos" : "Mod întunecat"}</span>
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </button>
+
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -216,10 +305,29 @@ export function Header() {
                 </Link>
               ))}
 
+              {/* Favorites - Mobile */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate("/favorite");
+                }}
+                className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Heart className="h-5 w-5" />
+                  {t("nav.favorites")}
+                </span>
+                {favoritesCount > 0 && (
+                  <Badge variant="destructive" className="h-5 px-2 text-xs">
+                    {favoritesCount}
+                  </Badge>
+                )}
+              </button>
+
               {/* Community Links - Mobile */}
-              <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-muted-foreground mb-2">COMMUNITY</p>
-                <div className="space-y-2">
+              <div className="px-4 py-2 border-t mt-2">
+                <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase">Community</p>
+                <div className="space-y-1">
                   <Link
                     to="/feed"
                     onClick={() => setMobileMenuOpen(false)}
@@ -271,76 +379,6 @@ export function Header() {
                   </Link>
                 </div>
               </div>
-
-              {user && (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate("/favorite");
-                  }}
-                  className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <Heart className="h-5 w-5" />
-                    {t("nav.favorites")}
-                  </span>
-                  {favoritesCount > 0 && (
-                    <Badge variant="destructive" className="h-5 px-2 text-xs">
-                      {favoritesCount}
-                    </Badge>
-                  )}
-                </button>
-              )}
-
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
-              >
-                <span>{t("common.theme", "Temă")}</span>
-                {theme === "dark" ? (
-                  <Moon className="h-5 w-5" />
-                ) : (
-                  <Sun className="h-5 w-5" />
-                )}
-              </button>
-
-              {/* Auth Buttons Mobile */}
-              {user ? (
-                <div className="px-4 py-2 space-y-2 border-t">
-                  <Button
-                    className="w-full"
-                    variant="outline"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate("/dashboard");
-                    }}
-                  >
-                    Dashboard
-                  </Button>
-                </div>
-              ) : (
-                <div className="px-4 py-2 space-y-2 border-t">
-                  <Button
-                    className="w-full"
-                    variant="outline"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate("/auth/login");
-                    }}
-                  >
-                    Autentificare
-                  </Button>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate("/auth/signup");
-                    }}
-                  >
-                    Înregistrare
-                  </Button>
-                </div>
-              )}
             </div>
           </Container>
         </div>
