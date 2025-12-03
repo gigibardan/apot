@@ -53,8 +53,8 @@ export default function UserBanManagement() {
         .from('user_bans')
         .select(`
           *,
-          profiles:user_id (full_name, email),
-          banned_by_profile:banned_by (full_name)
+          profiles!user_bans_user_id_fkey (full_name, email),
+          banned_by_profile:profiles!user_bans_banned_by_fkey (full_name)
         `)
         .eq('is_active', true)
         .order('banned_at', { ascending: false });

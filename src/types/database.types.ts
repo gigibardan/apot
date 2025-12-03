@@ -208,7 +208,7 @@ export interface Review {
   rating: number;
   title: string | null;
   comment: string | null;
-  visit_date: string | null;
+  travel_date: string | null;
   helpful_count: number;
   approved: boolean;
   created_at: string;

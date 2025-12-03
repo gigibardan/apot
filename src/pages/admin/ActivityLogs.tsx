@@ -48,7 +48,7 @@ export default function ActivityLogs() {
         .from('activity_logs')
         .select(`
           *,
-          profiles:user_id (full_name)
+          profiles!activity_logs_user_id_fkey (full_name)
         `)
         .order('created_at', { ascending: false })
         .range((page - 1) * logsPerPage, page * logsPerPage - 1);

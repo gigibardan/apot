@@ -11,7 +11,7 @@ export interface ObjectiveReviewInput {
   rating: number;
   title?: string;
   comment?: string;
-  visit_date?: string;
+  travel_date?: string;
 }
 
 /**

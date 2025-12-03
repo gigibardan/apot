@@ -16,7 +16,7 @@ interface Review {
   rating: number;
   title?: string;
   comment?: string;
-  visit_date?: string;
+  travel_date?: string;
   created_at: string;
   helpful_count: number;
   profiles?: {
@@ -82,10 +82,10 @@ export function ObjectiveReviewList({
                         <time dateTime={review.created_at}>
                           {formatDate(review.created_at)}
                         </time>
-                        {review.visit_date && (
+                        {review.travel_date && (
                           <>
                             <span>•</span>
-                            <span>Visited {formatDate(review.visit_date)}</span>
+                            <span>Visited {formatDate(review.travel_date)}</span>
                           </>
                         )}
                       </div>
