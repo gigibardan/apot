@@ -69,6 +69,9 @@ import PhotoContests from "@/pages/PhotoContests";
 import ContestSingle from "@/pages/ContestSingle";
 import CommunityChallenges from "@/pages/CommunityChallenges";
 import SuggestObjective from "@/pages/SuggestObjective";
+import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
+import TermsPage from "@/pages/TermsPage";
+import CookiePolicyPage from "@/pages/CookiePolicyPage";
 import SuggestionsAdmin from "@/pages/admin/SuggestionsAdmin";
 import ContestsAdmin from "@/pages/admin/ContestsAdmin";
 import ChallengesAdmin from "@/pages/admin/ChallengesAdmin";
@@ -78,6 +81,7 @@ import ScheduledActions from "@/pages/admin/ScheduledActions";
 import ContentRevisions from "@/pages/admin/ContentRevisions";
 import SEOAudit from "@/pages/admin/SEOAudit";
 import { AIChatbot } from "@/components/features/ai/AIChatbot";
+import { CookieConsentBanner } from "@/components/features/gdpr/CookieConsentBanner";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +102,7 @@ const App = () => (
             <BrowserRouter>
               <AnalyticsTracker />
               <AIChatbot />
+              <CookieConsentBanner />
               <LanguageProvider>
                 <Routes>
             {/* Public Routes - with optional language prefix */}
@@ -129,6 +134,9 @@ const App = () => (
               <Route path="contests/:slug" element={<ContestSingle />} />
               <Route path="challenges" element={<CommunityChallenges />} />
               <Route path="suggest-objective" element={<ProtectedRoute><SuggestObjective /></ProtectedRoute>} />
+              <Route path="politica-confidentialitate" element={<PrivacyPolicyPage />} />
+              <Route path="termeni-conditii" element={<TermsPage />} />
+              <Route path="cookies" element={<CookiePolicyPage />} />
             </Route>
 
             {/* Admin Routes - Protected */}
