@@ -219,169 +219,183 @@ export function Header() {
         </nav>
       </Container>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t animate-fade-in">
-          <Container>
-            <div className="py-4 space-y-2">
-              {/* Auth Buttons Mobile - At Top */}
-              {user ? (
-                <div className="flex items-center justify-between px-4 py-3 bg-muted/50 rounded-md mb-4">
-                  <span className="text-sm font-medium">Bine ai venit!</span>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        navigate("/dashboard");
-                      }}
-                    >
-                      <User className="h-4 w-4 mr-1" />
-                      Dashboard
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        handleLogout();
-                      }}
-                    >
-                      <LogOut className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex gap-2 px-4 py-3 bg-muted/50 rounded-md mb-4">
-                  <Button
-                    className="flex-1"
-                    variant="outline"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate("/auth/login");
-                    }}
-                  >
-                    Autentificare
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate("/auth/signup");
-                    }}
-                  >
-                    Înregistrare
-                  </Button>
-                </div>
-              )}
-
-              {/* Theme Toggle - Mobile */}
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
-              >
-                <span>{theme === "dark" ? "Mod luminos" : "Mod întunecat"}</span>
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </button>
-
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "block px-4 py-3 text-base font-medium rounded-md transition-colors",
-                    pathname === item.href
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground/80 hover:bg-muted hover:text-foreground"
+        <>
+          {/* Backdrop blur overlay */}
+          <div 
+            className="fixed inset-0 top-[73px] z-40 bg-background/80 backdrop-blur-sm md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Scrollable menu container */}
+          <div className="fixed inset-x-0 top-[73px] bottom-0 z-50 md:hidden overflow-y-auto overscroll-contain">
+            <div className="bg-background border-t animate-fade-in">
+              <Container>
+                <div className="py-4 space-y-2">
+                  {/* Auth Buttons Mobile - At Top */}
+                  {user ? (
+                    <div className="flex items-center justify-between px-4 py-3 bg-muted/50 rounded-md mb-4">
+                      <span className="text-sm font-medium">Bine ai venit!</span>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            navigate("/dashboard");
+                          }}
+                        >
+                          <User className="h-4 w-4 mr-1" />
+                          Dashboard
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            handleLogout();
+                          }}
+                        >
+                          <LogOut className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2 px-4 py-3 bg-muted/50 rounded-md mb-4">
+                      <Button
+                        className="flex-1"
+                        variant="outline"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          navigate("/auth/login");
+                        }}
+                      >
+                        Autentificare
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          navigate("/auth/signup");
+                        }}
+                      >
+                        Înregistrare
+                      </Button>
+                    </div>
                   )}
-                >
-                  {item.name}
-                </Link>
-              ))}
 
-              {/* Favorites - Mobile */}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate("/favorite");
-                }}
-                className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
-              >
-                <span className="flex items-center gap-2">
-                  <Heart className="h-5 w-5" />
-                  {t("nav.favorites")}
-                </span>
-                {favoritesCount > 0 && (
-                  <Badge variant="destructive" className="h-5 px-2 text-xs">
-                    {favoritesCount}
-                  </Badge>
-                )}
-              </button>
+                  {/* Theme Toggle - Mobile */}
+                  <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
+                  >
+                    <span>{theme === "dark" ? "Mod luminos" : "Mod întunecat"}</span>
+                    {theme === "dark" ? (
+                      <Sun className="h-5 w-5" />
+                    ) : (
+                      <Moon className="h-5 w-5" />
+                    )}
+                  </button>
 
-              {/* Community Links - Mobile */}
-              <div className="px-4 py-2 border-t mt-2">
-                <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase">Community</p>
-                <div className="space-y-1">
-                  <Link
-                    to="/feed"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        "block px-4 py-3 text-base font-medium rounded-md transition-colors",
+                        pathname === item.href
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground/80 hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+
+                  {/* Favorites - Mobile */}
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/favorite");
+                    }}
+                    className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-foreground/80 hover:bg-muted rounded-md transition-colors"
                   >
-                    Activity Feed
-                  </Link>
-                  <Link
-                    to="/forum"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
-                  >
-                    Forum
-                  </Link>
-                  <Link
-                    to="/journals"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
-                  >
-                    Travel Journals
-                  </Link>
-                  <Link
-                    to="/contests"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
-                  >
-                    Photo Contests
-                  </Link>
-                  <Link
-                    to="/challenges"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
-                  >
-                    Challenges
-                  </Link>
-                  <Link
-                    to="/leaderboards"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
-                  >
-                    Leaderboards
-                  </Link>
-                  <Link
-                    to="/suggest-objective"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md border-t mt-2 pt-2"
-                  >
-                    Sugerează Obiectiv
-                  </Link>
+                    <span className="flex items-center gap-2">
+                      <Heart className="h-5 w-5" />
+                      {t("nav.favorites")}
+                    </span>
+                    {favoritesCount > 0 && (
+                      <Badge variant="destructive" className="h-5 px-2 text-xs">
+                        {favoritesCount}
+                      </Badge>
+                    )}
+                  </button>
+
+                  {/* Community Links - Mobile */}
+                  <div className="px-4 py-2 border-t mt-2">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase">Community</p>
+                    <div className="space-y-1">
+                      <Link
+                        to="/feed"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                      >
+                        Activity Feed
+                      </Link>
+                      <Link
+                        to="/forum"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                      >
+                        Forum
+                      </Link>
+                      <Link
+                        to="/journals"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                      >
+                        Travel Journals
+                      </Link>
+                      <Link
+                        to="/contests"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                      >
+                        Photo Contests
+                      </Link>
+                      <Link
+                        to="/challenges"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                      >
+                        Challenges
+                      </Link>
+                      <Link
+                        to="/leaderboards"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md"
+                      >
+                        Leaderboards
+                      </Link>
+                      <Link
+                        to="/suggest-objective"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted rounded-md border-t mt-2 pt-2"
+                      >
+                        Sugerează Obiectiv
+                      </Link>
+                    </div>
+                  </div>
+                  
+                  {/* Bottom padding for safe area */}
+                  <div className="h-8" />
                 </div>
-              </div>
+              </Container>
             </div>
-          </Container>
-        </div>
+          </div>
+        </>
       )}
     </header>
   );
