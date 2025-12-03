@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import DOMPurify from "dompurify";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { SEO } from "@/components/seo/SEO";
@@ -249,7 +250,7 @@ export default function GuideSinglePage() {
                 <CardContent>
                   <div
                     className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: guide.bio }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(guide.bio) }}
                   />
                 </CardContent>
               </Card>
