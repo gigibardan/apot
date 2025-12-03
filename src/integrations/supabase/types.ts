@@ -1851,6 +1851,7 @@ export type Database = {
           contact_phone: string | null
           continent_id: string | null
           country_id: string | null
+          country_name: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -1896,6 +1897,7 @@ export type Database = {
           contact_phone?: string | null
           continent_id?: string | null
           country_id?: string | null
+          country_name?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1941,6 +1943,7 @@ export type Database = {
           contact_phone?: string | null
           continent_id?: string | null
           country_id?: string | null
+          country_name?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
