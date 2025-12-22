@@ -1,202 +1,326 @@
-import { useParams, Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getJournalBySlug } from "@/lib/supabase/queries/journals";
-import { toggleJournalLike } from "@/lib/supabase/mutations/journals";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Calendar, Clock, Eye, MapPin, User, ArrowLeft, Share2 } from "lucide-react";
+import { Container } from "@/components/layout/Container";
 import { SEO } from "@/components/seo/SEO";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { ShareButtons } from "@/components/features/objectives/ShareButtons";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
+import { getJournalBySlug } from "@/lib/supabase/queries/journals";
+import { getJournalComments } from "@/lib/supabase/queries/journal-comments";
+import { isJournalLiked } from "@/lib/supabase/queries/journals";
+import { JournalLikeButton } from "@/components/features/journals/JournalLikeButton";
+import { JournalComments } from "@/components/features/journals/JournalComments";
 import { FollowButton } from "@/components/features/social/FollowButton";
-import { Heart, Calendar, Eye, User, MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
-import DOMPurify from "dompurify";
+import { ro } from "date-fns/locale";
 
 export default function JournalSingle() {
-  const { slug } = useParams();
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [liked, setLiked] = useState(false);
 
-  const { data: journal, isLoading } = useQuery({
+  // Fetch journal data
+  const {
+    data: journal,
+    isLoading,
+    error,
+    refetch: refetchJournal,
+  } = useQuery({
     queryKey: ["journal", slug],
     queryFn: () => getJournalBySlug(slug!),
+    enabled: !!slug,
   });
 
-  const likeMutation = useMutation({
-    mutationFn: () => toggleJournalLike(journal!.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journal", slug] });
-      toast.success("Updated!");
-    },
-    onError: () => {
-      toast.error("Failed to update like");
-    },
+  // Fetch comments
+  const {
+    data: comments = [],
+    refetch: refetchComments,
+  } = useQuery({
+    queryKey: ["journal-comments", journal?.id],
+    queryFn: () => getJournalComments(journal!.id),
+    enabled: !!journal?.id,
   });
+
+  // Check if user liked this journal
+  useEffect(() => {
+    if (journal?.id) {
+      isJournalLiked(journal.id).then(setLiked).catch(console.error);
+    }
+  }, [journal?.id]);
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: journal?.title,
+          text: journal?.excerpt || "",
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      // Fallback: Copy link to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copiat!",
+        description: "Link-ul jurnalului a fost copiat în clipboard.",
+      });
+    }
+  };
+
+  const formatTripDates = () => {
+    if (!journal?.trip_start_date) return null;
+
+    const start = format(new Date(journal.trip_start_date), "d MMM yyyy", {
+      locale: ro,
+    });
+
+    if (journal.trip_end_date) {
+      const end = format(new Date(journal.trip_end_date), "d MMM yyyy", {
+        locale: ro,
+      });
+      return `${start} - ${end}`;
+    }
+
+    return start;
+  };
+
+  const getUserInitials = () => {
+    return journal?.user?.full_name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() || "?";
+  };
 
   if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!journal) {
     return (
-      <div className="container py-12 text-center">
-        <h2 className="text-2xl font-bold mb-4">Journal not found</h2>
-        <Link to="/journals">
-          <Button>Back to Journals</Button>
-        </Link>
-      </div>
+      <>
+        <SEO title="Se încarcă..." noindex />
+        <Container className="py-12">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <Skeleton className="h-12 w-3/4" />
+            <Skeleton className="h-64 w-full" />
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+        </Container>
+      </>
     );
   }
 
-  const sanitizedContent = DOMPurify.sanitize(journal.content || "");
+  if (error || !journal) {
+    return (
+      <>
+        <SEO title="Jurnal negăsit" noindex />
+        <Container className="py-12">
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold">Jurnal negăsit</h1>
+            <p className="text-muted-foreground">
+              Jurnalul pe care îl cauți nu există sau nu este disponibil.
+            </p>
+            <Button onClick={() => navigate("/journals")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Înapoi la Jurnale
+            </Button>
+          </div>
+        </Container>
+      </>
+    );
+  }
 
   return (
     <>
       <SEO
-        title={journal.title}
-        description={journal.excerpt || "Travel journal"}
-        ogImage={journal.cover_image}
+        title={journal.meta_title || journal.title}
+        description={journal.meta_description || journal.excerpt || ""}
+        ogImage={journal.cover_image || undefined}
+        canonical={`/journals/${journal.slug}`}
       />
 
-      <div className="container py-8 max-w-4xl">
-        {/* Cover Image */}
-        {journal.cover_image && (
-          <div className="aspect-[21/9] overflow-hidden rounded-lg mb-8">
-            <img
-              src={journal.cover_image}
-              alt={journal.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+      <Container className="py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-6"
+            onClick={() => navigate("/journals")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Înapoi la Jurnale
+          </Button>
 
-        {/* Title & Meta */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{journal.title}</h1>
-          
-          <div className="flex flex-wrap items-center gap-4 text-muted-foreground mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              {format(new Date(journal.published_at), "MMM dd, yyyy")}
-            </div>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              {journal.views_count || 0} views
-            </div>
-            {journal.trip_start_date && (
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Trip: {format(new Date(journal.trip_start_date), "MMM yyyy")}
-                {journal.trip_end_date && ` - ${format(new Date(journal.trip_end_date), "MMM yyyy")}`}
-              </div>
-            )}
-          </div>
+          {/* Header */}
+          <div className="space-y-6">
+            {/* Title */}
+            <h1 className="text-4xl lg:text-5xl font-bold">{journal.title}</h1>
 
-          {/* Author Info */}
-          <div className="flex items-center justify-between border-y py-4">
-            <Link 
-              to={`/profil/${journal.user?.username || journal.user_id}`}
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-            >
-              <Avatar>
-                <AvatarImage src={journal.user?.avatar_url} />
-                <AvatarFallback>
-                  <User className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold">{journal.user?.full_name}</p>
-                {journal.user?.username && (
-                  <p className="text-sm text-muted-foreground">@{journal.user.username}</p>
-                )}
-              </div>
-            </Link>
-            {user && user.id !== journal.user_id && (
-              <FollowButton userId={journal.user_id} size="sm" />
-            )}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div 
-          className="prose prose-lg dark:prose-invert max-w-none mb-8"
-          dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-        />
-
-        {/* Gallery */}
-        {journal.gallery_images && journal.gallery_images.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-2xl font-bold mb-4">Photo Gallery</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {journal.gallery_images.map((img: string, idx: number) => (
-                <div key={idx} className="aspect-square overflow-hidden rounded-lg">
-                  <img
-                    src={img}
-                    alt={`Gallery ${idx + 1}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform"
-                  />
+            {/* Meta Info */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              {formatTripDates() && (
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatTripDates()}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              )}
 
-        {/* Actions */}
-        <Card className="mb-8">
-          <CardContent className="flex items-center justify-between p-6">
-            <div className="flex items-center gap-4">
-              <Button
-                variant={journal.user_has_liked ? "default" : "outline"}
-                size="sm"
-                onClick={() => likeMutation.mutate()}
-                disabled={!user || likeMutation.isPending}
-              >
-                <Heart className="mr-2 h-4 w-4" fill={journal.user_has_liked ? "currentColor" : "none"} />
-                {journal.likes_count || 0} Likes
+              <div className="flex items-center gap-1">
+                <Eye className="h-4 w-4" />
+                <span>{journal.views_count || 0} vizualizări</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>
+                  {format(new Date(journal.created_at), "d MMM yyyy", {
+                    locale: ro,
+                  })}
+                </span>
+              </div>
+            </div>
+
+            {/* Author Card */}
+            <Card>
+              <CardContent className="flex items-center justify-between p-6">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={journal.user?.avatar_url || undefined} />
+                    <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <Link
+                      to={`/user/${journal.user?.username || journal.user_id}`}
+                      className="font-medium text-lg hover:underline"
+                    >
+                      {journal.user?.full_name}
+                    </Link>
+                    {journal.user?.bio && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {journal.user.bio}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <FollowButton
+                  userId={journal.user_id}
+                  size="default"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <JournalLikeButton
+                journalId={journal.id}
+                initialLiked={liked}
+                initialCount={journal.likes_count || 0}
+                onLikeChange={(liked, count) => {
+                  setLiked(liked);
+                  refetchJournal();
+                }}
+              />
+
+              <Button variant="outline" size="sm" onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-2" />
+                Distribuie
               </Button>
             </div>
-            <ShareButtons
-              url={window.location.href}
-              title={journal.title}
-              description={journal.excerpt}
-            />
-          </CardContent>
-        </Card>
 
-        {/* Related Journals */}
-        {journal.related_journals && journal.related_journals.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-bold mb-4">Related Journals</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {journal.related_journals.map((related: any) => (
-                <Link key={related.id} to={`/journals/${related.slug}`}>
-                  <Card className="hover:shadow-md transition-shadow">
-                    {related.cover_image && (
-                      <div className="aspect-video overflow-hidden">
+            {/* Cover Image */}
+            {journal.cover_image && (
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                <img
+                  src={journal.cover_image}
+                  alt={journal.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            {/* Excerpt */}
+            {journal.excerpt && (
+              <div className="text-lg text-muted-foreground border-l-4 border-primary pl-4">
+                {journal.excerpt}
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: journal.content }} />
+            </div>
+
+            {/* Gallery */}
+            {journal.gallery_images &&
+              Array.isArray(journal.gallery_images) &&
+              journal.gallery_images.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-semibold">Galerie Foto</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {journal.gallery_images.map((image: any, index: number) => (
+                      <div
+                        key={index}
+                        className="relative aspect-video rounded-lg overflow-hidden"
+                      >
                         <img
-                          src={related.cover_image}
-                          alt={related.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform"
+                          src={image.url || image}
+                          alt={`Galerie ${index + 1}`}
+                          className="w-full h-full object-cover"
                         />
                       </div>
-                    )}
-                    <CardContent className="p-4">
-                      <h4 className="font-semibold line-clamp-2">{related.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {format(new Date(related.published_at), "MMM dd, yyyy")}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Visited Objectives */}
+            {journal.visited_objectives &&
+              journal.visited_objectives.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-semibold flex items-center gap-2">
+                    <MapPin className="h-6 w-6" />
+                    Obiective Vizitate
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {journal.visited_objectives.map((objectiveId) => (
+                      <Badge key={objectiveId} variant="secondary">
+                        <Link
+                          to={`/obiective/${objectiveId}`}
+                          className="hover:underline"
+                        >
+                          Vezi obiectiv
+                        </Link>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Comments Section */}
+            <div className="pt-8">
+              <JournalComments
+                journalId={journal.id}
+                comments={comments}
+                onCommentAdded={() => {
+                  refetchComments();
+                  refetchJournal();
+                }}
+              />
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </Container>
     </>
   );
 }
