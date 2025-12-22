@@ -172,7 +172,7 @@ Already exists in database with proper RLS policies.
 
 ```sql
 CREATE TABLE user_favorites (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users,
   objective_id uuid NOT NULL REFERENCES objectives(id),
   created_at timestamptz NOT NULL DEFAULT now(),

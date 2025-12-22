@@ -11,7 +11,42 @@ interface Message {
   role: "user" | "assistant";
   content: string;
 }
-
+function formatMessage(text: string): JSX.Element {
+  // FORȚĂM paragrafele după punct + majusculă
+  const withBreaks = text
+    .replace(/([.!?])\s+([A-ZĂÎÂȘȚ])/g, '$1\n$2')
+    .replace(/([.!?:])\s+(•)/g, '$1\n$2');
+  
+  const parts = withBreaks.split('\n');
+  
+  return (
+    <>
+      {parts.map((part, i) => {
+        const trimmed = part.trim();
+        if (!trimmed) return null;
+        
+        if (trimmed.startsWith('•')) {
+          return (
+            <div key={i} style={{ 
+              marginLeft: '1.2em', 
+              marginBottom: '0.4em',
+              textIndent: '-1em',
+              paddingLeft: '1em'
+            }}>
+              {trimmed}
+            </div>
+          );
+        }
+        
+        return (
+          <p key={i} style={{ marginBottom: '0.8em' }}>
+            {trimmed}
+          </p>
+        );
+      })}
+    </>
+  );
+}
 export function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -161,7 +196,9 @@ export function AIChatbot() {
                           : "bg-muted"
                       )}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      <div className="text-sm" style={{ lineHeight: '1.7' }}>
+  {formatMessage(msg.content)}
+</div>
                     </div>
                   </div>
                 ))}

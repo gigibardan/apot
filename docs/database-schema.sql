@@ -20,7 +20,7 @@ CREATE TYPE blog_category AS ENUM ('călătorii', 'cultură', 'istorie', 'natur�
 
 -- Continents
 CREATE TABLE continents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   slug TEXT NOT NULL UNIQUE,
   description TEXT,
@@ -34,7 +34,7 @@ CREATE TABLE continents (
 
 -- Countries
 CREATE TABLE countries (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   continent_id UUID NOT NULL REFERENCES continents(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
@@ -53,7 +53,7 @@ CREATE TABLE countries (
 
 -- Objective Types
 CREATE TABLE objective_types (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   slug TEXT NOT NULL UNIQUE,
   description TEXT,
@@ -69,7 +69,7 @@ CREATE TABLE objective_types (
 
 -- Objectives (main table)
 CREATE TABLE objectives (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   excerpt TEXT,
@@ -113,7 +113,7 @@ CREATE TABLE objectives (
 
 -- Objectives-Types Many-to-Many
 CREATE TABLE objectives_types_relations (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   objective_id UUID NOT NULL REFERENCES objectives(id) ON DELETE CASCADE,
   type_id UUID NOT NULL REFERENCES objective_types(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -122,7 +122,7 @@ CREATE TABLE objectives_types_relations (
 
 -- Blog Articles
 CREATE TABLE blog_articles (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   excerpt TEXT,
@@ -145,7 +145,7 @@ CREATE TABLE blog_articles (
 
 -- Jinfotours Circuits
 CREATE TABLE jinfotours_circuits (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   description TEXT,
@@ -167,7 +167,7 @@ CREATE TABLE jinfotours_circuits (
 
 -- User Favorites
 CREATE TABLE user_favorites (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   objective_id UUID NOT NULL REFERENCES objectives(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -176,7 +176,7 @@ CREATE TABLE user_favorites (
 
 -- Reviews
 CREATE TABLE reviews (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   objective_id UUID NOT NULL REFERENCES objectives(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
@@ -195,7 +195,7 @@ CREATE TABLE reviews (
 
 -- Media Library
 CREATE TABLE media_library (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   filename TEXT NOT NULL,
   original_filename TEXT NOT NULL,
   file_path TEXT NOT NULL,
@@ -214,7 +214,7 @@ CREATE TABLE media_library (
 
 -- User Roles
 CREATE TABLE user_roles (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   role user_role_type NOT NULL DEFAULT 'user',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -223,7 +223,7 @@ CREATE TABLE user_roles (
 
 -- Activity Logs
 CREATE TABLE activity_logs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
   action TEXT NOT NULL,
   entity_type TEXT,
@@ -236,7 +236,7 @@ CREATE TABLE activity_logs (
 
 -- Settings
 CREATE TABLE settings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   key TEXT NOT NULL UNIQUE,
   value JSONB NOT NULL,
   description TEXT,
@@ -249,7 +249,7 @@ CREATE TABLE settings (
 
 -- Page Views
 CREATE TABLE page_views (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   page_url TEXT NOT NULL,
   page_title TEXT,
   referrer TEXT,
@@ -261,7 +261,7 @@ CREATE TABLE page_views (
 
 -- Jinfotours Clicks
 CREATE TABLE jinfotours_clicks (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   circuit_id UUID REFERENCES jinfotours_circuits(id) ON DELETE SET NULL,
   clicked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   source_url TEXT,

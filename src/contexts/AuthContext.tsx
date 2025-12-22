@@ -30,25 +30,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Fetch user role from database
-  const fetchUserRole = async (userId: string): Promise<UserRole> => {
-    try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .single();
+ const fetchUserRole = async (userId: string): Promise<UserRole> => {
+  try {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
 
-      if (error) {
-        console.error("Error fetching user role:", error);
-        return null;
-      }
-
-      return data?.role || null;
-    } catch (error) {
-      console.error("Error in fetchUserRole:", error);
+    if (error) {
+      console.error("Error fetching user role:", error);
       return null;
     }
-  };
+
+    // If no roles, return null
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    // Return highest role (admin > editor > contributor > user)
+    const roles = data.map(r => r.role);
+    if (roles.includes("admin")) return "admin";
+    if (roles.includes("editor")) return "editor";
+    if (roles.includes("contributor")) return "contributor";
+    return "user";
+  } catch (error) {
+    console.error("Error in fetchUserRole:", error);
+    return null;
+  }
+};
 
   // Initialize auth state
   useEffect(() => {
