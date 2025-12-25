@@ -107,9 +107,9 @@ export async function isJournalLiked(journalId: string) {
     .select("id")
     .eq("journal_id", journalId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();  // ← CHANGED
 
-  if (error && error.code !== "PGRST116") throw error;
+  if (error) throw error;  // ← SIMPLIFIED
 
   return !!data;
 }

@@ -380,10 +380,10 @@ export default function ObjectivesAdmin() {
                         </Badge>
                       ))}
                       {objective.types?.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{objective.types.length - 2}
-                        </Badge>
-                      )}
+  <Badge key="more" variant="outline" className="text-xs">
+    +{objective.types.length - 2}
+  </Badge>
+)}
                     </div>
                   </TableCell>
                   <TableCell>

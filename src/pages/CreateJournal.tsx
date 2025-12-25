@@ -13,6 +13,16 @@ import { SEO } from "@/components/seo/SEO";
 import { toast } from "sonner";
 import { BookOpen, Save, Eye } from "lucide-react";
 
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-')      // Replace spaces with -
+    .replace(/-+/g, '-')       // Replace multiple - with single -
+    .substring(0, 100);        // Limit length
+};
+
 interface JournalFormData {
   title: string;
   excerpt: string;
@@ -45,6 +55,7 @@ export default function CreateJournal() {
   const onSubmit = (data: JournalFormData) => {
     createMutation.mutate({
       ...data,
+      slug: generateSlug(data.title), // ← ADD THIS
       content,
       cover_image: coverImage,
       gallery_images: galleryImages,
@@ -52,15 +63,16 @@ export default function CreateJournal() {
     });
   };
 
-  const saveDraft = (data: JournalFormData) => {
-    createMutation.mutate({
-      ...data,
-      content,
-      cover_image: coverImage,
-      gallery_images: galleryImages,
-      published: false,
-    });
-  };
+const saveDraft = (data: JournalFormData) => {
+  createMutation.mutate({
+    ...data,
+    slug: generateSlug(data.title), // ← ADD THIS
+    content,
+    cover_image: coverImage,
+    gallery_images: galleryImages,
+    published: false,
+  });
+};
 
   return (
     <>

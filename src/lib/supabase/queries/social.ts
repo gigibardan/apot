@@ -76,9 +76,9 @@ export async function isFollowing(userId: string) {
     .select("id")
     .eq("follower_id", user.id)
     .eq("following_id", userId)
-    .single();
+    .maybeSingle();  // ← CHANGED
 
-  if (error && error.code !== "PGRST116") throw error;
+  if (error) throw error;  // ← SIMPLIFIED
 
   return !!data;
 }
