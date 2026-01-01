@@ -2,8 +2,42 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// ====================================
+// 🛡️ PROTECTION: FORCE SELF-HOSTED
+// ====================================
+const FORCE_SELF_HOSTED = true; // NU schimba niciodată în false!
+
+const SELF_HOSTED_URL = "https://aeazzctapbhojqendxks.supabase.co";
+const SELF_HOSTED_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlYXp6Y3RhcGJob2pxZW5keGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4Njg0NTAsImV4cCI6MjA4MTQ0NDQ1MH0.wlSGbEnaen2-z08nWbLAJt6wwkqFUy7g3Ng4J1h64Qs";
+
+// Decide URL și KEY
+let SUPABASE_URL: string;
+let SUPABASE_PUBLISHABLE_KEY: string;
+
+if (FORCE_SELF_HOSTED) {
+  // FORȚEAZĂ self-hosted - ignoră .env
+  SUPABASE_URL = SELF_HOSTED_URL;
+  SUPABASE_PUBLISHABLE_KEY = SELF_HOSTED_KEY;
+  console.log('🛡️ PROTECTED: Using self-hosted Supabase');
+} else {
+  // Normal flow din .env
+  SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+}
+
+// 🚨 DETECT & ALERT dacă Lovable Cloud apare
+if (SUPABASE_URL?.includes('cxiloqsmxzyzkhbnwara')) {
+  console.error('❌❌❌ LOVABLE CLOUD DETECTED! OVERRIDING TO SELF-HOSTED ❌❌❌');
+  SUPABASE_URL = SELF_HOSTED_URL;
+  SUPABASE_PUBLISHABLE_KEY = SELF_HOSTED_KEY;
+  
+  // Alert vizual în browser
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      alert('⚠️ LOVABLE a încercat să schimbe database-ul! A fost blocat automat.');
+    }, 1000);
+  }
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
