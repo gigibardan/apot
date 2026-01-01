@@ -15,6 +15,7 @@ export const PUBLIC_ROUTES = {
   blogPost: (slug: string) => `/blog/${slug}`,
   about: "/despre",
   contact: "/contact",
+  favorites: "/favorites",
   // Social Routes
   userProfile: (username: string) => `/user/${username}`,
   activityFeed: "/feed",
