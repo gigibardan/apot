@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon, Heart, LogOut, User, Settings as SettingsIcon, Shield } from "lucide-react";
+import { Menu, X, Sun, Moon, Heart, LogOut, User, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -263,105 +263,121 @@ export function Header() {
         </nav>
       </Container>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t">
-          <Container>
-            <div className="py-4 space-y-1">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "block px-4 py-2 text-sm rounded-md",
-                    pathname === item.href
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-foreground/80 hover:bg-background/80"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
+      {/* Mobile Menu Backdrop - Click pentru a închide, site scroll în spate */}
+      <div 
+        className={cn(
+          "fixed inset-0 bg-black/20 z-40 md:hidden transition-opacity duration-300",
+          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+      
+      {/* Mobile Menu Drawer - cu animație slide + scroll independent */}
+      <div 
+        className={cn(
+          "fixed inset-x-0 top-[73px] bottom-0 z-50 md:hidden",
+          "bg-background/98 backdrop-blur-lg border-t",
+          "overflow-y-auto overscroll-contain",
+          "transition-transform duration-300 ease-in-out",
+          mobileMenuOpen ? "translate-y-0" : "translate-y-full"
+        )}
+      >
+        <Container>
+          <div className="py-4 space-y-1 pb-safe">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  "block px-4 py-2 text-sm rounded-md transition-colors",
+                  pathname === item.href
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-foreground/80 hover:bg-muted/50"
+                )}
+              >
+                {item.name}
+              </Link>
+            ))}
 
-              {/* Community Section in Mobile */}
-              <div className="pt-2 border-t border-foreground/10 mt-2">
-                <div className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase">
-                  Comunitate
-                </div>
-                <div className="space-y-1">
-                  <Link
-                    to="/feed"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md"
-                  >
-                    Activity Feed
-                  </Link>
-                  <Link
-                    to="/forum"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md"
-                  >
-                    Forum
-                  </Link>
-                  <Link
-                    to="/journals"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md"
-                  >
-                    Travel Journals
-                  </Link>
-                  <Link
-                    to="/contests"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md"
-                  >
-                    Photo Contests
-                  </Link>
-                  <Link
-                    to="/challenges"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md"
-                  >
-                    Challenges
-                  </Link>
-                  <Link
-                    to="/leaderboards"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md"
-                  >
-                    Leaderboards
-                  </Link>
-                  <Link
-                    to="/suggest-objective"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-foreground/80 hover:bg-background/80 rounded-md border-t border-foreground/10 mt-2 pt-2"
-                  >
-                    Sugerează Obiectiv
-                  </Link>
-                </div>
+            {/* Community Section in Mobile */}
+            <div className="pt-2 border-t border-foreground/10 mt-2">
+              <div className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase tracking-wide">
+                Comunitate
               </div>
-
-              {/* Admin Link in Mobile - Only for Admins */}
-              {user && isAdmin && (
-                <div className="pt-2 border-t border-foreground/10 mt-2">
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center px-4 py-2 text-sm text-primary hover:bg-primary/10 rounded-md font-medium"
-                  >
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin Panel
-                  </Link>
-                </div>
-              )}
-              
-              {/* Bottom padding for safe area */}
-              <div className="h-8" />
+              <div className="space-y-1">
+                <Link
+                  to="/feed"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Activity Feed
+                </Link>
+                <Link
+                  to="/forum"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Forum
+                </Link>
+                <Link
+                  to="/journals"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Travel Journals
+                </Link>
+                <Link
+                  to="/contests"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Photo Contests
+                </Link>
+                <Link
+                  to="/challenges"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Challenges
+                </Link>
+                <Link
+                  to="/leaderboards"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Leaderboards
+                </Link>
+                <Link
+                  to="/suggest-objective"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md border-t border-foreground/10 mt-2 pt-2 transition-colors"
+                >
+                  Sugerează Obiectiv
+                </Link>
+              </div>
             </div>
-          </Container>
-        </div>
-      )}
+
+            {/* Admin Link in Mobile - Only for Admins */}
+            {user && isAdmin && (
+              <div className="pt-2 border-t border-foreground/10 mt-2">
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center px-4 py-2 text-sm text-primary hover:bg-primary/10 rounded-md font-medium transition-colors"
+                >
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin Panel
+                </Link>
+              </div>
+            )}
+            
+            {/* Bottom padding for safe area (notch/gestures) */}
+            <div className="h-20" />
+          </div>
+        </Container>
+      </div>
     </header>
   );
 }
