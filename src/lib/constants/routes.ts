@@ -26,6 +26,7 @@ export const PUBLIC_ROUTES = {
   contestSingle: (slug: string) => `/contests/${slug}`,
   challenges: "/challenges",
   suggestObjective: "/suggest-objective",
+  favorites: "/favorites",
 } as const;
 
 export const ADMIN_ROUTES = {
