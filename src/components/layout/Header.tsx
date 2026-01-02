@@ -145,20 +145,24 @@ export function Header() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center space-x-3">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
+          <div className="flex items-center space-x-2 md:space-x-3">
+            {/* Language Switcher - HIDDEN on mobile */}
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
 
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </Button>
+            {/* Theme Toggle - HIDDEN on mobile */}
+            <div className="hidden md:block">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              </Button>
+            </div>
 
             {/* Favorites Button */}
             {user && (
@@ -266,31 +270,51 @@ export function Header() {
       {/* Mobile Menu - TRANSPARENT backdrop allows site scroll */}
       <div 
         className={cn(
-          "fixed inset-0 z-40 md:hidden transition-all duration-300",
-          mobileMenuOpen ? "visible" : "invisible"
+          "fixed inset-0 z-40 md:hidden",
+          mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none"
         )}
       >
-        {/* Backdrop overlay - semi-transparent, site visible and scrollable */}
+        {/* Backdrop overlay - site visible and scrollable behind */}
         <div 
           className={cn(
-            "absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300",
+            "absolute inset-0 bg-gradient-to-b from-black/40 to-black/60 backdrop-blur transition-opacity duration-300",
             mobileMenuOpen ? "opacity-100" : "opacity-0"
           )}
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
         
-        {/* Menu Drawer - slides from bottom */}
+        {/* Menu Drawer - semi-transparent */}
         <div 
           className={cn(
             "absolute left-0 right-0 top-[73px] bottom-0",
-            "bg-background/95 backdrop-blur-md border-t shadow-xl",
+            "bg-background/90 backdrop-blur-xl border-t border-border/50 shadow-2xl",
             "overflow-y-auto overscroll-contain",
             "transition-transform duration-300 ease-out",
             mobileMenuOpen ? "translate-y-0" : "translate-y-full"
           )}
         >
           <div className="w-full px-4 py-4 space-y-1 pb-24">
+            {/* Mobile-only: Theme Toggle & Language at top */}
+            <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border md:hidden">
+              <div className="flex items-center gap-2">
+                <Sun className="h-4 w-4" />
+                <span className="text-sm font-medium">Temă & Limbă</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  aria-label="Toggle theme"
+                >
+                  <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                </Button>
+              </div>
+            </div>
+            
             {navigation.map((item) => (
               <Link
                 key={item.name}
