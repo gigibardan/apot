@@ -285,7 +285,7 @@ export function Header() {
               className={cn(
                 "fixed inset-x-0 bottom-0 z-[120] md:hidden",
                 "bg-background/75 backdrop-blur-2xl border-t-2 border-border shadow-2xl",
-                "max-h-[calc(100vh-73px)] pt-[73px]",
+                "max-h-[85vh]",
                 "overflow-y-auto overscroll-contain",
                 "transition-transform duration-300 ease-out will-change-transform",
                 mobileMenuOpen
@@ -294,7 +294,7 @@ export function Header() {
               )}
               aria-hidden={!mobileMenuOpen}
             >
-              <div className="w-full px-4 py-4 space-y-1 pb-24">
+              <div className="w-full px-4 py-3 space-y-1 pb-24">
                 {/* Top row inside drawer (keeps blur, provides visible close) */}
                 <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border">
                   <div className="flex items-center gap-2">
