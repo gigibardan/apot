@@ -50,6 +50,11 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Auto-close menu on route change (UX improvement)
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   useEffect(() => {
     if (user) {
       loadFavoritesCount();
@@ -268,23 +273,24 @@ export function Header() {
         </nav>
       </div>
 
+      {/* Portal mobile menu to body (escapes sticky header constraints) */}
       {typeof document !== "undefined" &&
         createPortal(
           <>
             {/* Mobile Menu Backdrop */}
             {mobileMenuOpen && (
               <div
-                className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-[110] md:hidden"
+                className="fixed inset-0 bg-black/60  z-[110] md:hidden"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-hidden="true"
               />
             )}
 
-            {/* Mobile Menu Drawer (portaled to body to avoid scroll/transform clipping) */}
+            {/* Mobile Menu Drawer */}
             <div
               className={cn(
                 "fixed inset-x-0 top-[73px] z-[120] md:hidden",
-                "bg-background/75 backdrop-blur-2xl border-b-2 border-border shadow-2xl",
+                "bg-background/90 backdrop-blur-xl border-b-2 border-primary/20 shadow-2xl",
                 "max-h-[calc(100vh-73px)]",
                 "overflow-y-auto overscroll-contain",
                 "transition-all duration-300 ease-out",
@@ -294,24 +300,9 @@ export function Header() {
               )}
               aria-hidden={!mobileMenuOpen}
             >
-              <div className="w-full px-4 py-3 space-y-1 pb-8">
-                {/* Top row inside drawer (keeps blur, provides visible close) */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Meniu</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-label="Închide meniul"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-
+              <div className="w-full px-4 py-4 space-y-1 pb-8">
                 {/* Mobile-only: Theme Toggle & Language */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border md:hidden">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border">
                   <div className="flex items-center gap-2">
                     <Sun className="h-4 w-4" />
                     <span className="text-sm font-medium">Temă & Limbă</span>
@@ -330,6 +321,7 @@ export function Header() {
                   </div>
                 </div>
 
+                {/* Navigation Links */}
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
@@ -346,54 +338,29 @@ export function Header() {
                   </Link>
                 ))}
 
-                {/* Community Section in Mobile */}
+                {/* Community Section */}
                 <div className="pt-3 border-t-2 border-border mt-3">
                   <div className="px-4 py-2 text-xs font-bold text-foreground uppercase tracking-wider">
                     Comunitate
                   </div>
                   <div className="space-y-1">
-                    <Link
-                      to="/feed"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                    >
-                      Activity Feed
-                    </Link>
-                    <Link
-                      to="/forum"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                    >
-                      Forum
-                    </Link>
-                    <Link
-                      to="/journals"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                    >
-                      Travel Journals
-                    </Link>
-                    <Link
-                      to="/contests"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                    >
-                      Photo Contests
-                    </Link>
-                    <Link
-                      to="/challenges"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                    >
-                      Challenges
-                    </Link>
-                    <Link
-                      to="/leaderboards"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                    >
-                      Leaderboards
-                    </Link>
+                    {[
+                      { to: "/feed", label: "Activity Feed" },
+                      { to: "/forum", label: "Forum" },
+                      { to: "/journals", label: "Travel Journals" },
+                      { to: "/contests", label: "Photo Contests" },
+                      { to: "/challenges", label: "Challenges" },
+                      { to: "/leaderboards", label: "Leaderboards" },
+                    ].map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
                     <Link
                       to="/suggest-objective"
                       onClick={() => setMobileMenuOpen(false)}
@@ -404,7 +371,7 @@ export function Header() {
                   </div>
                 </div>
 
-                {/* Admin Link in Mobile - Only for Admins */}
+                {/* Admin Link - Only for Admins */}
                 {user && isAdmin && (
                   <div className="pt-3 border-t-2 border-border mt-3">
                     <Link
@@ -425,8 +392,6 @@ export function Header() {
           </>,
           document.body
         )}
-     
-
     </header>
   );
 }
