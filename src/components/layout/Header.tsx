@@ -267,33 +267,25 @@ export function Header() {
         </nav>
       </div>
 
-      {/* Mobile Menu - TRANSPARENT backdrop allows site scroll */}
-      <div 
-        className={cn(
-          "fixed inset-0 z-40 md:hidden",
-          mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none"
-        )}
-      >
-        {/* Backdrop overlay - site visible and scrollable behind */}
+      {/* Mobile Menu Backdrop */}
+      {mobileMenuOpen && (
         <div 
-          className={cn(
-            "absolute inset-0 bg-gradient-to-b from-black/40 to-black/60 backdrop-blur transition-opacity duration-300",
-            mobileMenuOpen ? "opacity-100" : "opacity-0"
-          )}
+          className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-40 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
-        
-        {/* Menu Drawer - semi-transparent */}
-        <div 
-          className={cn(
-            "absolute left-0 right-0 top-[73px] bottom-0",
-            "bg-background/90 backdrop-blur-xl border-t border-border/50 shadow-2xl",
-            "overflow-y-auto overscroll-contain",
-            "transition-transform duration-300 ease-out",
-            mobileMenuOpen ? "translate-y-0" : "translate-y-full"
-          )}
-        >
+      )}
+      
+      {/* Mobile Menu Drawer */}
+      <div 
+        className={cn(
+          "fixed left-0 right-0 top-[73px] bottom-0 z-50 md:hidden",
+          "bg-background/90 backdrop-blur-2xl border-t border-border/20",
+          "overflow-y-auto overscroll-contain",
+          "transition-transform duration-300 ease-out",
+          mobileMenuOpen ? "translate-y-0" : "translate-y-full"
+        )}
+      >
           <div className="w-full px-4 py-4 space-y-1 pb-24">
             {/* Mobile-only: Theme Toggle & Language at top */}
             <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border md:hidden">
@@ -407,7 +399,6 @@ export function Header() {
             <div className="h-20" />
           </div>
         </div>
-      </div>
     </header>
   );
 }
