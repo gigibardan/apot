@@ -283,18 +283,18 @@ export function Header() {
             {/* Mobile Menu Drawer (portaled to body to avoid scroll/transform clipping) */}
             <div
               className={cn(
-                "fixed inset-x-0 bottom-0 z-[120] md:hidden",
-                "bg-background/75 backdrop-blur-2xl border-t-2 border-border shadow-2xl",
-                "max-h-[85vh]",
+                "fixed inset-x-0 top-[73px] z-[120] md:hidden",
+                "bg-background/75 backdrop-blur-2xl border-b-2 border-border shadow-2xl",
+                "max-h-[calc(100vh-73px)]",
                 "overflow-y-auto overscroll-contain",
-                "transition-transform duration-300 ease-out will-change-transform",
+                "transition-all duration-300 ease-out",
                 mobileMenuOpen
-                  ? "translate-y-0 pointer-events-auto"
-                  : "translate-y-full pointer-events-none"
+                  ? "opacity-100 translate-y-0 pointer-events-auto"
+                  : "opacity-0 -translate-y-4 pointer-events-none"
               )}
               aria-hidden={!mobileMenuOpen}
             >
-              <div className="w-full px-4 py-3 space-y-1 pb-24">
+              <div className="w-full px-4 py-3 space-y-1 pb-8">
                 {/* Top row inside drawer (keeps blur, provides visible close) */}
                 <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border">
                   <div className="flex items-center gap-2">
