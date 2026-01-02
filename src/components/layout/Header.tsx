@@ -49,11 +49,6 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Auto-close mobile menu when route changes
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
   useEffect(() => {
     if (user) {
       loadFavoritesCount();
@@ -79,10 +74,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-[60] w-full transition-all duration-300",
+        "sticky top-0 z-50 w-full transition-all duration-300",
         scrolled
-          ? "bg-background/70 backdrop-blur-md shadow-sm"
-          : "bg-background/40 backdrop-blur-sm"
+          ? "bg-background/80 backdrop-blur-md shadow-sm"
+          : "bg-background"
       )}
     >
       <div className="w-full px-4">
@@ -151,12 +146,12 @@ export function Header() {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2 md:space-x-3">
-            {/* Language Switcher - HIDDEN on mobile */}
+            {/* Language Switcher - HIDDEN on mobile to save space */}
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
 
-            {/* Theme Toggle - HIDDEN on mobile */}
+            {/* Theme Toggle - HIDDEN on mobile to save space */}
             <div className="hidden md:block">
               <Button
                 variant="ghost"
@@ -275,7 +270,7 @@ export function Header() {
       {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-[60] md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -284,13 +279,11 @@ export function Header() {
       {/* Mobile Menu Drawer */}
       <div 
         className={cn(
-          "fixed left-0 right-0 top-[73px] bottom-0 z-[70] md:hidden",
-          "bg-background/95 backdrop-blur-2xl border-t-2 border-border shadow-2xl",
+          "fixed left-0 right-0 top-[73px] bottom-0 z-50 md:hidden",
+          "bg-background/75 backdrop-blur-md border-t-2 border-primary/20",
           "overflow-y-auto overscroll-contain",
-          "transition-all duration-300 ease-out origin-top",
-          mobileMenuOpen
-            ? "opacity-100 scale-y-100 pointer-events-auto"
-            : "opacity-0 scale-y-95 pointer-events-none"
+          "transition-transform duration-300 ease-out",
+          mobileMenuOpen ? "translate-y-0" : "translate-y-full"
         )}
       >
           <div className="w-full px-4 py-4 space-y-1 pb-24">

@@ -69,8 +69,8 @@ export default function ObjectivesAdmin() {
             statusFilter === "published"
               ? true
               : statusFilter === "draft"
-              ? false
-              : undefined,
+                ? false
+                : undefined,
           limit: 20,
         }),
         getContinents(),
@@ -213,7 +213,7 @@ export default function ObjectivesAdmin() {
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Obiective" }]} />
-      
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -380,10 +380,10 @@ export default function ObjectivesAdmin() {
                         </Badge>
                       ))}
                       {objective.types?.length > 2 && (
-  <Badge key="more" variant="outline" className="text-xs">
-    +{objective.types.length - 2}
-  </Badge>
-)}
+                        <Badge key="more" variant="outline" className="text-xs">
+                          +{objective.types.length - 2}
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>

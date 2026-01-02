@@ -83,6 +83,8 @@ import SEOAudit from "@/pages/admin/SEOAudit";
 import { AIChatbot } from "@/components/features/ai/AIChatbot";
 import { CookieConsentBanner } from "@/components/features/gdpr/CookieConsentBanner";
 
+
+
 const queryClient = new QueryClient();
 
 // Analytics tracking component
@@ -137,6 +139,8 @@ const App = () => (
               <Route path="politica-confidentialitate" element={<PrivacyPolicyPage />} />
               <Route path="termeni-conditii" element={<TermsPage />} />
               <Route path="cookies" element={<CookiePolicyPage />} />
+
+
             </Route>
 
             {/* Admin Routes - Protected (Admin only) */}
