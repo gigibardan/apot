@@ -79,7 +79,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-300",
+        "sticky top-0 z-[60] w-full transition-all duration-300",
         scrolled
           ? "bg-background/70 backdrop-blur-md shadow-sm"
           : "bg-background/40 backdrop-blur-sm"
@@ -275,7 +275,7 @@ export function Header() {
       {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-45 md:hidden"
+          className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-[60] md:hidden"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -284,8 +284,8 @@ export function Header() {
       {/* Mobile Menu Drawer */}
       <div 
         className={cn(
-          "fixed left-0 right-0 top-[73px] bottom-0 z-50 md:hidden",
-          "bg-background/90 backdrop-blur-2xl border-t border-border/20",
+          "fixed left-0 right-0 top-[73px] bottom-0 z-[70] md:hidden",
+          "bg-background/95 backdrop-blur-2xl border-t-2 border-border shadow-2xl",
           "overflow-y-auto overscroll-contain",
           "transition-all duration-300 ease-out origin-top",
           mobileMenuOpen
