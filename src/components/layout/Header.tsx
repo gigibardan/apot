@@ -80,7 +80,7 @@ export function Header() {
           : "bg-background"
       )}
     >
-      <Container>
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-xl">
         <nav
           className="flex items-center justify-between py-4"
           aria-label="Navigation principală"
@@ -261,29 +261,29 @@ export function Header() {
             </Button>
           </div>
         </nav>
-      </Container>
+      </div>
 
-      {/* Mobile Menu Backdrop - Click pentru a închide, site scroll în spate */}
+      {/* Mobile Menu Backdrop - Click pentru a închide */}
       <div 
         className={cn(
-          "fixed inset-0 bg-black/20 z-40 md:hidden transition-opacity duration-300",
+          "fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300",
           mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
         onClick={() => setMobileMenuOpen(false)}
         aria-hidden="true"
       />
       
-      {/* Mobile Menu Drawer - cu animație slide + scroll independent */}
+      {/* Mobile Menu Drawer - full width, scroll independent */}
       <div 
         className={cn(
-          "fixed inset-x-0 top-[73px] bottom-0 z-50 md:hidden",
-          "bg-background/98 backdrop-blur-lg border-t",
+          "fixed left-0 right-0 top-[73px] bottom-0 z-50 md:hidden",
+          "bg-background backdrop-blur-xl border-t shadow-2xl",
           "overflow-y-auto overscroll-contain",
           "transition-transform duration-300 ease-in-out",
           mobileMenuOpen ? "translate-y-0" : "translate-y-full"
         )}
       >
-        <Container>
+        <div className="mx-auto w-full px-4 sm:px-6 max-w-screen-xl">
           <div className="py-4 space-y-1 pb-safe">
             {navigation.map((item) => (
               <Link
@@ -291,10 +291,10 @@ export function Header() {
                 to={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "block px-4 py-2 text-sm rounded-md transition-colors",
+                  "block px-4 py-3 text-base font-medium rounded-lg transition-all",
                   pathname === item.href
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-foreground/80 hover:bg-muted/50"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-foreground hover:bg-primary/10 hover:text-primary active:scale-95"
                 )}
               >
                 {item.name}
@@ -302,57 +302,57 @@ export function Header() {
             ))}
 
             {/* Community Section in Mobile */}
-            <div className="pt-2 border-t border-foreground/10 mt-2">
-              <div className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase tracking-wide">
+            <div className="pt-3 border-t-2 border-border mt-3">
+              <div className="px-4 py-2 text-xs font-bold text-foreground uppercase tracking-wider">
                 Comunitate
               </div>
               <div className="space-y-1">
                 <Link
                   to="/feed"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
                 >
                   Activity Feed
                 </Link>
                 <Link
                   to="/forum"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
                 >
                   Forum
                 </Link>
                 <Link
                   to="/journals"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
                 >
                   Travel Journals
                 </Link>
                 <Link
                   to="/contests"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
                 >
                   Photo Contests
                 </Link>
                 <Link
                   to="/challenges"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
                 >
                   Challenges
                 </Link>
                 <Link
                   to="/leaderboards"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
                 >
                   Leaderboards
                 </Link>
                 <Link
                   to="/suggest-objective"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md border-t border-foreground/10 mt-2 pt-2 transition-colors"
+                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg border-t-2 border-border mt-2 pt-3 transition-all active:scale-95"
                 >
                   Sugerează Obiectiv
                 </Link>
@@ -361,13 +361,13 @@ export function Header() {
 
             {/* Admin Link in Mobile - Only for Admins */}
             {user && isAdmin && (
-              <div className="pt-2 border-t border-foreground/10 mt-2">
+              <div className="pt-3 border-t-2 border-border mt-3">
                 <Link
                   to="/admin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-2 text-sm text-primary hover:bg-primary/10 rounded-md font-medium transition-colors"
+                  className="flex items-center px-4 py-3 text-base text-primary hover:bg-primary/10 rounded-lg font-semibold transition-all active:scale-95"
                 >
-                  <Shield className="mr-2 h-4 w-4" />
+                  <Shield className="mr-2 h-5 w-5" />
                   Admin Panel
                 </Link>
               </div>
@@ -376,7 +376,7 @@ export function Header() {
             {/* Bottom padding for safe area (notch/gestures) */}
             <div className="h-20" />
           </div>
-        </Container>
+        </div>
       </div>
     </header>
   );
