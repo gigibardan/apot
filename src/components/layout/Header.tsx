@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Menu, X, Sun, Moon, Heart, LogOut, User, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
@@ -267,140 +268,165 @@ export function Header() {
         </nav>
       </div>
 
-      {/* Mobile Menu Backdrop */}
-      {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-[110] md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-      
-      {/* Mobile Menu Drawer */}
-      <div 
-        className={cn(
-          "fixed left-0 right-0 top-[73px] bottom-0 z-[120] md:hidden",
-          "bg-background/75 backdrop-blur-2xl border-t-2 border-border shadow-2xl",
-          "overflow-y-auto overscroll-contain",
-          "transition-all duration-300 ease-out origin-top",
-          mobileMenuOpen
-            ? "opacity-100 scale-y-100 pointer-events-auto"
-            : "opacity-0 scale-y-95 pointer-events-none"
-        )}
-      >
-          <div className="w-full px-4 py-4 space-y-1 pb-24">
-            {/* Mobile-only: Theme Toggle & Language at top */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border md:hidden">
-              <div className="flex items-center gap-2">
-                <Sun className="h-4 w-4" />
-                <span className="text-sm font-medium">Temă & Limbă</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <LanguageSwitcher />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  aria-label="Toggle theme"
-                >
-                  <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                </Button>
-              </div>
-            </div>
-            
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <>
+            {/* Mobile Menu Backdrop */}
+            {mobileMenuOpen && (
+              <div
+                className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 backdrop-blur z-[110] md:hidden"
                 onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "block px-4 py-3 text-base font-medium rounded-lg transition-all",
-                  pathname === item.href
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-foreground hover:bg-primary/10 hover:text-primary active:scale-95"
-                )}
-              >
-                {item.name}
-              </Link>
-            ))}
+                aria-hidden="true"
+              />
+            )}
 
-            {/* Community Section in Mobile */}
-            <div className="pt-3 border-t-2 border-border mt-3">
-              <div className="px-4 py-2 text-xs font-bold text-foreground uppercase tracking-wider">
-                Comunitate
-              </div>
-              <div className="space-y-1">
-                <Link
-                  to="/feed"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                >
-                  Activity Feed
-                </Link>
-                <Link
-                  to="/forum"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                >
-                  Forum
-                </Link>
-                <Link
-                  to="/journals"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                >
-                  Travel Journals
-                </Link>
-                <Link
-                  to="/contests"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                >
-                  Photo Contests
-                </Link>
-                <Link
-                  to="/challenges"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                >
-                  Challenges
-                </Link>
-                <Link
-                  to="/leaderboards"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
-                >
-                  Leaderboards
-                </Link>
-                <Link
-                  to="/suggest-objective"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg border-t-2 border-border mt-2 pt-3 transition-all active:scale-95"
-                >
-                  Sugerează Obiectiv
-                </Link>
+            {/* Mobile Menu Drawer (portaled to body to avoid scroll/transform clipping) */}
+            <div
+              className={cn(
+                "fixed inset-x-0 bottom-0 z-[120] md:hidden",
+                "bg-background/75 backdrop-blur-2xl border-t-2 border-border shadow-2xl",
+                "max-h-[calc(100vh-73px)] pt-[73px]",
+                "overflow-y-auto overscroll-contain",
+                "transition-transform duration-300 ease-out will-change-transform",
+                mobileMenuOpen
+                  ? "translate-y-0 pointer-events-auto"
+                  : "translate-y-full pointer-events-none"
+              )}
+              aria-hidden={!mobileMenuOpen}
+            >
+              <div className="w-full px-4 py-4 space-y-1 pb-24">
+                {/* Top row inside drawer (keeps blur, provides visible close) */}
+                <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Meniu</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-label="Închide meniul"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* Mobile-only: Theme Toggle & Language */}
+                <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-border md:hidden">
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4" />
+                    <span className="text-sm font-medium">Temă & Limbă</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <LanguageSwitcher />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                      aria-label="Toggle theme"
+                    >
+                      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    </Button>
+                  </div>
+                </div>
+
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "block px-4 py-3 text-base font-medium rounded-lg transition-all",
+                      pathname === item.href
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-foreground hover:bg-primary/10 hover:text-primary active:scale-95"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+
+                {/* Community Section in Mobile */}
+                <div className="pt-3 border-t-2 border-border mt-3">
+                  <div className="px-4 py-2 text-xs font-bold text-foreground uppercase tracking-wider">
+                    Comunitate
+                  </div>
+                  <div className="space-y-1">
+                    <Link
+                      to="/feed"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                    >
+                      Activity Feed
+                    </Link>
+                    <Link
+                      to="/forum"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                    >
+                      Forum
+                    </Link>
+                    <Link
+                      to="/journals"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                    >
+                      Travel Journals
+                    </Link>
+                    <Link
+                      to="/contests"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                    >
+                      Photo Contests
+                    </Link>
+                    <Link
+                      to="/challenges"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                    >
+                      Challenges
+                    </Link>
+                    <Link
+                      to="/leaderboards"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all active:scale-95"
+                    >
+                      Leaderboards
+                    </Link>
+                    <Link
+                      to="/suggest-objective"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-base text-foreground hover:bg-primary/10 hover:text-primary rounded-lg border-t-2 border-border mt-2 pt-3 transition-all active:scale-95"
+                    >
+                      Sugerează Obiectiv
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Admin Link in Mobile - Only for Admins */}
+                {user && isAdmin && (
+                  <div className="pt-3 border-t-2 border-border mt-3">
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center px-4 py-3 text-base text-primary hover:bg-primary/10 rounded-lg font-semibold transition-all active:scale-95"
+                    >
+                      <Shield className="mr-2 h-5 w-5" />
+                      Admin Panel
+                    </Link>
+                  </div>
+                )}
+
+                {/* Bottom safe area */}
+                <div className="h-20" />
               </div>
             </div>
+          </>,
+          document.body
+        )}
+     
 
-            {/* Admin Link in Mobile - Only for Admins */}
-            {user && isAdmin && (
-              <div className="pt-3 border-t-2 border-border mt-3">
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-4 py-3 text-base text-primary hover:bg-primary/10 rounded-lg font-semibold transition-all active:scale-95"
-                >
-                  <Shield className="mr-2 h-5 w-5" />
-                  Admin Panel
-                </Link>
-              </div>
-            )}
-            
-            {/* Bottom safe area */}
-            <div className="h-20" />
-          </div>
-        </div>
     </header>
   );
 }
