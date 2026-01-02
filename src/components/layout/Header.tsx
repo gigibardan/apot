@@ -80,7 +80,7 @@ export function Header() {
           : "bg-background"
       )}
     >
-      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-screen-xl">
+      <div className="w-full px-4">
         <nav
           className="flex items-center justify-between py-4"
           aria-label="Navigation principală"
@@ -263,28 +263,34 @@ export function Header() {
         </nav>
       </div>
 
-      {/* Mobile Menu Backdrop - Click pentru a închide */}
+      {/* Mobile Menu - TRANSPARENT backdrop allows site scroll */}
       <div 
         className={cn(
-          "fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300",
-          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={() => setMobileMenuOpen(false)}
-        aria-hidden="true"
-      />
-      
-      {/* Mobile Menu Drawer - full width, scroll independent */}
-      <div 
-        className={cn(
-          "fixed left-0 right-0 top-[73px] bottom-0 z-50 md:hidden",
-          "bg-background backdrop-blur-xl border-t shadow-2xl",
-          "overflow-y-auto overscroll-contain",
-          "transition-transform duration-300 ease-in-out",
-          mobileMenuOpen ? "translate-y-0" : "translate-y-full"
+          "fixed inset-0 z-40 md:hidden transition-all duration-300",
+          mobileMenuOpen ? "visible" : "invisible"
         )}
       >
-        <div className="mx-auto w-full px-4 sm:px-6 max-w-screen-xl">
-          <div className="py-4 space-y-1 pb-safe">
+        {/* Backdrop overlay - semi-transparent, site visible and scrollable */}
+        <div 
+          className={cn(
+            "absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300",
+            mobileMenuOpen ? "opacity-100" : "opacity-0"
+          )}
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+        
+        {/* Menu Drawer - slides from bottom */}
+        <div 
+          className={cn(
+            "absolute left-0 right-0 top-[73px] bottom-0",
+            "bg-background/95 backdrop-blur-md border-t shadow-xl",
+            "overflow-y-auto overscroll-contain",
+            "transition-transform duration-300 ease-out",
+            mobileMenuOpen ? "translate-y-0" : "translate-y-full"
+          )}
+        >
+          <div className="w-full px-4 py-4 space-y-1 pb-24">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -373,7 +379,7 @@ export function Header() {
               </div>
             )}
             
-            {/* Bottom padding for safe area (notch/gestures) */}
+            {/* Bottom safe area */}
             <div className="h-20" />
           </div>
         </div>
