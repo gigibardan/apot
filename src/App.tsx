@@ -82,6 +82,8 @@ import ContentRevisions from "@/pages/admin/ContentRevisions";
 import SEOAudit from "@/pages/admin/SEOAudit";
 import { AIChatbot } from "@/components/features/ai/AIChatbot";
 import { CookieConsentBanner } from "@/components/features/gdpr/CookieConsentBanner";
+import AuthorizedGuidesPublicPage from "@/pages/AuthorizedGuidesPublicPage";
+import AuthorizedGuideSinglePage from "@/pages/AuthorizedGuideSinglePage";
 
 
 
@@ -107,96 +109,98 @@ const App = () => (
               <CookieConsentBanner />
               <LanguageProvider>
                 <Routes>
-            {/* Public Routes - with optional language prefix */}
-            <Route path="/:lang?" element={<PublicLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="obiective" element={<ObjectivesPage />} />
-              <Route path="obiective/:slug" element={<ObjectiveSingle />} />
-              <Route path="favorite" element={<FavoritesPage />} />
-              <Route path="dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
-              <Route path="newsletter/confirmare" element={<NewsletterConfirm />} />
-              <Route path="newsletter/dezabonare" element={<NewsletterUnsubscribe />} />
-              <Route path="ghizi" element={<GuidesPage />} />
-              <Route path="ghid/:slug" element={<GuideSinglePage />} />
-              <Route path="circuite" element={<CircuitsPage />} />
-              <Route path="blog" element={<BlogPage />} />
-              <Route path="blog/:slug" element={<BlogArticle />} />
-              <Route path="despre" element={<AboutPage />} />
-              <Route path="contact" element={<ContactPage />} />
-              <Route path="forum" element={<ForumHomePage />} />
-              <Route path="forum/:categorySlug" element={<ForumCategoryPage />} />
-              <Route path="forum/:categorySlug/:postSlug" element={<ForumPostPage />} />
-              <Route path="user/:username" element={<UserProfile />} />
-              <Route path="feed" element={<ActivityFeed />} />
-              <Route path="leaderboards" element={<Leaderboards />} />
-              <Route path="journals" element={<TravelJournals />} />
-              <Route path="journals/new" element={<ProtectedRoute><CreateJournal /></ProtectedRoute>} />
-              <Route path="journals/:slug" element={<JournalSingle />} />
-              <Route path="contests" element={<PhotoContests />} />
-              <Route path="contests/:slug" element={<ContestSingle />} />
-              <Route path="challenges" element={<CommunityChallenges />} />
-              <Route path="suggest-objective" element={<ProtectedRoute><SuggestObjective /></ProtectedRoute>} />
-              <Route path="politica-confidentialitate" element={<PrivacyPolicyPage />} />
-              <Route path="termeni-conditii" element={<TermsPage />} />
-              <Route path="cookies" element={<CookiePolicyPage />} />
+                  {/* Public Routes - with optional language prefix */}
+                  <Route path="/:lang?" element={<PublicLayout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path="obiective" element={<ObjectivesPage />} />
+                    <Route path="obiective/:slug" element={<ObjectiveSingle />} />
+                    <Route path="favorite" element={<FavoritesPage />} />
+                    <Route path="dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+                    <Route path="newsletter/confirmare" element={<NewsletterConfirm />} />
+                    <Route path="newsletter/dezabonare" element={<NewsletterUnsubscribe />} />
+                    <Route path="ghizi" element={<GuidesPage />} />
+                    <Route path="ghid/:slug" element={<GuideSinglePage />} />
+                    <Route path="circuite" element={<CircuitsPage />} />
+                    <Route path="blog" element={<BlogPage />} />
+                    <Route path="blog/:slug" element={<BlogArticle />} />
+                    <Route path="despre" element={<AboutPage />} />
+                    <Route path="contact" element={<ContactPage />} />
+                    <Route path="forum" element={<ForumHomePage />} />
+                    <Route path="forum/:categorySlug" element={<ForumCategoryPage />} />
+                    <Route path="forum/:categorySlug/:postSlug" element={<ForumPostPage />} />
+                    <Route path="user/:username" element={<UserProfile />} />
+                    <Route path="feed" element={<ActivityFeed />} />
+                    <Route path="leaderboards" element={<Leaderboards />} />
+                    <Route path="journals" element={<TravelJournals />} />
+                    <Route path="journals/new" element={<ProtectedRoute><CreateJournal /></ProtectedRoute>} />
+                    <Route path="journals/:slug" element={<JournalSingle />} />
+                    <Route path="contests" element={<PhotoContests />} />
+                    <Route path="contests/:slug" element={<ContestSingle />} />
+                    <Route path="challenges" element={<CommunityChallenges />} />
+                    <Route path="suggest-objective" element={<ProtectedRoute><SuggestObjective /></ProtectedRoute>} />
+                    <Route path="politica-confidentialitate" element={<PrivacyPolicyPage />} />
+                    <Route path="termeni-conditii" element={<TermsPage />} />
+                    <Route path="cookies" element={<CookiePolicyPage />} />
+                    <Route path="ghizi-autorizati" element={<AuthorizedGuidesPublicPage />} />
+                    <Route path="ghid-autorizat/:slug" element={<AuthorizedGuideSinglePage />} />
 
 
-            </Route>
+                  </Route>
 
-            {/* Admin Routes - Protected (Admin only) */}
-            <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="obiective" element={<ObjectivesAdmin />} />
-              <Route path="obiective/nou" element={<ObjectiveForm />} />
-              <Route path="obiective/:id" element={<ObjectiveForm />} />
-              <Route path="ghizi" element={<GuidesAdmin />} />
-              <Route path="ghizi/nou" element={<GuideForm />} />
-              <Route path="ghizi/:id/edit" element={<GuideForm />} />
-              <Route path="ghizi-autorizati" element={<AuthorizedGuidesAdmin />} />
-              <Route path="recenzii" element={<ReviewsAdmin />} />
-              <Route path="recenzii-ghizi" element={<GuideReviewsAdmin />} />
-              <Route path="recenzii-obiective" element={<ObjectiveReviewsAdmin />} />
-              <Route path="blog" element={<BlogAdmin />} />
-              <Route path="blog/nou" element={<BlogArticleForm />} />
-              <Route path="blog/:id" element={<BlogArticleForm />} />
-              <Route path="circuite" element={<CircuitsAdmin />} />
-              <Route path="circuite/nou" element={<CircuitForm />} />
-              <Route path="circuite/:id" element={<CircuitForm />} />
-              <Route path="media" element={<MediaLibrary />} />
-              <Route path="newsletter" element={<NewsletterAdmin />} />
-              <Route path="mesaje-contact" element={<ContactMessagesAdmin />} />
-              <Route path="setari" element={<Settings />} />
-              <Route path="utilizatori" element={<ProtectedRoute requireRole="admin"><UsersPage /></ProtectedRoute>} />
-              <Route path="import" element={<BulkImport />} />
-              <Route path="templates" element={<Templates />} />
-              <Route path="suggestions" element={<SuggestionsAdmin />} />
-              <Route path="contests" element={<ContestsAdmin />} />
-              <Route path="challenges" element={<ChallengesAdmin />} />
-              <Route path="forum" element={<ForumAdmin />} />
-              <Route path="activity-logs" element={<ActivityLogs />} />
-              <Route path="user-bans" element={<UserBanManagement />} />
-              <Route path="scheduled" element={<ScheduledActions />} />
-              <Route path="content-revisions" element={<ContentRevisions />} />
-              <Route path="seo-audit" element={<SEOAudit />} />
-            </Route>
+                  {/* Admin Routes - Protected (Admin only) */}
+                  <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminLayout /></ProtectedRoute>}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route path="obiective" element={<ObjectivesAdmin />} />
+                    <Route path="obiective/nou" element={<ObjectiveForm />} />
+                    <Route path="obiective/:id" element={<ObjectiveForm />} />
+                    <Route path="ghizi" element={<GuidesAdmin />} />
+                    <Route path="ghizi/nou" element={<GuideForm />} />
+                    <Route path="ghizi/:id/edit" element={<GuideForm />} />
+                    <Route path="ghizi-autorizati" element={<AuthorizedGuidesAdmin />} />
+                    <Route path="recenzii" element={<ReviewsAdmin />} />
+                    <Route path="recenzii-ghizi" element={<GuideReviewsAdmin />} />
+                    <Route path="recenzii-obiective" element={<ObjectiveReviewsAdmin />} />
+                    <Route path="blog" element={<BlogAdmin />} />
+                    <Route path="blog/nou" element={<BlogArticleForm />} />
+                    <Route path="blog/:id" element={<BlogArticleForm />} />
+                    <Route path="circuite" element={<CircuitsAdmin />} />
+                    <Route path="circuite/nou" element={<CircuitForm />} />
+                    <Route path="circuite/:id" element={<CircuitForm />} />
+                    <Route path="media" element={<MediaLibrary />} />
+                    <Route path="newsletter" element={<NewsletterAdmin />} />
+                    <Route path="mesaje-contact" element={<ContactMessagesAdmin />} />
+                    <Route path="setari" element={<Settings />} />
+                    <Route path="utilizatori" element={<ProtectedRoute requireRole="admin"><UsersPage /></ProtectedRoute>} />
+                    <Route path="import" element={<BulkImport />} />
+                    <Route path="templates" element={<Templates />} />
+                    <Route path="suggestions" element={<SuggestionsAdmin />} />
+                    <Route path="contests" element={<ContestsAdmin />} />
+                    <Route path="challenges" element={<ChallengesAdmin />} />
+                    <Route path="forum" element={<ForumAdmin />} />
+                    <Route path="activity-logs" element={<ActivityLogs />} />
+                    <Route path="user-bans" element={<UserBanManagement />} />
+                    <Route path="scheduled" element={<ScheduledActions />} />
+                    <Route path="content-revisions" element={<ContentRevisions />} />
+                    <Route path="seo-audit" element={<SEOAudit />} />
+                  </Route>
 
-            {/* Auth Routes */}
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/auth/signup" element={<SignUpPage />} />
-            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+                  {/* Auth Routes */}
+                  <Route path="/auth/login" element={<LoginPage />} />
+                  <Route path="/auth/signup" element={<SignUpPage />} />
+                  <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
-            {/* Test Routes */}
-            <Route path="/test-database" element={<TestDatabase />} />
+                  {/* Test Routes */}
+                  <Route path="/test-database" element={<TestDatabase />} />
 
-            {/* Catch All */}
-            <Route path="*" element={<NotFound />} />
-            </Routes>
-          </LanguageProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
+                  {/* Catch All */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </LanguageProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </HelmetProvider>
 );

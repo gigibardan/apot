@@ -216,7 +216,7 @@ export function Header() {
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
-                  
+
                   {/* Admin Panel Link - Only for Admins */}
                   {isAdmin && (
                     <>
@@ -229,7 +229,7 @@ export function Header() {
                       </DropdownMenuItem>
                     </>
                   )}
-                  
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}
@@ -290,7 +290,7 @@ export function Header() {
             <div
               className={cn(
                 "fixed inset-x-0 top-[73px] z-[120] md:hidden",
-                "bg-background/90 backdrop-blur-xl border-b-2 border-primary/20 shadow-2xl",
+                "bg-background/95 backdrop-blur-2xl border-b-2 border-primary/20 shadow-2xl",
                 "max-h-[calc(100vh-73px)]",
                 "overflow-y-auto overscroll-contain",
                 "transition-all duration-300 ease-out",
@@ -298,7 +298,7 @@ export function Header() {
                   ? "opacity-100 translate-y-0 pointer-events-auto"
                   : "opacity-0 -translate-y-4 pointer-events-none"
               )}
-              aria-hidden={!mobileMenuOpen}
+              {...(!mobileMenuOpen && { "aria-hidden": "true" })}
             >
               <div className="w-full px-4 py-4 space-y-1 pb-8">
                 {/* Mobile-only: Theme Toggle & Language */}

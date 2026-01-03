@@ -1,5 +1,6 @@
 /**
- * Types for Guides System
+ * Types for Guides System - UPDATED for SITUR Integration
+ * Includes new fields for official government data import
  */
 
 export interface Guide {
@@ -48,6 +49,13 @@ export interface AuthorizedGuide {
   email: string | null;
   license_active: boolean;
   license_expiry_date: string | null;
+  // ===== NEW SITUR FIELDS =====
+  data_source: string; // 'manual', 'situr_import_2025', etc.
+  verified_status: string; // 'pending', 'imported_official', 'verified', 'rejected'
+  import_date: string | null; // Timestamp când a fost importat
+  issue_date: string | null; // Data eliberării atestatului (din SITUR)
+  attestation_type: string | null; // Tipul complet din SITUR: "National", "Local", "Specializat - montan", etc.
+  slug: string | null; // SEO-friendly URL slug
   created_at: string;
   updated_at: string;
 }
@@ -78,4 +86,49 @@ export type GuideInput = Omit<
   "id" | "created_at" | "updated_at" | "rating_average" | "reviews_count" | "views_count" | "contact_count"
 >;
 
-export type AuthorizedGuideInput = Omit<AuthorizedGuide, "id" | "created_at" | "updated_at">;
+export type AuthorizedGuideInput = Omit<AuthorizedGuide, "id" | "created_at" | "updated_at" | "slug"> & {
+  slug?: string | null; // Optional - se generează automat via trigger
+};
+
+// ===== NEW: SITUR Import Types =====
+
+/**
+ * Raw SITUR CSV row structure
+ */
+export interface SITURRawData {
+  "Nume și prenume": string;
+  "Nr. atestat": string;
+  "Data eliberării": string;
+  "Tip atestat": string;
+}
+
+/**
+ * Processed SITUR data for import
+ */
+export interface SITURProcessedGuide {
+  full_name: string;
+  license_number: string;
+  issue_date: string;
+  attestation_type: string;
+  specialization: string; // Mapped from attestation_type
+  data_source: string;
+  verified_status: string;
+  import_date: string;
+  license_active: boolean;
+  languages: string[];
+  region: string | null;
+  phone: string | null;
+  email: string | null;
+  license_expiry_date: string | null;
+}
+
+/**
+ * Import statistics after SITUR import
+ */
+export interface SITURImportStats {
+  total_rows: number;
+  successfully_imported: number;
+  skipped_duplicates: number;
+  errors: number;
+  error_details: string[];
+}
