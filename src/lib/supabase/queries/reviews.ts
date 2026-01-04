@@ -1,6 +1,8 @@
 /**
  * Guide Reviews Queries
  * Functions for fetching guide reviews
+ * NOTE: guide_reviews.user_id references auth.users, not profiles
+ * We need to fetch profile data separately
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -25,11 +27,6 @@ export async function getGuideReviews(guideId: string, limit: number = 10, offse
         id,
         full_name,
         slug
-      ),
-      profiles!guide_reviews_user_id_fkey (
-        id,
-        full_name,
-        avatar_url
       )
     `, { count: "exact" })
     .eq("guide_id", guideId)
@@ -39,7 +36,31 @@ export async function getGuideReviews(guideId: string, limit: number = 10, offse
 
   if (error) throw error;
   
-  return { reviews: data || [], count: count || 0 };
+  // Fetch profile data for each review
+  const reviewsWithProfiles = await enrichReviewsWithProfiles(data || []);
+  
+  return { reviews: reviewsWithProfiles, count: count || 0 };
+}
+
+/**
+ * Helper to enrich reviews with profile data
+ */
+async function enrichReviewsWithProfiles(reviews: any[]) {
+  if (reviews.length === 0) return reviews;
+  
+  const userIds = [...new Set(reviews.map(r => r.user_id))];
+  
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .in("id", userIds);
+  
+  const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+  
+  return reviews.map(review => ({
+    ...review,
+    profiles: profileMap.get(review.user_id) || null,
+  }));
 }
 
 /**
@@ -54,11 +75,6 @@ export async function getAllReviews(filters?: ReviewFilters) {
         id,
         full_name,
         slug
-      ),
-      profiles!guide_reviews_user_id_fkey (
-        id,
-        full_name,
-        avatar_url
       )
     `, { count: "exact" })
     .order("created_at", { ascending: false });
@@ -84,7 +100,10 @@ export async function getAllReviews(filters?: ReviewFilters) {
 
   if (error) throw error;
   
-  return { reviews: data || [], count: count || 0 };
+  // Enrich with profile data
+  const reviewsWithProfiles = await enrichReviewsWithProfiles(data || []);
+  
+  return { reviews: reviewsWithProfiles, count: count || 0 };
 }
 
 /**
@@ -112,11 +131,6 @@ export async function getReviewById(id: string) {
         id,
         full_name,
         slug
-      ),
-      profiles!guide_reviews_user_id_fkey (
-        id,
-        full_name,
-        avatar_url
       )
     `)
     .eq("id", id)
@@ -124,7 +138,9 @@ export async function getReviewById(id: string) {
 
   if (error) throw error;
   
-  return data;
+  // Enrich with profile
+  const enriched = await enrichReviewsWithProfiles([data]);
+  return enriched[0];
 }
 
 /**
