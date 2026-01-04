@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { GuideReview } from "@/types/guides";
 
 interface ReviewWithUser extends GuideReview {
-  user?: {
+  profiles?: {  // Am schimbat aici numele câmpului pentru claritate
     full_name: string;
     avatar_url?: string;
   };
@@ -60,9 +60,9 @@ export function ReviewList({
             <div className="flex items-start gap-4">
               {/* Avatar */}
               <Avatar className="h-10 w-10">
-                <AvatarImage src={review.user?.avatar_url} />
+                <AvatarImage src={review.profiles?.avatar_url} />  {/* ← schimbat user → profiles */}
                 <AvatarFallback>
-                  {review.user?.full_name?.charAt(0).toUpperCase() || "?"}
+                  {review.profiles?.full_name?.charAt(0).toUpperCase() || "?"}  {/* ← schimbat */}
                 </AvatarFallback>
               </Avatar>
 
@@ -71,7 +71,9 @@ export function ReviewList({
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold">{review.user?.full_name || "Anonim"}</span>
+                      <span className="font-semibold">
+                        {review.profiles?.full_name || "Anonim"}  {/* ← schimbat */}
+                      </span>
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
                           <Star
