@@ -4,8 +4,8 @@
  * SEO-optimized, mobile-friendly
  */
 
-import { useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query"; // ← Adaugă keepPreviousData aici
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,21 +33,56 @@ import {
 } from "lucide-react";
 import { SEO } from "@/components/seo/SEO";
 
+// Component skeleton simplu pentru card-uri (opțional, pentru UX mai bun în timpul fetching)
+const GuideCardSkeleton = () => (
+  <Card className="h-full animate-pulse">
+    <CardHeader className="pb-3">
+      <div className="flex items-start gap-4">
+        <div className="w-14 h-14 rounded-full bg-gray-200" />
+        <div className="flex-1 space-y-2">
+          <div className="h-5 bg-gray-200 rounded w-3/4" />
+          <div className="h-4 bg-gray-200 rounded w-1/2" />
+        </div>
+        <ChevronRight className="h-5 w-5 text-gray-200" />
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-3 pt-0">
+      <div className="h-8 bg-gray-200 rounded-lg" />
+      <div className="space-y-2">
+        <div className="h-6 bg-gray-200 rounded w-1/3" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+      </div>
+      <div className="pt-2 border-t h-6 bg-gray-200 rounded" />
+    </CardContent>
+  </Card>
+);
+
 export default function AuthorizedGuidesPublicPage() {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [attestationTypeFilter, setAttestationTypeFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const pageSize = 24;
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["public-authorized-guides", search, attestationTypeFilter, page],
+  // Debounce search - wait 500ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["public-authorized-guides", debouncedSearch, attestationTypeFilter, page],
     queryFn: () => getAuthorizedGuides({ 
-      search: search || undefined,
+      search: debouncedSearch || undefined,
       attestationType: attestationTypeFilter !== "all" ? attestationTypeFilter : undefined,
       limit: pageSize,
       offset: (page - 1) * pageSize
     }),
+    placeholderData: keepPreviousData, // ← Asta păstrează datele vechi în timpul refetch-ului
   });
 
   const { data: stats } = useQuery({
@@ -59,14 +94,7 @@ export default function AuthorizedGuidesPublicPage() {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / pageSize);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
+  // Întotdeauna renderizează layout-ul principal
   return (
     <>
       <SEO 
@@ -128,10 +156,7 @@ export default function AuthorizedGuidesPublicPage() {
                     ref={searchInputRef}
                     placeholder="Caută după nume sau număr atestat..."
                     value={search}
-                    onChange={(e) => {
-                      setSearch(e.target.value);
-                      setPage(1);
-                    }}
+                    onChange={(e) => setSearch(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -198,145 +223,167 @@ export default function AuthorizedGuidesPublicPage() {
           </div>
         </section>
 
-        {/* Guides Grid */}
+        {/* Guides Grid - Gestionează loading-ul doar aici */}
         <section className="container mx-auto px-4 pb-12">
-          {guides.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent>
-                <FileText className="h-16 w-16 mx-auto text-muted-foreground opacity-20 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Nu au fost găsiți ghizi</h3>
-                <p className="text-muted-foreground mb-4">
-                  Încercați să modificați criteriile de căutare
-                </p>
-                {(search || attestationTypeFilter !== "all") && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSearch("");
-                      setAttestationTypeFilter("all");
-                      setPage(1);
-                    }}
-                  >
-                    Resetează filtrele
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+          {/* Loader pentru initial load (când nu avem date deloc) */}
+          {(!data && isLoading) ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <LoadingSpinner size="lg" />
+            </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {guides.map((guide: any) => (
-                  <Link 
-                    key={guide.id} 
-                    to={`/ghid-autorizat/${guide.slug}`}
-                    className="block group"
-                  >
-                    <Card className="h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2 hover:border-blue-300">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start gap-4">
-                          {/* Avatar */}
-                          <div className="relative flex-shrink-0">
-                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
-                              {guide.full_name.charAt(0)}
-                            </div>
-                            {guide.data_source?.startsWith("situr") && (
-                              <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1 shadow-md">
-                                <CheckCircle className="h-4 w-4 text-white" />
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Name & Description */}
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg group-hover:text-blue-600 transition-colors line-clamp-2">
-                              {guide.full_name}
-                            </CardTitle>
-                            {guide.specialization && (
-                              <CardDescription className="mt-1 line-clamp-1">
-                                {guide.specialization}
-                              </CardDescription>
-                            )}
-                          </div>
-                          
-                          {/* Arrow Icon */}
-                          <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent className="space-y-3 pt-0">
-                        {/* License Number */}
-                        <div className="flex items-center gap-2 text-sm bg-blue-50 rounded-lg px-3 py-2">
-                          <Award className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                          <span className="font-mono font-semibold text-blue-900">
-                            {guide.license_number || "N/A"}
-                          </span>
-                        </div>
-
-                        {/* Attestation Type & Issue Date */}
-                        <div className="space-y-2">
-                          {guide.attestation_type && (
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="gap-1 text-xs">
-                                <Shield className="h-3 w-3" />
-                                {guide.attestation_type}
-                              </Badge>
-                            </div>
-                          )}
-
-                          {guide.issue_date && (
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Calendar className="h-3 w-3" />
-                              Eliberat: {formatDate(guide.issue_date)}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Status Badge */}
-                        <div className="pt-2 border-t flex items-center justify-between">
-                          {guide.data_source?.startsWith("situr") ? (
-                            <Badge variant="default" className="gap-1 text-xs">
-                              <CheckCircle className="h-3 w-3" />
-                              Verificat SITUR
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="text-xs">
-                              Manual
-                            </Badge>
-                          )}
-                          
-                          <span className="text-xs text-blue-600 font-medium group-hover:underline">
-                            Vezi detalii →
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <p className="text-sm text-muted-foreground">
-                    Pagina {page} din {totalPages}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setPage(p => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                    >
-                      Anterior
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                    >
-                      Următorul
-                    </Button>
-                  </div>
+              {/* Indicator pentru refetch (background loading) */}
+              {isFetching && (
+                <div className="flex items-center justify-center mb-4">
+                  <LoadingSpinner size="md" />
+                  <p className="ml-2 text-muted-foreground">Se actualizează rezultatele...</p>
                 </div>
+              )}
+
+              {guides.length === 0 ? (
+                <Card className="text-center py-12">
+                  <CardContent>
+                    <FileText className="h-16 w-16 mx-auto text-muted-foreground opacity-20 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Nu au fost găsiți ghizi</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Încercați să modificați criteriile de căutare
+                    </p>
+                    {(search || attestationTypeFilter !== "all") && (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSearch("");
+                          setAttestationTypeFilter("all");
+                          setPage(1);
+                        }}
+                      >
+                        Resetează filtrele
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    {/* Dacă isFetching, arată skeleton-uri peste datele vechi; altfel, card-urile reale */}
+                    {isFetching
+                      ? Array.from({ length: pageSize }).map((_, index) => (
+                          <GuideCardSkeleton key={index} />
+                        ))
+                      : guides.map((guide: any) => (
+                          <Link 
+                            key={guide.id} 
+                            to={`/ghid-autorizat/${guide.slug}`}
+                            className="block group"
+                          >
+                            <Card className="h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2 hover:border-blue-300">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-start gap-4">
+                                  {/* Avatar */}
+                                  <div className="relative flex-shrink-0">
+                                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                                      {guide.full_name.charAt(0)}
+                                    </div>
+                                    {guide.data_source?.startsWith("situr") && (
+                                      <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1 shadow-md">
+                                        <CheckCircle className="h-4 w-4 text-white" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Name & Description */}
+                                  <div className="flex-1 min-w-0">
+                                    <CardTitle className="text-lg group-hover:text-blue-600 transition-colors line-clamp-2">
+                                      {guide.full_name}
+                                    </CardTitle>
+                                    {guide.specialization && (
+                                      <CardDescription className="mt-1 line-clamp-1">
+                                        {guide.specialization}
+                                      </CardDescription>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Arrow Icon */}
+                                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                                </div>
+                              </CardHeader>
+                              
+                              <CardContent className="space-y-3 pt-0">
+                                {/* License Number */}
+                                <div className="flex items-center gap-2 text-sm bg-blue-50 rounded-lg px-3 py-2">
+                                  <Award className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                                  <span className="font-mono font-semibold text-blue-900">
+                                    {guide.license_number || "N/A"}
+                                  </span>
+                                </div>
+
+                                {/* Attestation Type & Issue Date */}
+                                <div className="space-y-2">
+                                  {guide.attestation_type && (
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant="outline" className="gap-1 text-xs">
+                                        <Shield className="h-3 w-3" />
+                                        {guide.attestation_type}
+                                      </Badge>
+                                    </div>
+                                  )}
+
+                                  {guide.issue_date && (
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                      <Calendar className="h-3 w-3" />
+                                      Eliberat: {formatDate(guide.issue_date)}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Status Badge */}
+                                <div className="pt-2 border-t flex items-center justify-between">
+                                  {guide.data_source?.startsWith("situr") ? (
+                                    <Badge variant="default" className="gap-1 text-xs">
+                                      <CheckCircle className="h-3 w-3" />
+                                      Verificat SITUR
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-xs">
+                                      Manual
+                                    </Badge>
+                                  )}
+                                  
+                                  <span className="text-xs text-blue-600 font-medium group-hover:underline">
+                                    Vezi detalii →
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </Link>
+                        ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <p className="text-sm text-muted-foreground">
+                        Pagina {page} din {totalPages}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1 || isFetching}
+                        >
+                          Anterior
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          disabled={page === totalPages || isFetching}
+                        >
+                          Următorul
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}

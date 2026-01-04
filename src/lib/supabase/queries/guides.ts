@@ -17,6 +17,10 @@ export interface GetAuthorizedGuidesParams {
 /**
  * Get authorized guides with advanced filters
  */
+/**
+ * Get authorized guides with advanced filters
+ * FIXED: Diacritic-insensitive search + proper filtering
+ */
 export async function getAuthorizedGuides(params: GetAuthorizedGuidesParams = {}) {
   const {
     search,
@@ -30,14 +34,7 @@ export async function getAuthorizedGuides(params: GetAuthorizedGuidesParams = {}
   let query = supabase
     .from("authorized_guides")
     .select("*", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  // Search by name (with unaccent for diacritic-insensitive search)
-  if (search) {
-    // Use PostgreSQL unaccent + ilike for diacritic-insensitive search
-    query = query.or(`full_name.ilike.%${search}%,license_number.ilike.%${search}%`);
-  }
+    .order("created_at", { ascending: false });
 
   // Filter by region
   if (region && region !== "all") {
@@ -51,15 +48,67 @@ export async function getAuthorizedGuides(params: GetAuthorizedGuidesParams = {}
 
   // Filter by data source
   if (dataSource && dataSource !== "all") {
-    query = query.eq("data_source", dataSource);
+    query = query.ilike("data_source", `${dataSource}%`);
   }
 
-  const { data, error, count } = await query;
+  // Fetch data - if search exists, get ALL for filtering, otherwise paginate
+  let data, error, count;
+  
+  if (search) {
+    // Get ALL records for search filtering
+    const result = await query;
+    data = result.data;
+    error = result.error;
+    count = result.data?.length || 0;
+  } else {
+    // Normal pagination
+    const result = await query.range(offset, offset + limit - 1);
+    data = result.data;
+    error = result.error;
+    count = result.count;
+  }
 
   if (error) throw error;
 
+  // Frontend filtering for diacritic-insensitive search
+  let filteredData = data || [];
+  
+  if (search) {
+    const normalizedSearch = search
+      .toLowerCase()
+      .replace(/ă/g, 'a')
+      .replace(/â/g, 'a')
+      .replace(/î/g, 'i')
+      .replace(/ș/g, 's')
+      .replace(/ț/g, 't');
+    
+    filteredData = filteredData.filter(guide => {
+      const normalizedName = (guide.full_name || "")
+        .toLowerCase()
+        .replace(/ă/g, 'a')
+        .replace(/â/g, 'a')
+        .replace(/î/g, 'i')
+        .replace(/ș/g, 's')
+        .replace(/ț/g, 't');
+      
+      const normalizedLicense = (guide.license_number || "").toLowerCase();
+      
+      return normalizedName.includes(normalizedSearch) || 
+             normalizedLicense.includes(search.toLowerCase());
+    });
+    
+    // Apply pagination to filtered results
+    const totalFiltered = filteredData.length;
+    filteredData = filteredData.slice(offset, offset + limit);
+    
+    return {
+      guides: filteredData,
+      total: totalFiltered,
+    };
+  }
+
   return {
-    guides: data || [],
+    guides: filteredData,
     total: count || 0,
   };
 }
@@ -286,11 +335,21 @@ export async function getGuideById(id: string) {
 export async function getGuideBySlug(slug: string) {
   const { data, error } = await supabase
     .from("guides")
-    .select("*")
+    .select(`
+      *,
+      guides_objectives_relations (
+        objectives (
+          id,
+          name,
+          slug,
+          image_url
+        )
+      )
+    `)
     .eq("slug", slug)
     .eq("active", true)
     .single();
-  
+
   if (error) throw error;
   return data;
 }
