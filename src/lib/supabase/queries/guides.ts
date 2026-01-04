@@ -335,22 +335,16 @@ export async function getGuideById(id: string) {
 export async function getGuideBySlug(slug: string) {
   const { data, error } = await supabase
     .from("guides")
-    .select(`
-      *,
-      guides_objectives_relations (
-        objectives (
-          id,
-          name,
-          slug,
-          image_url
-        )
-      )
-    `)
+    .select("*")
     .eq("slug", slug)
     .eq("active", true)
     .single();
-
-  if (error) throw error;
+  
+  if (error) {
+    console.error("Error fetching guide:", error);
+    throw error;
+  }
+  
   return data;
 }
 
