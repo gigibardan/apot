@@ -32,6 +32,12 @@ export interface Guide {
   meta_title: string | null;
   meta_description: string | null;
   availability_calendar_url: string | null;
+  license_number?: string | null;
+  attestation_type?: string | null;
+  official_guide?: boolean;
+  license_active?: boolean;
+  license_expiry_date?: string | null;
+  authorized_guide_id?: string | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;

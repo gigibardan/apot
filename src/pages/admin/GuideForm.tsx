@@ -35,6 +35,8 @@ import { Save, Eye, ArrowLeft } from "lucide-react";
 import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Shield, CheckCircle, AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const guideSchema = z.object({
   full_name: z.string().min(3, "Numele trebuie să aibă minim 3 caractere"),
@@ -59,6 +61,9 @@ const guideSchema = z.object({
   meta_title: z.string().max(60).optional(),
   meta_description: z.string().max(160).optional(),
   availability_calendar_url: z.string().url("URL invalid").optional().or(z.literal("")),
+  license_number: z.string().optional().nullable(),
+  attestation_type: z.string().optional().nullable(),
+  official_guide: z.boolean().optional(),
 });
 
 type GuideFormValues = z.infer<typeof guideSchema>;
@@ -124,9 +129,13 @@ export default function GuideForm() {
       meta_title: "",
       meta_description: "",
       availability_calendar_url: "",
+      license_number: null,
+      attestation_type: null,
+      official_guide: false,
     },
   });
 
+  // Load guide data into form
   // Load guide data into form
   useEffect(() => {
     if (guide) {
@@ -153,6 +162,10 @@ export default function GuideForm() {
         meta_title: guide.meta_title || "",
         meta_description: guide.meta_description || "",
         availability_calendar_url: guide.availability_calendar_url || "",
+        // ADAUGĂ ACESTEA - LIPSEAU!
+        license_number: guide.license_number || null,
+        attestation_type: guide.attestation_type || null,
+        official_guide: guide.official_guide || false,
       });
     }
   }, [guide, form]);
@@ -164,7 +177,7 @@ export default function GuideForm() {
         ...data,
         verification_date: data.verified ? new Date().toISOString() : null,
       };
-      
+
       if (isEdit && id) {
         await updateGuide(id, guideData);
         await updateGuideObjectives(id, selectedObjectives);
@@ -415,6 +428,8 @@ export default function GuideForm() {
               </Card>
             </TabsContent>
 
+
+
             {/* Tab 2: Professional Info */}
             <TabsContent value="professional" className="space-y-6">
               <Card>
@@ -537,7 +552,96 @@ export default function GuideForm() {
                   />
                 </CardContent>
               </Card>
+
+              {/* SECȚIUNE NOUĂ: Licență Oficială SITUR */}
+              <Card>
+                <CardHeader className="bg-blue-50">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-blue-600" />
+                    <CardTitle>Licență Oficială SITUR</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Opțional - completează dacă ghidul are licență oficială
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="license_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Număr Atestat/Licență</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ex: GHT-2018-12345"
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Se verifică automat în baza SITUR la salvare
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="attestation_type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tip Atestat</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value || undefined}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selectează tipul..." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="National">National</SelectItem>
+                              <SelectItem value="Local">Local</SelectItem>
+                              <SelectItem value="Specializat">Specializat</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {form.watch("official_guide") && (
+                    <div className="flex items-center gap-2 text-green-700 bg-green-50 p-4 rounded-lg border-2 border-green-200">
+                      <CheckCircle className="h-5 w-5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Licență Verificată în SITUR!</p>
+                        <p className="text-sm text-green-600">
+                          Acest ghid are licență oficială confirmată
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {form.watch("license_number") && !form.watch("official_guide") && (
+                    <div className="flex items-center gap-2 text-amber-700 bg-amber-50 p-4 rounded-lg border-2 border-amber-200">
+                      <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Licență nevalidată</p>
+                        <p className="text-sm text-amber-600">
+                          Numărul introdus nu a fost găsit în SITUR sau va fi verificat la salvare
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
+
+
 
             {/* Tab 3: Contact & Pricing */}
             <TabsContent value="contact" className="space-y-6">

@@ -1,6 +1,7 @@
 /**
  * Guide Reviews Queries
  * Functions for fetching guide reviews
+ * FIXED: Removed joins on profiles - no foreign key exists
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -19,20 +20,14 @@ export interface ReviewFilters {
 export async function getGuideReviews(guideId: string, limit: number = 10, offset: number = 0) {
   const { data, error, count } = await supabase
     .from("guide_reviews")
-    .select(
-      `
-      *,
-      user:profiles(full_name, avatar_url)
-    `,
-      { count: "exact" }
-    )
+    .select("*", { count: "exact" })
     .eq("guide_id", guideId)
     .eq("approved", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) throw error;
-  return { reviews: data, count };
+  return { reviews: data || [], count: count || 0 };
 }
 
 /**
@@ -41,14 +36,7 @@ export async function getGuideReviews(guideId: string, limit: number = 10, offse
 export async function getAllReviews(filters?: ReviewFilters) {
   let query = supabase
     .from("guide_reviews")
-    .select(
-      `
-      *,
-      user:profiles(full_name, avatar_url),
-      guide:guides(full_name, slug)
-    `,
-      { count: "exact" }
-    )
+    .select("*", { count: "exact" })
     .order("created_at", { ascending: false });
 
   if (filters?.guideId) {
@@ -71,7 +59,7 @@ export async function getAllReviews(filters?: ReviewFilters) {
   const { data, error, count } = await query;
 
   if (error) throw error;
-  return { reviews: data, count };
+  return { reviews: data || [], count: count || 0 };
 }
 
 /**
@@ -93,13 +81,7 @@ export async function getPendingReviewsCount() {
 export async function getReviewById(id: string) {
   const { data, error } = await supabase
     .from("guide_reviews")
-    .select(
-      `
-      *,
-      user:profiles(full_name, avatar_url),
-      guide:guides(full_name, slug)
-    `
-    )
+    .select("*")
     .eq("id", id)
     .single();
 

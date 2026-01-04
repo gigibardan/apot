@@ -285,8 +285,9 @@ GEORGESCU ANDREI,11111,20.01.2024,Local`;
     setImportDialogOpen(false);
 
     try {
-      // Batch processing - împarte în loturi de 500 pentru stabilitate
-      const batchSize = 500;
+      // Batch processing - împarte în loturi de 300 pentru stabilitate
+      // (mai mic decât 500 pentru siguranță maximă)
+      const batchSize = 300;
       const batches = [];
       
       for (let i = 0; i < importPreview.length; i += batchSize) {
@@ -297,7 +298,7 @@ GEORGESCU ANDREI,11111,20.01.2024,Local`;
       let totalSkipped = 0;
       let totalErrors = 0;
 
-      // Procesare batch cu batch cu progress
+      // Procesare batch cu batch cu progress și retry
       for (let i = 0; i < batches.length; i++) {
         const batchNum = i + 1;
         const batch = batches[i];
@@ -306,15 +307,34 @@ GEORGESCU ANDREI,11111,20.01.2024,Local`;
           duration: 2000
         });
 
-        const stats = await bulkInsertSITURGuides(batch, true);
-        
-        totalImported += stats.successfully_imported;
-        totalSkipped += stats.skipped_duplicates;
-        totalErrors += stats.errors;
+        try {
+          const stats = await bulkInsertSITURGuides(batch, true);
+          
+          totalImported += stats.successfully_imported;
+          totalSkipped += stats.skipped_duplicates;
+          totalErrors += stats.errors;
 
-        // Pauză mică între batch-uri pentru a nu suprasolicita DB
-        if (i < batches.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Pauză mai mare între batch-uri pentru stabilitate
+          if (i < batches.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        } catch (batchError) {
+          console.error(`Batch ${batchNum} failed:`, batchError);
+          toast.error(`Batch ${batchNum} a eșuat - se reîncearcă...`);
+          
+          // Retry cu delay mai mare
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          try {
+            const retryStats = await bulkInsertSITURGuides(batch, true);
+            totalImported += retryStats.successfully_imported;
+            totalSkipped += retryStats.skipped_duplicates;
+            totalErrors += retryStats.errors;
+            toast.success(`✅ Batch ${batchNum} re-importat cu succes!`);
+          } catch (retryError) {
+            totalErrors += batch.length;
+            toast.error(`❌ Batch ${batchNum} a eșuat definitiv`);
+          }
         }
       }
 
@@ -323,8 +343,15 @@ GEORGESCU ANDREI,11111,20.01.2024,Local`;
         { duration: 5000 }
       );
 
+      // Invalidare queries cu delay pentru a aștepta DB update
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       queryClient.invalidateQueries({ queryKey: ["authorized-guides"] });
       queryClient.invalidateQueries({ queryKey: ["authorized-guides-stats"] });
+      
+      // Forțează refetch
+      await queryClient.refetchQueries({ queryKey: ["authorized-guides-stats"] });
+      
       setImportPreview([]);
     } catch (error: any) {
       toast.error(error.message || "Eroare la importul ghizilor SITUR");

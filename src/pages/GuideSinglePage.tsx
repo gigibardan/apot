@@ -21,6 +21,7 @@ import { ReviewForm } from "@/components/features/guides/ReviewForm";
 import { ReviewList } from "@/components/features/guides/ReviewList";
 import { useTranslatedGuide } from "@/hooks/useTranslatedContent";
 
+
 export default function GuideSinglePage() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated, user } = useAuth();
@@ -120,6 +121,13 @@ export default function GuideSinglePage() {
                     Verificat
                   </Badge>
                 )}
+                {/* Badge Licență Oficială SITUR */}
+                {guide.official_guide && guide.license_number && (
+                  <Badge className="bg-green-600 hover:bg-green-700 text-white gap-2">
+                    <Shield className="h-4 w-4" />
+                    Licență Verificată SITUR #{guide.license_number}
+                  </Badge>
+                )}
                 {guide.featured && (
                   <Badge variant="secondary" className="text-base px-3 py-1">
                     <Star className="h-4 w-4 mr-1" />
@@ -133,11 +141,10 @@ export default function GuideSinglePage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${
-                        i < Math.floor(guide.rating_average)
+                      className={`h-5 w-5 ${i < Math.floor(guide.rating_average)
                           ? "fill-yellow-400 text-yellow-400"
                           : "text-gray-300"
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -184,7 +191,7 @@ export default function GuideSinglePage() {
                     />
                   </DialogContent>
                 </Dialog>
-                
+
                 {guide.email && (
                   <Button variant="outline" asChild>
                     <a href={`mailto:${guide.email}`}>
@@ -318,11 +325,10 @@ export default function GuideSinglePage() {
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${
-                          i < userReview.rating
+                        className={`h-4 w-4 ${i < userReview.rating
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-300"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>

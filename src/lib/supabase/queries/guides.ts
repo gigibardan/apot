@@ -108,40 +108,51 @@ export async function getAuthorizedGuideByLicenseNumber(licenseNumber: string) {
 
 /**
  * NEW: Get import statistics
+ * FIXED: Uses count aggregation instead of fetching all rows
  */
 export async function getImportStatistics() {
-  const { data: allGuides, error } = await supabase
+  // Get total count
+  const { count: totalCount, error: totalError } = await supabase
     .from("authorized_guides")
-    .select("data_source, verified_status");
+    .select("*", { count: "exact", head: true });
 
-  if (error) throw error;
+  if (totalError) throw totalError;
 
-  const stats = {
-    total: allGuides?.length || 0,
-    manual: 0,
-    situr: 0,
-    imported_official: 0,
-    verified: 0,
-    pending: 0,
+  // Get counts by data_source
+  const { count: manualCount } = await supabase
+    .from("authorized_guides")
+    .select("*", { count: "exact", head: true })
+    .eq("data_source", "manual");
+
+  const { count: siturCount } = await supabase
+    .from("authorized_guides")
+    .select("*", { count: "exact", head: true })
+    .ilike("data_source", "situr%");
+
+  // Get counts by verified_status
+  const { count: importedOfficialCount } = await supabase
+    .from("authorized_guides")
+    .select("*", { count: "exact", head: true })
+    .eq("verified_status", "imported_official");
+
+  const { count: verifiedCount } = await supabase
+    .from("authorized_guides")
+    .select("*", { count: "exact", head: true })
+    .eq("verified_status", "verified");
+
+  const { count: pendingCount } = await supabase
+    .from("authorized_guides")
+    .select("*", { count: "exact", head: true })
+    .eq("verified_status", "pending");
+
+  return {
+    total: totalCount || 0,
+    manual: manualCount || 0,
+    situr: siturCount || 0,
+    imported_official: importedOfficialCount || 0,
+    verified: verifiedCount || 0,
+    pending: pendingCount || 0,
   };
-
-  allGuides?.forEach(guide => {
-    if (guide.data_source === "manual") {
-      stats.manual++;
-    } else if (guide.data_source?.startsWith("situr")) {
-      stats.situr++;
-    }
-
-    if (guide.verified_status === "imported_official") {
-      stats.imported_official++;
-    } else if (guide.verified_status === "verified") {
-      stats.verified++;
-    } else if (guide.verified_status === "pending") {
-      stats.pending++;
-    }
-  });
-
-  return stats;
 }
 
 /**
@@ -275,21 +286,11 @@ export async function getGuideById(id: string) {
 export async function getGuideBySlug(slug: string) {
   const { data, error } = await supabase
     .from("guides")
-    .select(`
-      *,
-      guides_objectives_relations (
-        objectives (
-          id,
-          name,
-          slug,
-          image_url
-        )
-      )
-    `)
+    .select("*")
     .eq("slug", slug)
     .eq("active", true)
     .single();
-
+  
   if (error) throw error;
   return data;
 }
