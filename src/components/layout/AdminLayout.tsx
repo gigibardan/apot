@@ -15,10 +15,11 @@ import {
   Eye,
   MessageCircle,
   Activity,
-  ShieldOff,
   CalendarClock,
   History,
   Search,
+  Star,
+  UserCheck,
 } from "lucide-react";
 import { ADMIN_ROUTES, PUBLIC_ROUTES } from "@/lib/constants/routes";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,10 @@ const sidebarLinks = [
   { name: "Obiective", href: ADMIN_ROUTES.objectives, icon: MapPin, showDrafts: true },
   { name: "Blog", href: ADMIN_ROUTES.blog, icon: FileText, showDrafts: true },
   { name: "Circuite", href: ADMIN_ROUTES.circuits, icon: Bus },
-  { name: "Ghizi", href: ADMIN_ROUTES.guides, icon: Users },
+  { name: "Ghizi", href: ADMIN_ROUTES.guides, icon: UserCheck },
+  { name: "Ghizi Autorizați", href: ADMIN_ROUTES.authorizedGuides, icon: Users },
+  { name: "Recenzii Ghizi", href: ADMIN_ROUTES.guideReviews, icon: Star },
+  { name: "Recenzii Obiective", href: ADMIN_ROUTES.objectiveReviews, icon: Star },
   { name: "Forum", href: ADMIN_ROUTES.forum, icon: MessageCircle },
   { name: "Media", href: ADMIN_ROUTES.media, icon: Image },
   { name: "Newsletter", href: ADMIN_ROUTES.newsletter, icon: FileText },

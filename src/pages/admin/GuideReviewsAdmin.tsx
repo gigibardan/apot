@@ -19,15 +19,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { getAllReviews } from "@/lib/supabase/queries/reviews";
+import { getAllReviews, getPendingReviewsCount } from "@/lib/supabase/queries/reviews";
 import { 
   approveReview, 
   rejectReview, 
   bulkApproveReviews,
-  bulkDeleteReviews 
+  bulkDeleteReviews,
+  deleteReview 
 } from "@/lib/supabase/mutations/reviews";
 import { toast } from "sonner";
-import { Search, CheckCircle, XCircle, Trash2, Star } from "lucide-react";
+import { Search, CheckCircle, XCircle, Trash2, Star, ExternalLink } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import { ADMIN_ROUTES } from "@/lib/constants/routes";
@@ -41,6 +42,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function GuideReviewsAdmin() {
   const queryClient = useQueryClient();
@@ -49,11 +52,16 @@ export default function GuideReviewsAdmin() {
   const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-guide-reviews", search, statusFilter],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admin-guide-reviews", statusFilter],
     queryFn: () => getAllReviews({
       approved: statusFilter === "all" ? undefined : statusFilter === "approved",
     }),
+  });
+
+  const { data: pendingCount = 0 } = useQuery({
+    queryKey: ["pending-guide-reviews-count"],
+    queryFn: () => getPendingReviewsCount(),
   });
 
   const reviews = Array.isArray(data) ? data : (data?.reviews || []);
@@ -62,10 +70,11 @@ export default function GuideReviewsAdmin() {
     mutationFn: approveReview,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-guide-reviews"] });
-      toast.success("Review aprobat cu succes");
+      queryClient.invalidateQueries({ queryKey: ["pending-guide-reviews-count"] });
+      toast.success("Recenzie aprobată cu succes");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Eroare la aprobarea review-ului");
+      toast.error(error.message || "Eroare la aprobarea recenziei");
     },
   });
 
@@ -73,10 +82,23 @@ export default function GuideReviewsAdmin() {
     mutationFn: rejectReview,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-guide-reviews"] });
-      toast.success("Review respins cu succes");
+      queryClient.invalidateQueries({ queryKey: ["pending-guide-reviews-count"] });
+      toast.success("Recenzie respinsă");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Eroare la respingerea review-ului");
+      toast.error(error.message || "Eroare la respingere");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-guide-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-guide-reviews-count"] });
+      toast.success("Recenzie ștearsă");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Eroare la ștergere");
     },
   });
 
@@ -84,11 +106,12 @@ export default function GuideReviewsAdmin() {
     mutationFn: bulkApproveReviews,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-guide-reviews"] });
-      toast.success("Review-uri aprobate cu succes");
+      queryClient.invalidateQueries({ queryKey: ["pending-guide-reviews-count"] });
+      toast.success("Recenzii aprobate cu succes");
       setSelectedReviews([]);
     },
     onError: (error: any) => {
-      toast.error(error.message || "Eroare la aprobarea review-urilor");
+      toast.error(error.message || "Eroare la aprobarea recenziilor");
     },
   });
 
@@ -96,12 +119,13 @@ export default function GuideReviewsAdmin() {
     mutationFn: bulkDeleteReviews,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-guide-reviews"] });
-      toast.success("Review-uri șterse cu succes");
+      queryClient.invalidateQueries({ queryKey: ["pending-guide-reviews-count"] });
+      toast.success("Recenzii șterse cu succes");
       setSelectedReviews([]);
       setDeleteDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.message || "Eroare la ștergerea review-urilor");
+      toast.error(error.message || "Eroare la ștergerea recenziilor");
     },
   });
 
@@ -147,24 +171,31 @@ export default function GuideReviewsAdmin() {
             Gestionează recenziile ghizilor profesioniști
           </p>
         </div>
-        {selectedReviews.length > 0 && (
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => bulkApproveMutation.mutate(selectedReviews)}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Aprobă ({selectedReviews.length})
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Șterge ({selectedReviews.length})
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {pendingCount > 0 && (
+            <Badge variant="destructive" className="text-lg px-4 py-2">
+              {pendingCount} În Așteptare
+            </Badge>
+          )}
+          {selectedReviews.length > 0 && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => bulkApproveMutation.mutate(selectedReviews)}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Aprobă ({selectedReviews.length})
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Șterge ({selectedReviews.length})
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="flex gap-4">
@@ -232,12 +263,30 @@ export default function GuideReviewsAdmin() {
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium">{review.guides?.full_name}</div>
+                      {review.guides ? (
+                        <Link
+                          to={`/ghid/${review.guides.slug}`}
+                          className="font-medium hover:underline flex items-center gap-1"
+                        >
+                          {review.guides.full_name}
+                          <ExternalLink className="h-3 w-3" />
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground">Ghid necunoscut</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{review.rating}</span>
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < review.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        ))}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -253,8 +302,16 @@ export default function GuideReviewsAdmin() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
-                        {review.profiles?.full_name || "Unknown"}
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={review.profiles?.avatar_url} />
+                          <AvatarFallback>
+                            {review.profiles?.full_name?.charAt(0) || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">
+                          {review.profiles?.full_name || "Utilizator necunoscut"}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -268,12 +325,13 @@ export default function GuideReviewsAdmin() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-1">
                         {!review.approved && (
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => approveMutation.mutate(review.id)}
+                            title="Aprobă"
                           >
                             <CheckCircle className="h-4 w-4 text-green-600" />
                           </Button>
@@ -283,10 +341,23 @@ export default function GuideReviewsAdmin() {
                             variant="ghost"
                             size="icon"
                             onClick={() => rejectMutation.mutate(review.id)}
+                            title="Respinge"
                           >
                             <XCircle className="h-4 w-4 text-orange-600" />
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            if (confirm("Sigur vrei să ștergi această recenzie?")) {
+                              deleteMutation.mutate(review.id);
+                            }
+                          }}
+                          title="Șterge"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -1,7 +1,8 @@
 /**
  * Guide Reviews Queries
  * Functions for fetching guide reviews
- * FIXED: Removed joins on profiles - no foreign key exists
+ * NOTE: guide_reviews.user_id references auth.users, not profiles
+ * We need to fetch profile data separately
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -20,14 +21,46 @@ export interface ReviewFilters {
 export async function getGuideReviews(guideId: string, limit: number = 10, offset: number = 0) {
   const { data, error, count } = await supabase
     .from("guide_reviews")
-    .select("*", { count: "exact" })
+    .select(`
+      *,
+      guides!guide_reviews_guide_id_fkey (
+        id,
+        full_name,
+        slug
+      )
+    `, { count: "exact" })
     .eq("guide_id", guideId)
     .eq("approved", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) throw error;
-  return { reviews: data || [], count: count || 0 };
+  
+  // Fetch profile data for each review
+  const reviewsWithProfiles = await enrichReviewsWithProfiles(data || []);
+  
+  return { reviews: reviewsWithProfiles, count: count || 0 };
+}
+
+/**
+ * Helper to enrich reviews with profile data
+ */
+async function enrichReviewsWithProfiles(reviews: any[]) {
+  if (reviews.length === 0) return reviews;
+  
+  const userIds = [...new Set(reviews.map(r => r.user_id))];
+  
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .in("id", userIds);
+  
+  const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+  
+  return reviews.map(review => ({
+    ...review,
+    profiles: profileMap.get(review.user_id) || null,
+  }));
 }
 
 /**
@@ -36,7 +69,14 @@ export async function getGuideReviews(guideId: string, limit: number = 10, offse
 export async function getAllReviews(filters?: ReviewFilters) {
   let query = supabase
     .from("guide_reviews")
-    .select("*", { count: "exact" })
+    .select(`
+      *,
+      guides!guide_reviews_guide_id_fkey (
+        id,
+        full_name,
+        slug
+      )
+    `, { count: "exact" })
     .order("created_at", { ascending: false });
 
   if (filters?.guideId) {
@@ -59,7 +99,11 @@ export async function getAllReviews(filters?: ReviewFilters) {
   const { data, error, count } = await query;
 
   if (error) throw error;
-  return { reviews: data || [], count: count || 0 };
+  
+  // Enrich with profile data
+  const reviewsWithProfiles = await enrichReviewsWithProfiles(data || []);
+  
+  return { reviews: reviewsWithProfiles, count: count || 0 };
 }
 
 /**
@@ -81,12 +125,22 @@ export async function getPendingReviewsCount() {
 export async function getReviewById(id: string) {
   const { data, error } = await supabase
     .from("guide_reviews")
-    .select("*")
+    .select(`
+      *,
+      guides!guide_reviews_guide_id_fkey (
+        id,
+        full_name,
+        slug
+      )
+    `)
     .eq("id", id)
     .single();
 
   if (error) throw error;
-  return data;
+  
+  // Enrich with profile
+  const enriched = await enrichReviewsWithProfiles([data]);
+  return enriched[0];
 }
 
 /**

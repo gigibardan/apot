@@ -94,8 +94,7 @@ export async function updateReview(id: string, data: Partial<ReviewInput>) {
 }
 
 /**
- * Delete a review
- * Can only be deleted by owner within 48h or by admin
+ * Delete a review (admin version - no ownership check)
  */
 export async function deleteReview(id: string) {
   const {
@@ -104,7 +103,26 @@ export async function deleteReview(id: string) {
 
   if (!user) throw new Error("User must be authenticated");
 
-  const { error } = await supabase.from("guide_reviews").delete().eq("id", id).eq("user_id", user.id);
+  const { error } = await supabase.from("guide_reviews").delete().eq("id", id);
+
+  if (error) throw error;
+}
+
+/**
+ * Delete own review (user version - checks ownership)
+ */
+export async function deleteOwnReview(id: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("User must be authenticated");
+
+  const { error } = await supabase
+    .from("guide_reviews")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
 
   if (error) throw error;
 }
