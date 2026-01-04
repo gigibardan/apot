@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Upload, Download, CheckCircle, XCircle } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Upload, Download, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import Papa from "papaparse";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
@@ -10,10 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ImportRow {
+  index: number; // rândul real în CSV (pentru debug)
   data: any;
   errors: string[];
   status: "pending" | "success" | "error";
@@ -21,13 +23,13 @@ interface ImportRow {
 
 export default function BulkImport() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("obiective");
+  const [activeTab, setActiveTab] = useState<"obiective" | "articole" | "circuite">("obiective");
   const [file, setFile] = useState<File | null>(null);
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const downloadTemplate = (type: string) => {
+  const downloadTemplate = useCallback((type: string) => {
     let headers: string[];
     let sampleData: string[][];
 
@@ -36,15 +38,24 @@ export default function BulkImport() {
         "title", "slug", "continent_slug", "country_name", "city", "excerpt", "description",
         "location_text", "latitude", "longitude", "visit_duration", "best_season",
         "difficulty_level", "entrance_fee", "opening_hours", "website_url",
-        "unesco_site", "featured", "types_slugs", "featured_image_url"
+        "unesco_site", "featured", "types_slugs",
+        "featured_image_url",           // imaginea principală (hero)
+        "gallery_image_1", "gallery_image_2", "gallery_image_3", "gallery_image_4",  // cele 4 extra
+        "video_url"                     // YouTube sau direct video
       ];
       sampleData = [
         [
-          "Castelul Bran", "castelul-bran", "europa", "România", "Brașov",
-          "Castelul legendar al lui Dracula", "Descriere completă...",
-          "Brașov, România", "45.5152", "25.3674", "2-3 ore", "Mai-Octombrie",
-          "easy", "50 RON", "09:00-18:00", "https://bran-castle.com",
-          "false", "true", "cultura,istoric", ""
+          "Taj Mahal", "taj-mahal", "asia", "India", "Agra",
+          "Monumentul iubirii eternă", "Descriere lungă și frumoasă aici...",
+          "Agra, India", "27.175145", "78.042142", "2-4 ore", "Octombrie-Martie",
+          "easy", "1000 INR", "06:00-19:00", "https://tajmahal.gov.in",
+          "true", "true", "cultura,istoric,romantic",
+          "https://images.unsplash.com/...-taj-mahal.jpg",
+          "https://images.unsplash.com/...-taj2.jpg",
+          "https://images.unsplash.com/...-taj3.jpg",
+          "https://images.unsplash.com/...-taj4.jpg",
+          "https://images.unsplash.com/...-taj5.jpg",
+          "https://www.youtube.com/watch?v=example"
         ]
       ];
     } else if (type === "articole") {
@@ -79,7 +90,7 @@ export default function BulkImport() {
       data: sampleData
     });
 
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -91,38 +102,55 @@ export default function BulkImport() {
       title: "Template descărcat",
       description: `Template CSV pentru ${type} a fost descărcat cu succes.`
     });
-  };
+  }, [toast]);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target.files?.[0];
     if (!uploadedFile) return;
 
     setFile(uploadedFile);
+    setRows([]);
+    setProgress(0);
 
     Papa.parse(uploadedFile, {
       header: true,
       skipEmptyLines: true,
+      dynamicTyping: false,
+      transformHeader: (h) => h.trim().toLowerCase(),
       complete: (results) => {
-        const parsedRows: ImportRow[] = results.data.map((row: any) => ({
+        if (results.errors.length > 0) {
+          toast({
+            variant: "destructive",
+            title: "Eroare parsare CSV",
+            description: "Verifică formatul fișierului (separator virgulă, encoding UTF-8)"
+          });
+          return;
+        }
+
+        const parsedRows: ImportRow[] = results.data.map((row: any, idx: number) => ({
+          index: idx + 2,
           data: row,
           errors: validateRow(row, activeTab),
           status: "pending"
         }));
+
         setRows(parsedRows);
+
+        const valid = parsedRows.filter(r => r.errors.length === 0).length;
         toast({
           title: "Fișier încărcat",
-          description: `${parsedRows.length} rânduri detectate.`
+          description: `${parsedRows.length} rânduri procesate (${valid} valide)`
         });
       },
-      error: (error) => {
+      error: (err) => {
         toast({
           variant: "destructive",
           title: "Eroare",
-          description: `Nu am putut citi fișierul: ${error.message}`
+          description: err.message
         });
       }
     });
-  };
+  }, [activeTab, toast]);
 
   const validateRow = (row: any, type: string): string[] => {
     const errors: string[] = [];
@@ -132,12 +160,13 @@ export default function BulkImport() {
 
     if (type === "obiective") {
       if (!row.continent_slug?.trim()) errors.push("Continent lipsă");
-      // country_name is now optional
-      if (row.latitude && isNaN(parseFloat(row.latitude))) {
-        errors.push("Latitudine invalidă");
+      if (row.latitude && isNaN(parseFloat(row.latitude.trim()))) errors.push("Latitudine invalidă");
+      if (row.longitude && isNaN(parseFloat(row.longitude.trim()))) errors.push("Longitudine invalidă");
+      if (row.unesco_site && !["true", "false", "TRUE", "FALSE", "1", "0"].includes(row.unesco_site.trim())) {
+        errors.push("unesco_site: true/false");
       }
-      if (row.longitude && isNaN(parseFloat(row.longitude))) {
-        errors.push("Longitudine invalidă");
+      if (row.featured && !["true", "false", "TRUE", "FALSE", "1", "0"].includes(row.featured.trim())) {
+        errors.push("featured: true/false");
       }
     }
 
@@ -145,61 +174,44 @@ export default function BulkImport() {
   };
 
   const startImport = async () => {
-    if (rows.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "Eroare",
-        description: "Nu există date de importat"
-      });
+    const validRows = rows.filter(r => r.errors.length === 0);
+    if (validRows.length === 0) {
+      toast({ variant: "destructive", title: "Nicio linie validă pentru import" });
       return;
     }
 
     setImporting(true);
-    setProgress(0);
 
-    let successCount = 0;
-    let errorCount = 0;
+    let success = 0;
+    let errors = 0;
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      
-      if (row.errors.length > 0) {
-        row.status = "error";
-        errorCount++;
-        setRows([...rows]);
-        continue;
-      }
-
+    for (let i = 0; i < validRows.length; i++) {
+      const row = validRows[i];
       try {
-        if (activeTab === "obiective") {
-          await importObjective(row.data);
-        } else if (activeTab === "articole") {
-          await importArticle(row.data);
-        } else {
-          await importCircuit(row.data);
-        }
-        
+        if (activeTab === "obiective") await importObjective(row.data);
+        else if (activeTab === "articole") await importArticle(row.data);
+        else await importCircuit(row.data);
+
         row.status = "success";
-        successCount++;
-      } catch (error: any) {
+        success++;
+      } catch (e: any) {
         row.status = "error";
-        row.errors.push(error.message || "Eroare la import");
-        errorCount++;
+        row.errors.push(e.message || "Eroare server");
+        errors++;
       }
 
+      setProgress(((i + 1) / validRows.length) * 100);
       setRows([...rows]);
-      setProgress(((i + 1) / rows.length) * 100);
     }
 
     setImporting(false);
-    
     toast({
       title: "Import finalizat",
-      description: `${successCount} create cu succes, ${errorCount} erori.`
+      description: `${success} succes, ${errors} erori`
     });
   };
 
-  // Helper to format name (First letter uppercase)
+  // === FUNCȚIILE TALE ORIGINALE (păstrate intacte) ===
   const formatName = (name: string): string => {
     if (!name) return "";
     return name
@@ -208,113 +220,134 @@ export default function BulkImport() {
       .join(" ");
   };
 
-  const importObjective = async (data: any) => {
-    // Resolve continent ID
-    const { data: continent } = await supabase
-      .from("continents")
+ // ============================================
+// FUNCȚIE CORECTATĂ pentru BulkImport.tsx
+// ============================================
+
+
+
+const importObjective = async (data: any) => {
+  // Găsim continentul
+  const { data: continent } = await supabase
+    .from("continents")
+    .select("id")
+    .eq("slug", data.continent_slug.trim())
+    .single();
+
+  if (!continent) throw new Error("Continent invalid");
+
+  // Procesăm țara (opțional, dar cu formatare corectă)
+  let countryId = null;
+  const countryName = data.country_name ? formatName(data.country_name.trim()) : null;
+
+  if (countryName) {
+    const { data: country } = await supabase
+      .from("countries")
       .select("id")
-      .eq("slug", data.continent_slug)
-      .single();
+      .ilike("name", countryName)
+      .maybeSingle();
 
-    if (!continent) {
-      throw new Error("Continent invalid");
-    }
+    if (country) countryId = country.id;
+  }
 
-    // Country is now optional - try to find by name if provided
-    let countryId = null;
-    const countryName = data.country_name ? formatName(data.country_name) : null;
-    
-    if (countryName) {
-      // Try to find existing country in DB
-      const { data: country } = await supabase
-        .from("countries")
+  // Procesăm orașul
+  const cityName = data.city ? formatName(data.city.trim()) : null;
+
+  // ✅ PROCESARE GALERIE - Preia TOATE cele 4 imagini din CSV
+  const galleryImages = [
+    data.gallery_image_1?.trim(),
+    data.gallery_image_2?.trim(),
+    data.gallery_image_3?.trim(),
+    data.gallery_image_4?.trim(),
+  ]
+    .filter(url => url && url.length > 0) // elimină valorile goale sau null
+    .map(url => ({ url: url })); // format pentru Supabase: array de obiecte {url: string}
+
+  // ✅ INSERT în baza de date cu TOATE câmpurile
+  const { data: objective, error } = await supabase
+    .from("objectives")
+    .insert({
+      title: data.title.trim(),
+      slug: data.slug.trim(),
+      continent_id: continent.id,
+      country_id: countryId,
+      country_name: countryName,
+      city: cityName,
+      excerpt: data.excerpt?.trim() || null,
+      description: data.description?.trim() || null,
+      location_text: data.location_text?.trim() || null,
+      latitude: data.latitude ? parseFloat(data.latitude.trim()) : null,
+      longitude: data.longitude ? parseFloat(data.longitude.trim()) : null,
+      visit_duration: data.visit_duration?.trim() || null,
+      best_season: data.best_season?.trim() || null,
+      difficulty_level: data.difficulty_level?.trim() || null,
+      entrance_fee: data.entrance_fee?.trim() || null,
+      opening_hours: data.opening_hours?.trim() || null,
+      website_url: data.website_url?.trim() || null,
+      booking_url: data.booking_url?.trim() || null,
+      contact_email: data.contact_email?.trim() || null,
+      contact_phone: data.contact_phone?.trim() || null,
+      accessibility_info: data.accessibility_info?.trim() || null,
+      google_place_id: data.google_place_id?.trim() || null,
+      
+      // ✅ VIDEO URLs - array JSON conform schema Supabase
+      video_urls: data.video_url?.trim() ? [{ url: data.video_url.trim() }] : null,
+      
+      // ✅ Metadata SEO
+      meta_title: data.meta_title?.trim() || null,
+      meta_description: data.meta_description?.trim() || null,
+      
+      // Boolean fields
+      unesco_site: data.unesco_site === "true" || data.unesco_site === "TRUE" || data.unesco_site === "1",
+      featured: data.featured === "true" || data.featured === "TRUE" || data.featured === "1",
+      
+      // ✅ IMAGINI - imaginea principală + galeria
+      featured_image: data.featured_image_url?.trim() || null,
+      gallery_images: galleryImages.length > 0 ? galleryImages : null,
+      
+      published: false // Importurile încep ca draft
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  // ✅ Procesăm tipurile de obiectiv (dacă există)
+  if (data.types_slugs && objective) {
+    const typeSlugs = data.types_slugs
+      .split(",")
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0);
+
+    for (const slug of typeSlugs) {
+      const { data: type } = await supabase
+        .from("objective_types")
         .select("id")
-        .ilike("name", countryName)
+        .eq("slug", slug)
         .maybeSingle();
-      
-      if (country) {
-        countryId = country.id;
+
+      if (type) {
+        await supabase
+          .from("objectives_types_relations")
+          .insert({
+            objective_id: objective.id,
+            type_id: type.id
+          });
       }
     }
-
-    // Format city name
-    const cityName = data.city ? formatName(data.city) : null;
-
-    // Insert objective
-    const { data: objective, error } = await supabase
-      .from("objectives")
-      .insert({
-        title: data.title,
-        slug: data.slug,
-        continent_id: continent.id,
-        country_id: countryId,
-        country_name: countryName,
-        city: cityName,
-        excerpt: data.excerpt,
-        description: data.description,
-        location_text: data.location_text,
-        latitude: data.latitude ? parseFloat(data.latitude) : null,
-        longitude: data.longitude ? parseFloat(data.longitude) : null,
-        visit_duration: data.visit_duration,
-        best_season: data.best_season,
-        difficulty_level: data.difficulty_level || null,
-        entrance_fee: data.entrance_fee,
-        opening_hours: data.opening_hours,
-        website_url: data.website_url,
-        unesco_site: data.unesco_site === "true",
-        featured: data.featured === "true",
-        featured_image: data.featured_image_url,
-        published: false
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Handle types
-    if (data.types_slugs && objective) {
-      const typeSlugs = data.types_slugs.split(",").map((s: string) => s.trim());
-      
-      for (const slug of typeSlugs) {
-        const { data: type } = await supabase
-          .from("objective_types")
-          .select("id")
-          .eq("slug", slug)
-          .single();
-
-        if (type) {
-          await supabase
-            .from("objectives_types_relations")
-            .insert({
-              objective_id: objective.id,
-              type_id: type.id
-            });
-        }
-      }
-    }
-  };
+  }
+};
 
   const importArticle = async (data: any) => {
-    // Normalize category to match enum values (remove diacritics)
     let normalizedCategory = null;
     if (data.category) {
       const categoryMap: Record<string, string> = {
-        "călătorii": "calatorii",
-        "călători": "calatorii", 
-        "calatorii": "calatorii",
-        "călăuzire": "calauze",
-        "călăuze": "calauze",
-        "calauze": "calauze",
-        "povești": "povesti",
-        "povestiri": "povesti",
-        "povesti": "povesti",
-        "tips": "tips",
-        "ghiduri": "ghiduri",
-        "ghid": "ghiduri",
-        "destinații": "destinatii",
-        "destinatii": "destinatii",
-        "inspiratie": "inspiratie",
-        "inspirație": "inspiratie"
+        "călătorii": "calatorii", "călători": "calatorii", "calatorii": "calatorii",
+        "călăuzire": "calauze", "călăuze": "calauze", "calauze": "calauze",
+        "povești": "povesti", "povestiri": "povesti", "povesti": "povesti",
+        "tips": "tips", "ghiduri": "ghiduri", "ghid": "ghiduri",
+        "destinații": "destinatii", "destinatii": "destinatii",
+        "inspiratie": "inspiratie", "inspirație": "inspiratie"
       };
       const lower = data.category.toLowerCase().trim();
       normalizedCategory = categoryMap[lower] || lower;
@@ -356,171 +389,134 @@ export default function BulkImport() {
 
     if (error) throw error;
   };
+  // === SFÂRȘIT FUNCȚII ===
 
   return (
     <Section className="py-8">
       <Container>
         <div className="mb-6">
-          <Breadcrumbs
-            items={[
-              { label: "Dashboard", href: "/admin" },
-              { label: "Import în Masă" }
-            ]}
-          />
+          <Breadcrumbs items={[{ label: "Dashboard", href: "/admin" }, { label: "Import în Masă" }]} />
         </div>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-display font-bold">Import în Masă</h1>
-          <p className="text-muted-foreground mt-2">
-            Importă obiective, articole sau circuite din fișiere CSV
-          </p>
-        </div>
+        <h1 className="text-3xl font-display font-bold mb-2">Import în Masă</h1>
+        <p className="text-muted-foreground mb-8">Importă obiective, articole sau circuite din fișiere CSV</p>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+          <TabsList className="grid w-full max-w-md grid-cols-3">
             <TabsTrigger value="obiective">Obiective</TabsTrigger>
             <TabsTrigger value="articole">Articole</TabsTrigger>
             <TabsTrigger value="circuite">Circuite</TabsTrigger>
           </TabsList>
 
-          <TabsContent value={activeTab} className="space-y-6">
-            {/* Step 1: Download Template */}
+          <TabsContent value={activeTab} className="space-y-6 mt-8">
+            {/* Template Download */}
             <Card>
               <CardHeader>
-                <CardTitle>Pasul 1: Descarcă Template</CardTitle>
-                <CardDescription>
-                  Descarcă template-ul CSV cu exemplu de date
-                </CardDescription>
+                <CardTitle>1. Descarcă Template</CardTitle>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => downloadTemplate(activeTab)}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Descarcă Template CSV
+                <Button onClick={() => downloadTemplate(activeTab)} variant="outline">
+                  <Download className="w-4 h-4 mr-2" /> Template CSV
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Step 2: Upload CSV */}
+            {/* Upload */}
             <Card>
               <CardHeader>
-                <CardTitle>Pasul 2: Încarcă CSV</CardTitle>
-                <CardDescription>
-                  Selectează fișierul CSV completat cu datele tale
-                </CardDescription>
+                <CardTitle>2. Încarcă CSV-ul completat</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-4">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="csv-upload"
-                  />
-                  <label htmlFor="csv-upload">
+                  <label>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
                     <Button asChild>
-                      <span>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Selectează Fișier
-                      </span>
+                      <span><Upload className="w-4 h-4 mr-2" /> Alege fișier</span>
                     </Button>
                   </label>
-                  {file && (
-                    <span className="text-sm text-muted-foreground">
-                      {file.name} - {rows.length} rânduri
-                    </span>
-                  )}
+                  {file && <span className="text-sm text-muted-foreground">{file.name}</span>}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Step 3: Preview */}
+            {/* Preview + Errors Summary */}
             {rows.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pasul 3: Previzualizare</CardTitle>
-                  <CardDescription>
-                    Verifică datele înainte de import. Erorile sunt marcate cu roșu.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border rounded-lg overflow-auto max-h-[400px]">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12">#</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Titlu</TableHead>
-                          <TableHead>Slug</TableHead>
-                          <TableHead>Erori</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {rows.slice(0, 10).map((row, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{index + 1}</TableCell>
-                            <TableCell>
-                              {row.status === "success" && (
-                                <CheckCircle className="w-4 h-4 text-green-500" />
-                              )}
-                              {row.status === "error" && (
-                                <XCircle className="w-4 h-4 text-destructive" />
-                              )}
-                              {row.status === "pending" && row.errors.length === 0 && (
-                                <Badge variant="secondary">Valid</Badge>
-                              )}
-                              {row.status === "pending" && row.errors.length > 0 && (
-                                <Badge variant="destructive">Invalid</Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className={row.errors.length > 0 ? "text-destructive" : ""}>
-                              {row.data.title}
-                            </TableCell>
-                            <TableCell>{row.data.slug}</TableCell>
-                            <TableCell className="text-sm text-destructive">
-                              {row.errors.join(", ")}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  {rows.length > 10 && (
-                    <p className="text-sm text-muted-foreground mt-4">
-                      Afișează primele 10 din {rows.length} rânduri
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+              <>
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {rows.filter(r => r.errors.length === 0).length} rânduri valide din {rows.length}.
+                    Doar cele valide vor fi importate.
+                  </AlertDescription>
+                </Alert>
 
-            {/* Step 4: Import */}
-            {rows.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pasul 4: Importă</CardTitle>
-                  <CardDescription>
-                    Începe procesul de import. Durata depinde de numărul de rânduri.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {importing && (
-                    <div className="space-y-2">
-                      <Progress value={progress} />
-                      <p className="text-sm text-muted-foreground text-center">
-                        {Math.round(progress)}% complet
-                      </p>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>3. Previzualizare</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Rând</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Titlu</TableHead>
+                            <TableHead>Slug</TableHead>
+                            <TableHead>Erori</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {rows.map((row) => (
+                            <TableRow key={row.index}>
+                              <TableCell>{row.index}</TableCell>
+                              <TableCell>
+                                {row.status === "success" && <CheckCircle className="w-4 h-4 text-green-600" />}
+                                {row.status === "error" && <XCircle className="w-4 h-4 text-destructive" />}
+                                {row.errors.length === 0 && row.status === "pending" && <Badge variant="secondary">Valid</Badge>}
+                                {row.errors.length > 0 && <Badge variant="destructive">Invalid</Badge>}
+                              </TableCell>
+                              <TableCell>{row.data.title || "-"}</TableCell>
+                              <TableCell>{row.data.slug || "-"}</TableCell>
+                              <TableCell className="max-w-xs truncate text-destructive">
+                                {row.errors.join(", ")}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </div>
-                  )}
-                  <Button 
-                    onClick={startImport} 
-                    disabled={importing || rows.every(r => r.errors.length > 0)}
-                    className="w-full"
-                  >
-                    {importing ? "Se importă..." : `Importă ${rows.length} ${activeTab}`}
-                  </Button>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+
+                {/* Import Button */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>4. Pornește importul</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {importing && (
+                      <div className="space-y-2">
+                        <Progress value={progress} />
+                        <p className="text-center text-sm text-muted-foreground">{Math.round(progress)}%</p>
+                      </div>
+                    )}
+                    <Button
+                      onClick={startImport}
+                      disabled={importing || rows.filter(r => r.errors.length === 0).length === 0}
+                      size="lg"
+                      className="w-full"
+                    >
+                      {importing ? "Se importă..." : `Importă ${rows.filter(r => r.errors.length === 0).length} ${activeTab}`}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
             )}
           </TabsContent>
         </Tabs>

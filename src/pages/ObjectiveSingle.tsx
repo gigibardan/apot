@@ -52,7 +52,7 @@ export default function ObjectiveSingle() {
 
   // Get translated content
   const { content: objective, isLoading: translationLoading } = useTranslatedObjective(objectiveData);
-  
+
   // Reviews state
   const [reviews, setReviews] = useState<any[]>([]);
   const [reviewStats, setReviewStats] = useState<any>(null);
@@ -117,7 +117,7 @@ export default function ObjectiveSingle() {
   const handleReviewSuccess = async () => {
     if (!objective) return;
     setShowReviewForm(false);
-    
+
     // Refresh reviews
     const [reviewsData, statsData, userReviewData] = await Promise.all([
       getObjectiveReviews(objective.id, reviewsPage),
@@ -388,29 +388,29 @@ export default function ObjectiveSingle() {
                 objective.opening_hours ||
                 objective.accessibility_info ||
                 objective.difficulty_level) && (
-                <section>
-                  <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
-                    Informații Practice
-                  </h2>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {objective.visit_duration && (
-                      <InfoCard icon={Clock} label="Durată Vizită" value={objective.visit_duration} />
-                    )}
-                    {objective.best_season && (
-                      <InfoCard icon={Calendar} label="Sezon Recomandat" value={objective.best_season} />
-                    )}
-                    {objective.entrance_fee && (
-                      <InfoCard icon={DollarSign} label="Tarif Intrare" value={objective.entrance_fee} />
-                    )}
-                    {objective.opening_hours && (
-                      <InfoCard icon={Clock3} label="Program" value={objective.opening_hours} />
-                    )}
-                    {objective.accessibility_info && (
-                      <InfoCard icon={Accessibility} label="Accesibilitate" value={objective.accessibility_info} />
-                    )}
-                  </div>
-                </section>
-              )}
+                  <section>
+                    <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
+                      Informații Practice
+                    </h2>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {objective.visit_duration && (
+                        <InfoCard icon={Clock} label="Durată Vizită" value={objective.visit_duration} />
+                      )}
+                      {objective.best_season && (
+                        <InfoCard icon={Calendar} label="Sezon Recomandat" value={objective.best_season} />
+                      )}
+                      {objective.entrance_fee && (
+                        <InfoCard icon={DollarSign} label="Tarif Intrare" value={objective.entrance_fee} />
+                      )}
+                      {objective.opening_hours && (
+                        <InfoCard icon={Clock3} label="Program" value={objective.opening_hours} />
+                      )}
+                      {objective.accessibility_info && (
+                        <InfoCard icon={Accessibility} label="Accesibilitate" value={objective.accessibility_info} />
+                      )}
+                    </div>
+                  </section>
+                )}
 
               {/* Contact & Links */}
               <section>
@@ -436,7 +436,7 @@ export default function ObjectiveSingle() {
                       />
                     </DialogContent>
                   </Dialog>
-                  
+
                   {objective.website_url && (
                     <Button asChild variant="outline">
                       <a href={objective.website_url} target="_blank" rel="noopener noreferrer">
@@ -472,12 +472,21 @@ export default function ObjectiveSingle() {
                     objective.gallery_images && objective.gallery_images.length > 0
                       ? objective.gallery_images
                       : objective.featured_image
-                      ? [{ url: objective.featured_image, alt: objective.title }]
-                      : []
+                        ? [{ url: objective.featured_image, alt: objective.title }]
+                        : []
                   }
                   objectiveTitle={objective.title}
                 />
               </section>
+              {/* Video Section - ADAUGĂ ACEST BLOC */}
+              {objective.video_urls && Array.isArray(objective.video_urls) && objective.video_urls.length > 0 && objective.video_urls[0]?.url && (
+                <section>
+                  <h2 className="text-2xl md:text-3xl font-display font-bold mb-6">
+                    Video Prezentare
+                  </h2>
+                  <VideoPlayer url={objective.video_urls[0].url} title={objective.title} />
+                </section>
+              )}
 
               {/* Location Section */}
               <section>
@@ -598,6 +607,75 @@ function InfoCard({ icon: Icon, label, value }: { icon: any; label: string; valu
         <p className="text-sm text-muted-foreground">{label}</p>
         <p className="font-medium">{value}</p>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Video Player Component
+ * Suportă YouTube, Vimeo și video-uri directe (MP4, etc.)
+ */
+function VideoPlayer({ url, title }: { url: string; title: string }) {
+  // Detectăm tipul de video
+  const getVideoType = (url: string): 'youtube' | 'vimeo' | 'direct' => {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+    if (url.includes('vimeo.com')) return 'vimeo';
+    return 'direct';
+  };
+
+  // Extragem ID-ul de YouTube
+  const getYouTubeId = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  // Extragem ID-ul de Vimeo
+  const getVimeoId = (url: string): string | null => {
+    const regExp = /vimeo.com\/(\d+)/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  };
+
+  const videoType = getVideoType(url);
+
+  return (
+    <div className="relative w-full bg-black rounded-lg overflow-hidden" style={{ paddingTop: '56.25%' }}>
+      {videoType === 'youtube' && (
+        <iframe
+          className="absolute top-0 left-0 w-full h-full"
+          src={`https://www.youtube.com/embed/${getYouTubeId(url)}?rel=0`}
+          title={`Video: ${title}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      )}
+
+      {videoType === 'vimeo' && (
+        <iframe
+          className="absolute top-0 left-0 w-full h-full"
+          src={`https://player.vimeo.com/video/${getVimeoId(url)}`}
+          title={`Video: ${title}`}
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+        />
+      )}
+
+      {videoType === 'direct' && (
+        <video
+          className="absolute top-0 left-0 w-full h-full"
+          controls
+          preload="metadata"
+        >
+          <source src={url} type="video/mp4" />
+          <p className="text-white p-4">
+            Browser-ul tău nu suportă redarea video.
+            <a href={url} className="underline ml-2" target="_blank" rel="noopener noreferrer">
+              Descarcă video-ul
+            </a>
+          </p>
+        </video>
+      )}
     </div>
   );
 }
