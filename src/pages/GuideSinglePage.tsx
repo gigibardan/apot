@@ -93,152 +93,147 @@ export default function GuideSinglePage() {
       />
 
       <div className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="md:col-span-1">
-            {guide.profile_image ? (
-              <img
-                src={guide.profile_image}
-                alt={guide.full_name}
-                className="w-full aspect-square object-cover rounded-lg shadow-lg"
-              />
-            ) : (
-              <div className="w-full aspect-square bg-primary/10 rounded-lg flex items-center justify-center">
-                <span className="text-6xl font-bold text-primary">
-                  {guide.full_name.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
 
-          <div className="md:col-span-2 space-y-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-4xl font-bold">{guide.full_name}</h1>
+
+        {/* Hero Section - REDESIGNED */}
+        <div className="bg-gradient-to-b from-blue-50 to-white rounded-xl overflow-hidden mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 md:p-8">
+            {/* Coloana 1: Imagine Profil */}
+            <div className="md:col-span-1 flex justify-center md:justify-start">
+              {guide.profile_image ? (
+                <img
+                  src={guide.profile_image}
+                  alt={guide.full_name}
+                  className="w-56 h-56 md:w-full md:h-96 object-cover rounded-2xl shadow-xl ring-4 ring-white"
+                />
+              ) : (
+                <div className="w-48 h-48 md:w-full md:h-96 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-xl ring-4 ring-white flex items-center justify-center">
+                  <span className="text-6xl md:text-8xl font-bold text-white">
+                    {guide.full_name.charAt(0)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Coloana 2-3: Informații */}
+            <div className="md:col-span-2 space-y-4">
+              {/* Nume + Rating */}
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                  {guide.full_name}
+                </h1>
+
+                {/* Rating */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-5 w-5 ${i < Math.floor(guide.rating_average)
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                          }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-lg font-semibold text-gray-700">
+                    {guide.rating_average.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    ({guide.reviews_count} {guide.reviews_count === 1 ? "recenzie" : "recenzii"})
+                  </span>
+                </div>
+              </div>
+
+              {/* Badges - În grid mobile-friendly */}
+              <div className="flex flex-wrap gap-2">
                 {guide.verified && (
-                  <Badge variant="default" className="text-base px-3 py-1">
-                    <Shield className="h-4 w-4 mr-1" />
+                  <Badge variant="default" className="gap-1.5 px-3 py-1.5">
+                    <Shield className="h-4 w-4" />
                     Verificat
                   </Badge>
                 )}
-                {/* Badge Licență Oficială SITUR */}
+
                 {guide.official_guide && guide.license_number && (
-                  <Badge className="bg-green-600 hover:bg-green-700 text-white gap-2">
+                  <Badge className="bg-green-600 hover:bg-green-700 text-white gap-1.5 px-3 py-1.5">
                     <Shield className="h-4 w-4" />
-                    Licență Verificată SITUR #{guide.license_number}
+                    Licență SITUR #{guide.license_number}
                   </Badge>
                 )}
+
                 {guide.featured && (
-                  <Badge variant="secondary" className="text-base px-3 py-1">
-                    <Star className="h-4 w-4 mr-1" />
+                  <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
+                    <Star className="h-4 w-4" />
                     Featured
                   </Badge>
                 )}
+
+                {guide.years_experience > 0 && (
+                  <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
+                    <Calendar className="h-4 w-4" />
+                    {guide.years_experience} ani experiență
+                  </Badge>
+                )}
               </div>
 
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 ${i < Math.floor(guide.rating_average)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300"
-                        }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-lg font-semibold">{guide.rating_average.toFixed(1)}</span>
-                <span className="text-muted-foreground">({guide.reviews_count} recenzii)</span>
-              </div>
-
+              {/* Descriere scurtă */}
               {guide.short_description && (
-                <p className="text-lg text-muted-foreground mb-6">{guide.short_description}</p>
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                  {guide.short_description}
+                </p>
               )}
 
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {guide.years_experience && (
-                  <div>
-                    <div className="text-sm text-muted-foreground">Experiență</div>
-                    <div className="text-lg font-semibold">{guide.years_experience} ani</div>
-                  </div>
-                )}
-                {guide.geographical_areas && guide.geographical_areas.length > 0 && (
-                  <div>
-                    <div className="text-sm text-muted-foreground">Zone</div>
-                    <div className="text-lg font-semibold">{guide.geographical_areas.length} regiuni</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Contact Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Send className="h-4 w-4 mr-2" />
-                      Cere Rezervare
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Rezervă cu {guide.full_name}</DialogTitle>
-                    </DialogHeader>
-                    <GuideBookingForm
-                      guideId={guide.id}
-                      guideName={guide.full_name}
-                      onSuccess={() => setShowBookingDialog(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
-
-                {guide.email && (
-                  <Button variant="outline" asChild>
-                    <a href={`mailto:${guide.email}`}>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Email
-                    </a>
-                  </Button>
-                )}
+              {/* Butoane Contact - Responsive */}
+              <div className="flex flex-wrap gap-2 md:gap-3 pt-2">
                 {guide.phone && (
-                  <Button variant="outline" asChild>
+                  <Button size="lg" className="flex-1 md:flex-initial gap-2" asChild>
                     <a href={`tel:${guide.phone}`}>
-                      <Phone className="h-4 w-4 mr-2" />
-                      Telefon
+                      <Phone className="h-4 w-4" />
+                      <span className="hidden sm:inline">Telefon</span>
                     </a>
                   </Button>
                 )}
+
                 {guide.whatsapp && (
-                  <Button variant="outline" asChild>
+                  <Button size="lg" variant="outline" className="flex-1 md:flex-initial gap-2" asChild>
                     <a
                       href={`https://wa.me/${guide.whatsapp.replace(/[^0-9]/g, "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      WhatsApp
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="hidden sm:inline">WhatsApp</span>
                     </a>
                   </Button>
                 )}
-                {guide.website_url && (
-                  <Button variant="outline" asChild>
-                    <a href={guide.website_url} target="_blank" rel="noopener noreferrer">
-                      <Globe className="h-4 w-4 mr-2" />
-                      Website
+
+                {guide.email && (
+                  <Button size="lg" variant="outline" className="flex-1 md:flex-initial gap-2" asChild>
+                    <a href={`mailto:${guide.email}`}>
+                      <Mail className="h-4 w-4" />
+                      <span className="hidden sm:inline">Email</span>
                     </a>
                   </Button>
                 )}
-                {guide.availability_calendar_url && (
-                  <Button variant="outline" asChild>
-                    <a
-                      href={guide.availability_calendar_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Disponibilitate
-                    </a>
-                  </Button>
+              </div>
+
+              {/* Info rapide - Pills */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {guide.languages && guide.languages.length > 0 && (
+                  <div className="inline-flex items-center gap-1.5 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
+                    <Globe className="h-3.5 w-3.5" />
+                    <span>{guide.languages.join(", ")}</span>
+                  </div>
+                )}
+
+                {guide.geographical_areas && guide.geographical_areas.length > 0 && (
+                  <div className="inline-flex items-center gap-1.5 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
+                    <MapPin className="h-3.5 w-3.5" />
+                    <span>{guide.geographical_areas.slice(0, 2).join(", ")}</span>
+                    {guide.geographical_areas.length > 2 && (
+                      <span className="text-xs">+{guide.geographical_areas.length - 2}</span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -326,8 +321,8 @@ export default function GuideSinglePage() {
                       <Star
                         key={i}
                         className={`h-4 w-4 ${i < userReview.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
                           }`}
                       />
                     ))}
