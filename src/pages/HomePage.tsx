@@ -335,6 +335,74 @@ export default function HomePage() {
       {/* Featured Guides Section */}
       <FeaturedGuides limit={6} />
 
+      {/* Blog Preview Section */}
+      <Section variant="default">
+        <Container>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
+              Ultimele Articole
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Ghiduri de călătorie, sfaturi și povești de aventură
+            </p>
+          </div>
+
+          {/* Loading State */}
+          {articlesLoading && (
+            <div className="grid gap-8 md:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-96 rounded-lg" />
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {articlesError && (
+            <EmptyState
+              icon="⚠️"
+              title="Eroare la încărcare"
+              description={articlesError}
+              action={{
+                label: "Încearcă din nou",
+                onClick: fetchArticles,
+              }}
+            />
+          )}
+
+          {/* Empty State */}
+          {!articlesLoading && !articlesError && articles.length === 0 && (
+            <EmptyState
+              icon="📝"
+              title="Primul articol va fi publicat în curând"
+              description="Pregătim ghiduri complete despre cele mai fascinante destinații din întreaga lume"
+            />
+          )}
+
+          {/* Success State */}
+          {!articlesLoading && !articlesError && articles.length > 0 && (
+            <>
+              <div className="grid gap-8 md:grid-cols-3">
+                {articles.map((article, index) => (
+                  <div
+                    key={article.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <ArticleCard article={article} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-12">
+                <Button size="lg" variant="outline" asChild>
+                  <Link to={PUBLIC_ROUTES.blog}>Vezi Toate Articolele</Link>
+                </Button>
+              </div>
+            </>
+          )}
+        </Container>
+      </Section>
+
       {/* Jinfotours Circuits Section */}
       <Section className="bg-gradient-to-br from-accent/5 via-accent/10 to-accent/5">
         <Container>
@@ -423,73 +491,6 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* Blog Preview Section */}
-      <Section variant="default">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
-              Ultimele Articole
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Ghiduri de călătorie, sfaturi și povești de aventură
-            </p>
-          </div>
-
-          {/* Loading State */}
-          {articlesLoading && (
-            <div className="grid gap-8 md:grid-cols-3">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-96 rounded-lg" />
-              ))}
-            </div>
-          )}
-
-          {/* Error State */}
-          {articlesError && (
-            <EmptyState
-              icon="⚠️"
-              title="Eroare la încărcare"
-              description={articlesError}
-              action={{
-                label: "Încearcă din nou",
-                onClick: fetchArticles,
-              }}
-            />
-          )}
-
-          {/* Empty State */}
-          {!articlesLoading && !articlesError && articles.length === 0 && (
-            <EmptyState
-              icon="📝"
-              title="Primul articol va fi publicat în curând"
-              description="Pregătim ghiduri complete despre cele mai fascinante destinații din întreaga lume"
-            />
-          )}
-
-          {/* Success State */}
-          {!articlesLoading && !articlesError && articles.length > 0 && (
-            <>
-              <div className="grid gap-8 md:grid-cols-3">
-                {articles.map((article, index) => (
-                  <div
-                    key={article.id}
-                    className="animate-fade-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <ArticleCard article={article} />
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center mt-12">
-                <Button size="lg" variant="outline" asChild>
-                  <Link to={PUBLIC_ROUTES.blog}>Vezi Toate Articolele</Link>
-                </Button>
-              </div>
-            </>
-          )}
-        </Container>
-      </Section>
 
       {/* Newsletter Section */}
       <Section className="bg-gradient-to-br from-accent via-accent/90 to-primary">
