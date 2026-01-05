@@ -155,7 +155,8 @@ export default function HomePage() {
         structuredData={structuredData}
       />
       {/* Hero Section */}
-      <Section className="hero-gradient">
+      <Section className="hero-gradient !py-8 md:!py-12">
+
         <Container className="text-center">
           <div className="mx-auto max-w-3xl space-y-8 animate-fade-in">
             <h1 className="text-4xl font-display font-bold tracking-tight sm:text-5xl lg:text-6xl text-white">
