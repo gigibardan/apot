@@ -36,22 +36,22 @@ export default function HomePage() {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Data state
   const [continents, setContinents] = useState<Continent[]>([]);
   const [rawObjectives, setRawObjectives] = useState<ObjectiveWithRelations[]>([]);
   const [circuits, setCircuits] = useState<JinfoursCircuit[]>([]);
   const [articles, setArticles] = useState<BlogArticle[]>([]);
-  
+
   // Get translated objectives using custom hook
   const { content: objectives, isLoading: objectivesTranslationLoading } = useTranslatedObjectives(rawObjectives);
-  
+
   // Loading state
   const [continentsLoading, setContinentsLoading] = useState(true);
   const [objectivesLoading, setObjectivesLoading] = useState(true);
   const [circuitsLoading, setCircuitsLoading] = useState(true);
   const [articlesLoading, setArticlesLoading] = useState(true);
-  
+
   // Error state
   const [continentsError, setContinentsError] = useState<string | null>(null);
   const [objectivesError, setObjectivesError] = useState<string | null>(null);
@@ -159,13 +159,13 @@ export default function HomePage() {
 
         <Container className="text-center">
           <div className="mx-auto max-w-3xl space-y-8 animate-fade-in">
-            <h1 className="text-4xl font-display font-bold tracking-tight sm:text-5xl lg:text-6xl text-white">
+            <h1 className="text-4xl font-display font-bold tracking-tight sm:text-5xl lg:text-6xl text-white drop-shadow-lg">
               {t("hero.title")}
             </h1>
             <p className="text-lg sm:text-xl text-white/90">
               {t("hero.subtitle")}
             </p>
-            <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               {t("hero.description", "Explorează mii de monumente, muzee, parcuri naturale și situri UNESCO. Informații detaliate pentru fiecare destinație.")}
             </p>
 
@@ -178,11 +178,11 @@ export default function HomePage() {
                   placeholder={t("hero.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/90 border-0"
+                  className="pl-10 bg-white/90 border-0 focus:ring-2 focus:ring-white/50 focus:outline-none transition-all"
                   aria-label={t("hero.searchPlaceholder")}
                 />
               </div>
-              <Button size="lg" type="submit" className="bg-accent hover:bg-accent/90">
+              <Button size="lg" type="submit" className="bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-all font-semibold shadow-lg border-2 border-white/20">
                 {t("common.search")}
               </Button>
             </form>
@@ -193,7 +193,7 @@ export default function HomePage() {
                 size="lg"
                 asChild
                 variant="secondary"
-                className="text-lg px-8 py-6"
+                className="text-lg px-8 py-6 hover:scale-105 transition-transform"
               >
                 <Link to={PUBLIC_ROUTES.objectives}>
                   {t("hero.exploreButton")}
