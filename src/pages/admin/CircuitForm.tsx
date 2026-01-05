@@ -22,21 +22,21 @@ import { slugify } from "@/lib/utils";
 const circuitSchema = z.object({
   title: z.string().min(1, "Titlul este obligatoriu").max(200),
   slug: z.string().min(1, "Slug-ul este obligatoriu"),
-  description: z.string().max(500).optional(),
-  countries: z.string().optional(),
-  highlights: z.string().optional(),
-  duration_days: z.number().min(1, "Durata este obligatorie"),
-  price_from: z.number().min(0, "Prețul este obligatoriu"),
+  description: z.string().max(500).optional().or(z.literal("")),
+  countries: z.string().optional().or(z.literal("")),
+  highlights: z.string().optional().or(z.literal("")),
+  duration_days: z.coerce.number().min(1, "Durata este obligatorie"),
+  price_from: z.coerce.number().min(0, "Prețul este obligatoriu"),
   thumbnail_url: z.string().min(1, "Imaginea este obligatorie"),
-  external_url: z.string().url("URL invalid").min(1, "URL-ul Jinfotours este obligatoriu"),
+  external_url: z.string().url("URL-ul Jinfotours este invalid").min(1, "URL-ul Jinfotours este obligatoriu"),
   featured: z.boolean().optional(),
-  order_index: z.number().optional(),
+  order_index: z.coerce.number().optional(),
   // Discount fields
-  discount_percentage: z.number().min(0).max(100).optional(),
-  original_price: z.number().min(0).optional(),
-  discount_until: z.string().optional(),
+  discount_percentage: z.coerce.number().min(0).max(100).optional().or(z.nan()),
+  original_price: z.coerce.number().min(0).optional().or(z.nan()),
+  discount_until: z.string().optional().or(z.literal("")),
   // Badge fields
-  badge_text: z.string().max(50).optional(),
+  badge_text: z.string().max(50).optional().or(z.literal("")),
   badge_color: z.enum(['accent', 'destructive', 'secondary']).optional(),
 });
 
@@ -117,10 +117,28 @@ export default function CircuitForm() {
         ? data.highlights.split(",").map((h) => h.trim()).filter(Boolean)
         : [];
 
+      // Clean up NaN values for optional number fields
+      const cleanDiscountPercentage = Number.isNaN(data.discount_percentage) ? null : data.discount_percentage;
+      const cleanOriginalPrice = Number.isNaN(data.original_price) ? null : data.original_price;
+      const cleanOrderIndex = Number.isNaN(data.order_index) ? 0 : data.order_index;
+
       const circuitData = {
-        ...data,
+        title: data.title,
+        slug: data.slug,
+        description: data.description || null,
         countries: countriesArray,
         highlights: highlightsArray,
+        duration_days: data.duration_days,
+        price_from: data.price_from,
+        thumbnail_url: data.thumbnail_url,
+        external_url: data.external_url,
+        featured: data.featured || false,
+        order_index: cleanOrderIndex,
+        discount_percentage: cleanDiscountPercentage,
+        original_price: cleanOriginalPrice,
+        discount_until: data.discount_until || null,
+        badge_text: data.badge_text || null,
+        badge_color: data.badge_color || null,
       };
 
       if (id) {
