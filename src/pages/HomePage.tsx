@@ -411,11 +411,7 @@ export default function HomePage() {
               Circuite Complete în Toată Lumea
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Explorează circuite organizate de partenerul nostru Jinfotours
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              În parteneriat cu{" "}
-              <a
+              Explorează circuite organizate de partenerul nostru <a
                 href="https://jinfotours.ro"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -424,6 +420,7 @@ export default function HomePage() {
                 Jinfotours.ro
               </a>
             </p>
+            
           </div>
 
           {/* Loading State */}
@@ -521,7 +518,7 @@ export default function HomePage() {
               De Ce APOT?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Platforma ta completă pentru turism mondial
+              Platforma ta completă pentru turism international
             </p>
           </div>
 
@@ -531,7 +528,7 @@ export default function HomePage() {
                 <Globe className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-display font-semibold">
-                Acoperire Mondială
+                Acoperire Internatională
               </h3>
               <p className="text-muted-foreground">
                 Mii de obiective turistice din toată lumea
