@@ -94,9 +94,15 @@ export function Header() {
           {/* Logo */}
           <Link
             to={PUBLIC_ROUTES.home}
-            className="flex items-center space-x-2 text-2xl font-display font-bold text-primary hover:opacity-90 transition-opacity"
+            className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
+            aria-label="APOT - Acasă"
           >
-            <span>APOT</span>
+            <img
+              src="/images/Logo-APOT-mic.webp"
+              alt="APOT Logo"
+              className="h-10 md:h-12 w-auto object-contain"
+              loading="eager"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -106,7 +112,7 @@ export function Header() {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
+                  "text-base font-medium transition-colors hover:text-primary",
                   pathname === item.href
                     ? "text-primary"
                     : "text-foreground/80"
@@ -123,24 +129,24 @@ export function Header() {
                   Comunitate
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" sideOffset={8} className="z-[150]">
                 <DropdownMenuItem asChild>
-                  <Link to="/feed">Activity Feed</Link>
+                  <Link to="/feed">Flux de Activitate</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/forum">Forum</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/journals">Travel Journals</Link>
+                  <Link to="/journals">Jurnale de Călătorie</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/contests">Photo Contests</Link>
+                  <Link to="/contests">Concursuri Foto</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/challenges">Challenges</Link>
+                  <Link to="/challenges">Provocări</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/leaderboards">Leaderboards</Link>
+                  <Link to="/leaderboards">Clasamente</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

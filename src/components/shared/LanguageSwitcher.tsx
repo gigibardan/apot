@@ -18,19 +18,20 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative hover:bg-accent/10 transition-colors"
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 relative"
+          aria-label="Switch language / Schimbă limba"
         >
-          <Globe className="h-5 w-5 transition-transform group-hover:scale-110" />
+          <Globe className="h-5 w-5" />
           <span className="sr-only">Switch language / Schimbă limba</span>
-          <span className="absolute -top-1 -right-1 text-xs bg-background rounded-full w-5 h-5 flex items-center justify-center border border-border shadow-sm">
+          <span className="absolute -top-1 -right-1 text-xs bg-background text-foreground rounded-full w-5 h-5 flex items-center justify-center border border-border shadow-sm">
             {languages[currentLanguage].flag}
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 animate-fade-in">
+      <DropdownMenuContent align="end" className="w-48 animate-fade-in z-[150]">
         <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
           Language / Limbă
         </DropdownMenuLabel>
