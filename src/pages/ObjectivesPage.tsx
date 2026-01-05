@@ -190,25 +190,24 @@ export default function ObjectivesPage() {
   // Dynamic SEO
   const getPageTitle = () => {
     const parts: string[] = ["Obiective Turistice"];
-    
+
     if (countryName) {
       parts.push(`în ${countryName}`);
     } else if (continentName) {
       parts.push(`în ${continentName}`);
     }
-    
+
     if (filters.unesco) {
       parts.push("UNESCO");
     }
-    
+
     return parts.join(" ");
   };
 
   const getPageDescription = () => {
     if (totalCount > 0) {
-      return `Descoperă ${totalCount} obiective turistice${
-        countryName ? ` în ${countryName}` : continentName ? ` în ${continentName}` : ""
-      }. Informații detaliate, fotografii și sfaturi practice pentru fiecare destinație.`;
+      return `Descoperă ${totalCount} obiective turistice${countryName ? ` în ${countryName}` : continentName ? ` în ${continentName}` : ""
+        }. Informații detaliate, fotografii și sfaturi practice pentru fiecare destinație.`;
     }
     return "Descoperă obiective turistice din întreaga lume. Informații detaliate despre monumente, muzee, parcuri naturale și destinații de vis.";
   };
@@ -239,22 +238,23 @@ export default function ObjectivesPage() {
   // Generate breadcrumbs
   const getBreadcrumbs = (): BreadcrumbItem[] => {
     const items: BreadcrumbItem[] = [{ label: "Obiective Turistice", href: "/obiective" }];
-    
+
     if (continentName) {
       items.push({
         label: continentName,
         href: `/obiective?continent=${filters.continent}`,
       });
     }
-    
+
     if (countryName) {
       items.push({
         label: countryName,
       });
     }
-    
+
     return items;
   };
+
 
   return (
     <>
@@ -265,42 +265,52 @@ export default function ObjectivesPage() {
         structuredData={getStructuredData()}
       />
 
-      <Section className="py-8">
-        <Container>
-          {/* Breadcrumbs */}
-          <Breadcrumbs items={getBreadcrumbs()} className="mb-6" />
+      {/* Hero Section */}
+      <div className="bg-[#0F172A] text-white border-b border-white/10">
+        <Container className="py-12 md:py-16">
+          {/* Breadcrumbs - Am adăugat !text-white/80 pentru a forța culoarea peste stilurile automate */}
+          <div className="mb-6">
+            <Breadcrumbs
+              items={getBreadcrumbs()}
+              className="!text-white/80 [&_*]:!text-white/80 hover:[&_*]:!text-white transition-colors"
+            />
+          </div>
 
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-display font-bold tracking-tight mb-2">
-              {countryName
-                ? `Obiective Turistice în ${countryName}`
-                : continentName
-                ? `Obiective Turistice în ${continentName}`
-                : "Obiective Turistice"}
+          <div className="max-w-4xl">
+            <h1 className="text-4xl md:text-[2.75rem] font-bold tracking-tight mb-2 leading-tight">
+              {countryName ? (
+                <>Obiective Turistice în <span className="text-primary">{countryName}</span></>
+              ) : continentName ? (
+                <>Obiective Turistice în <span className="text-primary">{continentName}</span></>
+              ) : (
+                <>Obiective <span className="text-primary">Turistice</span></>
+              )}
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-white/60 leading-relaxed max-w-2xl">
               {totalCount > 0
                 ? `${totalCount} obiective turistice fascinante`
                 : "Descoperă obiective turistice din întreaga lume"}
             </p>
           </div>
+        </Container>
+      </div>
 
-          {/* Main Layout */}
+      <Section className="py-12 bg-slate-50/50">
+        <Container>
           <div className="grid lg:grid-cols-[300px_1fr] gap-8">
-            {/* Filters - Desktop Sidebar */}
             {!isMobile && (
-              <div>
-                <ObjectiveFilters
-                  filters={filters}
-                  onFiltersChange={handleFiltersChange}
-                  activeFilterCount={activeFilterCount}
-                />
-              </div>
+              <aside>
+                <div className="sticky top-24">
+                  <ObjectiveFilters
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    activeFilterCount={activeFilterCount}
+                  />
+                </div>
+              </aside>
             )}
 
-            {/* Results Grid */}
-            <div>
+            <main>
               <ObjectivesGrid
                 objectives={objectives}
                 loading={loading}
@@ -316,16 +326,14 @@ export default function ObjectivesPage() {
                 onClearFilters={handleClearFilters}
                 onRetry={fetchObjectives}
               />
-            </div>
+            </main>
           </div>
 
-          {/* Filters - Mobile Drawer */}
           {isMobile && (
             <ObjectiveFilters
               filters={filters}
               onFiltersChange={handleFiltersChange}
               onApply={() => {
-                // Drawer will close automatically
                 toast({
                   title: "Filtre aplicate",
                   description: `${totalCount} obiective găsite`,
