@@ -332,6 +332,9 @@ export default function HomePage() {
         </Container>
       </Section>
 
+      {/* Featured Guides Section */}
+      <FeaturedGuides limit={6} />
+
       {/* Jinfotours Circuits Section */}
       <Section className="bg-gradient-to-br from-accent/5 via-accent/10 to-accent/5">
         <Container>
@@ -573,8 +576,6 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {/* Featured Guides Section */}
-      <FeaturedGuides limit={6} />
 
       {/* Final CTA Section */}
       <Section className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10">
