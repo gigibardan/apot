@@ -129,7 +129,8 @@ const App = () => (
                     <Route path="forum/:categorySlug" element={<ForumCategoryPage />} />
                     <Route path="forum/:categorySlug/:postSlug" element={<ForumPostPage />} />
                     <Route path="user/:username" element={<UserProfile />} />
-                    <Route path="feed" element={<ActivityFeed />} />
+                    <Route path="profil/:username" element={<UserProfile />} />
+                    <Route path="feed" element={<ProtectedRoute><ActivityFeed /></ProtectedRoute>} />
                     <Route path="leaderboards" element={<Leaderboards />} />
                     <Route path="journals" element={<TravelJournals />} />
                     <Route path="journals/new" element={<ProtectedRoute><CreateJournal /></ProtectedRoute>} />
