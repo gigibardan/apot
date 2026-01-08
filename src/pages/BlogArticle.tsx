@@ -227,6 +227,37 @@ export default function BlogArticle() {
     ],
   };
 
+  // Add this right before the return statement in BlogArticle component
+const customProseStyles = `
+  .article-content h2 {
+    font-size: 1.875rem;
+    margin-top: 1 rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid hsl(var(--border));
+  }
+  
+  .article-content h3 {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .article-content p {
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+  
+  .article-content p + h2 {
+    margin-top: 1rem;
+  }
+  
+  .article-content p + h3 {
+    margin-top: 1.5rem;
+  }
+`;
+
   // Success state
   return (
     <>
@@ -268,13 +299,13 @@ export default function BlogArticle() {
             )}
 
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl font-display font-bold tracking-tight mb-4">
               {article.title}
             </h1>
 
             {/* Excerpt */}
             {article.excerpt && (
-              <p className="text-xl text-muted-foreground mb-6">{article.excerpt}</p>
+              <p className="text-xl text-muted-foreground mb-4">{article.excerpt}</p>
             )}
 
             {/* Meta Info */}
@@ -305,12 +336,13 @@ export default function BlogArticle() {
 
             {/* Featured Image */}
             {article.featured_image && (
-              <div className="mb-12 rounded-lg overflow-hidden">
+              <div className="mb-12 rounded-lg overflow-hidden relative group">
                 <img
                   src={article.featured_image}
                   alt={article.title}
-                  className="w-full aspect-[16/9] object-cover"
+                  className="w-full aspect-[16/9] object-cover transition-transform duration-300 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
               </div>
             )}
           </article>
@@ -330,14 +362,17 @@ export default function BlogArticle() {
 
               {/* Article Body */}
               {processedContent && (
-                <div
-                  className="prose prose-slate dark:prose-invert max-w-none prose-lg
-                    prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
-                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                    prose-img:rounded-lg prose-img:shadow-lg
-                    prose-blockquote:border-l-primary prose-blockquote:bg-muted/50 prose-blockquote:py-1"
-                  dangerouslySetInnerHTML={{ __html: processedContent }}
-                />
+            <>
+  <style>{customProseStyles}</style>
+  <div
+    className="article-content prose prose-slate dark:prose-invert max-w-none prose-lg
+      prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
+      prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+      prose-img:rounded-lg prose-img:shadow-lg
+      prose-blockquote:border-l-primary prose-blockquote:bg-muted/50 prose-blockquote:py-1"
+    dangerouslySetInnerHTML={{ __html: processedContent }}
+  />
+</>
               )}
 
               {/* Tags */}
@@ -347,7 +382,12 @@ export default function BlogArticle() {
                   <div className="flex flex-wrap gap-2">
                     {article.tags.map((tag) => (
                       <Link key={tag} to={`/blog?tag=${tag}`}>
-                        <Badge variant="secondary">{tag}</Badge>
+                        <Badge
+                          variant="secondary"
+                          className="hover:bg-primary hover:text-primary-foreground transition-colors duration-200 cursor-pointer"
+                        >
+                          {tag}
+                        </Badge>
                       </Link>
                     ))}
                   </div>
