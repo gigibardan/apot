@@ -140,6 +140,34 @@ export default function ContestSingle() {
       </div>
 
       <div className="container py-8 space-y-8">
+        {/* Contest Description & Prizes */}
+        {(contest.description || contest.prizes_description) && (
+          <div className="grid gap-6 md:grid-cols-2">
+            {contest.description && (
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-3">Despre Concurs</h3>
+                  <div 
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: contest.description }}
+                  />
+                </CardContent>
+              </Card>
+            )}
+            {contest.prizes_description && (
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-3">Premii</h3>
+                  <div 
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: contest.prizes_description }}
+                  />
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
         {/* User Submission Status */}
         {user && userSubmission && (
           <Card className={userSubmission.status === "approved" ? "border-green-500" : userSubmission.status === "rejected" ? "border-red-500" : "border-yellow-500"}>
