@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -158,9 +159,15 @@ export default function ContestsAdmin() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t">
+                <div className="flex flex-wrap gap-2 pt-4 border-t">
+                  <Link to={`/admin/contests/${contest.id}/submissions`}>
+                    <Button variant="default" size="sm">
+                      Review Submissions
+                    </Button>
+                  </Link>
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() =>
                       updateStatusMutation.mutate({ id: contest.id, status: "active" })
                     }
@@ -170,6 +177,7 @@ export default function ContestsAdmin() {
                   </Button>
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() =>
                       updateStatusMutation.mutate({ id: contest.id, status: "voting" })
                     }
@@ -179,6 +187,7 @@ export default function ContestsAdmin() {
                   </Button>
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() =>
                       updateStatusMutation.mutate({ id: contest.id, status: "ended" })
                     }

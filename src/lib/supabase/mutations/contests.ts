@@ -11,15 +11,26 @@ export async function submitToContest(submission: {
   title: string;
   description?: string;
   objective_id?: string;
+  accepted_terms: boolean;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
+  if (!submission.accepted_terms) {
+    throw new Error("You must accept the terms and conditions");
+  }
+
   const { data, error } = await supabase
     .from("contest_submissions")
     .insert({
-      ...submission,
+      contest_id: submission.contest_id,
+      image_url: submission.image_url,
+      title: submission.title,
+      description: submission.description || null,
+      objective_id: submission.objective_id || null,
+      accepted_terms: submission.accepted_terms,
       user_id: user.id,
+      status: 'pending',
     })
     .select()
     .single();
@@ -70,6 +81,59 @@ export async function removeVote(contestId: string) {
   return { success: true };
 }
 
+export async function approveSubmission(
+  submissionId: string,
+  adminNotes?: string
+) {
+  const { data, error } = await supabase
+    .rpc('approve_submission', {
+      p_submission_id: submissionId,
+      p_admin_notes: adminNotes || null,
+    });
+
+  if (error) throw error;
+
+  return { success: data };
+}
+
+export async function rejectSubmission(
+  submissionId: string,
+  rejectionReason: string
+) {
+  if (!rejectionReason || rejectionReason.trim() === '') {
+    throw new Error("Rejection reason is required");
+  }
+
+  const { data, error } = await supabase
+    .rpc('reject_submission', {
+      p_submission_id: submissionId,
+      p_rejection_reason: rejectionReason,
+    });
+
+  if (error) throw error;
+
+  return { success: data };
+}
+
+export async function removeSubmission(
+  submissionId: string,
+  reason: string
+) {
+  if (!reason || reason.trim() === '') {
+    throw new Error("Removal reason is required");
+  }
+
+  const { data, error } = await supabase
+    .rpc('remove_submission', {
+      p_submission_id: submissionId,
+      p_reason: reason,
+    });
+
+  if (error) throw error;
+
+  return { success: data };
+}
+
 export async function setContestWinners(
   contestId: string,
   winners: { submission_id: string; rank: number }[]
@@ -90,9 +154,6 @@ export async function setContestWinners(
     .from("photo_contests")
     .update({ status: "ended" })
     .eq("id", contestId);
-
-  // TODO: Send notifications to winners
-  // TODO: Award badges/points to winners
 
   return { success: true };
 }

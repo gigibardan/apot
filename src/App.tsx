@@ -68,6 +68,7 @@ import CreateJournal from "@/pages/CreateJournal";
 import JournalSingle from "@/pages/JournalSingle";
 import PhotoContests from "@/pages/PhotoContests";
 import ContestSingle from "@/pages/ContestSingle";
+import ContestTerms from "@/pages/ContestTerms";
 import CommunityChallenges from "@/pages/CommunityChallenges";
 import SuggestObjective from "@/pages/SuggestObjective";
 import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
@@ -75,6 +76,7 @@ import TermsPage from "@/pages/TermsPage";
 import CookiePolicyPage from "@/pages/CookiePolicyPage";
 import SuggestionsAdmin from "@/pages/admin/SuggestionsAdmin";
 import ContestsAdmin from "@/pages/admin/ContestsAdmin";
+import ContestSubmissionsAdmin from "@/pages/admin/ContestSubmissionsAdmin";
 import ChallengesAdmin from "@/pages/admin/ChallengesAdmin";
 import ActivityLogs from "@/pages/admin/ActivityLogs";
 import UserBanManagement from "@/pages/admin/UserBanManagement";
@@ -138,6 +140,7 @@ const App = () => (
                     <Route path="journals/new" element={<ProtectedRoute><CreateJournal /></ProtectedRoute>} />
                     <Route path="journals/:slug" element={<JournalSingle />} />
                     <Route path="contests" element={<PhotoContests />} />
+                    <Route path="contests/terms" element={<ContestTerms />} />
                     <Route path="contests/:slug" element={<ContestSingle />} />
                     <Route path="challenges" element={<CommunityChallenges />} />
                     <Route path="suggest-objective" element={<ProtectedRoute><SuggestObjective /></ProtectedRoute>} />
@@ -179,6 +182,7 @@ const App = () => (
                     <Route path="templates" element={<Templates />} />
                     <Route path="suggestions" element={<SuggestionsAdmin />} />
                     <Route path="contests" element={<ContestsAdmin />} />
+                    <Route path="contests/:id/submissions" element={<ContestSubmissionsAdmin />} />
                     <Route path="challenges" element={<ChallengesAdmin />} />
                     <Route path="forum" element={<ForumAdmin />} />
                     <Route path="activity-logs" element={<ActivityLogs />} />
