@@ -295,7 +295,7 @@ export default function ObjectivesPage() {
         </Container>
       </div>
 
-      <Section className="py-12 bg-slate-50/50">
+      <Section className="py-12 bg-slate-50/50 dark:bg-background">
         <Container>
           <div className="grid lg:grid-cols-[300px_1fr] gap-8">
             {!isMobile && (
