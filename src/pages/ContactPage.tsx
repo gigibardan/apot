@@ -36,7 +36,7 @@ export default function ContactPage() {
         1. HERO SECTION (Dark Style)
         ============================================= */}
       <div className="bg-[#0F172A] text-white border-b border-white/10">
-        <Container className="py-16 md:py-24">
+        <Container className="py-16 md:py-16">
           <div className="max-w-3xl space-y-6">
             <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1">
               <MessageSquare className="h-3.5 w-3.5 mr-2" />

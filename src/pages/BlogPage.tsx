@@ -72,7 +72,7 @@ export default function BlogPage() {
              style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-0 pointer-events-none" />
 
-        <Container className="relative z-10 py-12 md:py-20">
+        <Container className="relative z-10 py-12 md:py-16">
           <div className="flex flex-col lg:flex-row gap-10 items-center justify-between">
             <div className="text-center lg:text-left space-y-4 max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary-foreground text-xs font-medium border border-primary/30 mb-2">

@@ -34,7 +34,7 @@ export default function AboutPage() {
         1. HERO SECTION (Unitate vizuală cu restul site-ului)
         ============================================= */}
       <div className="bg-[#0F172A] text-white border-b border-white/10">
-        <Container className="py-16 md:py-24 text-center">
+        <Container className="py-16 md:py-16 text-center">
           <div className="max-w-3xl mx-auto space-y-6">
             <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1">
               Misiunea Noastră

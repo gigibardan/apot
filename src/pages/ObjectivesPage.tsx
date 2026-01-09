@@ -267,7 +267,7 @@ export default function ObjectivesPage() {
 
       {/* Hero Section */}
       <div className="bg-[#0F172A] text-white border-b border-white/10">
-        <Container className="py-12 md:py-16">
+        <Container className="py-8 md:py-16">
           {/* Breadcrumbs - Am adăugat !text-white/80 pentru a forța culoarea peste stilurile automate */}
           <div className="mb-6">
             <Breadcrumbs
@@ -277,7 +277,7 @@ export default function ObjectivesPage() {
           </div>
 
           <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-[2.75rem] font-bold tracking-tight mb-2 leading-tight">
+            <h1 className="text-3xl md:text-[2.75rem] font-bold tracking-tight mb-2 leading-tight">
               {countryName ? (
                 <>Obiective Turistice în <span className="text-primary">{countryName}</span></>
               ) : continentName ? (
@@ -295,7 +295,7 @@ export default function ObjectivesPage() {
         </Container>
       </div>
 
-      <Section className="py-12 bg-slate-50/50 dark:bg-background">
+      <Section className="py-8 bg-slate-50/50 dark:bg-background">
         <Container>
           <div className="grid lg:grid-cols-[300px_1fr] gap-8">
             {!isMobile && (

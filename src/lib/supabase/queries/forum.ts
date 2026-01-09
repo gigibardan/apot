@@ -9,7 +9,7 @@ export async function getForumCategories(): Promise<ForumCategory[]> {
     .from('forum_categories')
     .select('*')
     .order('order_index');
-  
+
   if (error) throw error;
   return data || [];
 }
@@ -23,7 +23,7 @@ export async function getCategoryBySlug(slug: string): Promise<ForumCategory | n
     .select('*')
     .eq('slug', slug)
     .single();
-  
+
   if (error) throw error;
   return data;
 }
@@ -65,7 +65,7 @@ export async function getPostsByCategory(
   query = query.range(offset, offset + limit - 1);
 
   const { data, error, count } = await query;
-  
+
   if (error) throw error;
   return { posts: data || [], count: count || 0 };
 }
@@ -97,7 +97,7 @@ export async function getPostBySlug(
     .eq('slug', postSlug)
     .eq('status', 'active')
     .single();
-  
+
   if (error) throw error;
 
   // Increment view count
@@ -114,7 +114,10 @@ export async function getPostBySlug(
 /**
  * Get replies for a post (nested structure)
  */
-export async function getRepliesForPost(postId: string): Promise<ForumReply[]> {
+/**
+ * Get replies for a post (nested structure)
+ */
+export async function getRepliesForPost(postId: string, userId?: string): Promise<ForumReply[]> {
   const { data, error } = await supabase
     .from('forum_replies')
     .select(`
@@ -124,16 +127,37 @@ export async function getRepliesForPost(postId: string): Promise<ForumReply[]> {
     .eq('post_id', postId)
     .eq('status', 'active')
     .order('created_at', { ascending: true });
-  
+
   if (error) throw error;
+
+  // Get user votes if userId provided
+  let userVotes: Map<string, 'upvote' | 'downvote'> = new Map();
+  if (userId && data) {
+    const replyIds = data.map(r => r.id);
+    const { data: votes } = await supabase
+      .from('forum_votes')
+      .select('reply_id, vote_type')
+      .eq('user_id', userId)
+      .in('reply_id', replyIds);
+
+    votes?.forEach(vote => {
+      if (vote.reply_id) {
+        userVotes.set(vote.reply_id, vote.vote_type);
+      }
+    });
+  }
 
   // Build nested structure
   const repliesMap = new Map<string, ForumReply>();
   const rootReplies: ForumReply[] = [];
 
-  // Initialize map with all replies
+  // Initialize map with all replies + user_vote
   data?.forEach(reply => {
-    repliesMap.set(reply.id, { ...reply, replies: [] });
+    repliesMap.set(reply.id, {
+      ...reply,
+      replies: [],
+      user_vote: userId ? (userVotes.get(reply.id) || null) : null
+    });
   });
 
   // Build tree structure
@@ -168,7 +192,7 @@ export async function getUserVoteForPost(
     .eq('post_id', postId)
     .eq('user_id', userId)
     .single();
-  
+
   return data?.vote_type || null;
 }
 
@@ -185,7 +209,7 @@ export async function getUserVoteForReply(
     .eq('reply_id', replyId)
     .eq('user_id', userId)
     .single();
-  
+
   return data?.vote_type || null;
 }
 
@@ -207,7 +231,7 @@ export async function searchPosts(
     .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
     .order('last_activity_at', { ascending: false })
     .range(offset, offset + limit - 1);
-  
+
   if (error) throw error;
   return { posts: data || [], count: count || 0 };
 }
@@ -226,7 +250,7 @@ export async function getRecentPosts(limit = 10): Promise<ForumPost[]> {
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(limit);
-  
+
   if (error) throw error;
   return data || [];
 }
@@ -248,7 +272,7 @@ export async function getUserPosts(
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
-  
+
   if (error) throw error;
   return { posts: data || [], count: count || 0 };
 }
@@ -267,7 +291,7 @@ export async function getUserReplies(
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
-  
+
   if (error) throw error;
   return { replies: data || [], count: count || 0 };
 }
