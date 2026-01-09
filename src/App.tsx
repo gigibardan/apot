@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { usePageViewTracking } from "@/hooks/usePageViewTracking";
+import { RouteScrollToTop } from "@/components/shared/RouteScrollToTop";
 
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -104,6 +105,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <RouteScrollToTop />
               <AnalyticsTracker />
               <AIChatbot />
               <CookieConsentBanner />
