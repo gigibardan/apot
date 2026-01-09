@@ -29,7 +29,7 @@ export default function GuidesPage() {
   useEffect(() => { setPage(1); }, [debouncedSearch, filters]);
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-background">
       <SEO title="Ghizi Profesioniști Verificați | APOT" description="Descoperă experți locali." />
 
       {/* Hero Section */}
@@ -45,7 +45,7 @@ export default function GuidesPage() {
               <h1 className="text-3xl md:text-[2.75rem] font-bold tracking-tight leading-tight">
                 Ghizii Noștri <span className="text-primary">Profesioniști</span>
               </h1>
-              <p className="text-lg text-slate-400 leading-relaxed">
+              <p className="text-lg text-white/70 leading-relaxed">
                 Experți locali verificați care transformă călătoriile în experiențe memorabile.
               </p>
             </div>
@@ -67,11 +67,11 @@ export default function GuidesPage() {
       {/* Filtre Floating */}
       <div className="relative z-20">
         <Container className="-mt-8">
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-1.5">
+          <div className="bg-white dark:bg-card rounded-xl shadow-lg border border-slate-200 dark:border-border p-1.5">
             <div className="flex flex-col md:flex-row md:items-center gap-2">
-              <div className="px-5 py-3 md:border-r border-slate-100 flex items-center gap-3 shrink-0">
+              <div className="px-5 py-3 md:border-r border-slate-100 dark:border-border flex items-center gap-3 shrink-0">
                 <Filter className="h-4 w-4 text-primary" />
-                <span className="font-bold text-sm text-slate-800">Filtrează</span>
+                <span className="font-bold text-sm text-foreground">Filtrează</span>
               </div>
               <div className="flex-1 px-2 py-1">
                 <GuideAdvancedFilters filters={filters} onChange={setFilters} />
@@ -83,8 +83,8 @@ export default function GuidesPage() {
 
       {/* Grid Ghizi */}
       <Container className="py-12">
-        <div className="mb-8 flex items-baseline justify-between border-b border-slate-200 pb-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">
+        <div className="mb-8 flex items-baseline justify-between border-b border-slate-200 dark:border-border pb-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
             {guidesData?.total || 0} Experți locali
           </h2>
         </div>
@@ -97,7 +97,7 @@ export default function GuidesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {guidesData?.guides.map((guide) => (
               <Link key={guide.id} to={`/ghid/${guide.slug}`}>
-                <Card className="p-6 hover:shadow-xl transition-all duration-300 h-full border-slate-200 rounded-2xl flex flex-col group bg-white">
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 h-full border-slate-200 dark:border-border rounded-2xl flex flex-col group bg-white dark:bg-card">
                   {/* Header Card Wide - Layout Optimizat pentru nume lungi */}
                   <div className="flex items-start gap-4 mb-4">
                     <div className="shrink-0">
@@ -116,7 +116,7 @@ export default function GuidesPage() {
 
                     <div className="flex-1 min-w-0">
                       {/* Numele ocupă acum tot rândul de sus */}
-                      <h3 className="font-bold text-lg mb-2 text-slate-900 group-hover:text-primary transition-colors leading-tight">
+                      <h3 className="font-bold text-lg mb-2 text-foreground group-hover:text-primary transition-colors leading-tight">
                         {guide.full_name}
                       </h3>
 
@@ -124,8 +124,8 @@ export default function GuidesPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="flex items-center gap-1.5 text-sm">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-bold text-slate-700">{guide.rating_average.toFixed(1)}</span>
-                          <span className="text-slate-400">({guide.reviews_count})</span>
+                          <span className="font-bold text-foreground">{guide.rating_average.toFixed(1)}</span>
+                          <span className="text-muted-foreground">({guide.reviews_count})</span>
                         </div>
 
                         {guide.verified && (
@@ -139,7 +139,7 @@ export default function GuidesPage() {
                   </div>
 
                   {guide.short_description && (
-                    <p className="text-sm text-slate-600 mb-6 line-clamp-3 leading-relaxed">
+                    <p className="text-sm text-muted-foreground mb-6 line-clamp-3 leading-relaxed">
                       {guide.short_description}
                     </p>
                   )}
@@ -176,7 +176,7 @@ export default function GuidesPage() {
         )}
 
         {/* Separator subtil între grilă și CTA */}
-        <div className="w-full h-px bg-slate-200 mb-16" />
+        <div className="w-full h-px bg-slate-200 dark:bg-border mb-16" />
 
         {/* Zona de Verificare Licență */}
         <div className="mb-12">
@@ -189,7 +189,7 @@ export default function GuidesPage() {
             <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="rounded-lg h-9 w-9 p-0">
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm font-medium px-4 text-slate-600">Pagina {page} / {guidesData.pages}</span>
+            <span className="text-sm font-medium px-4 text-muted-foreground">Pagina {page} / {guidesData.pages}</span>
             <Button variant="outline" size="sm" disabled={page === guidesData.pages} onClick={() => setPage(p => p + 1)} className="rounded-lg h-9 w-9 p-0">
               <ChevronRight className="h-4 w-4" />
             </Button>
