@@ -9,7 +9,7 @@ export async function getActiveContest() {
     .from("photo_contests")
     .select("*")
     .eq("status", "active")
-    .single();
+    .maybeSingle(); // FIXED: maybeSingle() în loc de single()
 
   if (error && error.code !== "PGRST116") throw error;
 
@@ -54,6 +54,7 @@ export async function getContestBySlug(slug: string) {
 }
 
 export async function getContestSubmissions(contestId: string, isAdmin = false, limit = 100) {
+  // FIXED: Construim query-ul corect - FILTRE ÎNAINTE DE ORDER!
   let query = supabase
     .from("contest_submissions")
     .select(`
@@ -68,14 +69,15 @@ export async function getContestSubmissions(contestId: string, isAdmin = false, 
         slug
       )
     `)
-    .eq("contest_id", contestId)
-    .order("votes_count", { ascending: false })
-    .limit(limit);
+    .eq("contest_id", contestId);
 
-  // If not admin, only show approved submissions
+  // FIXED: Aplicăm filtrul de status ÎNAINTE de order
   if (!isAdmin) {
     query = query.eq("status", "approved");
   }
+
+  // APOI aplicăm order și limit
+  query = query.order("votes_count", { ascending: false }).limit(limit);
 
   const { data, error } = await query;
 
@@ -97,7 +99,7 @@ export async function getPendingSubmissions(contestId: string) {
       )
     `)
     .eq("contest_id", contestId)
-    .eq("status", "pending")
+    .eq("status", "pending") // FIXED: Status ÎNAINTE de order
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -106,6 +108,7 @@ export async function getPendingSubmissions(contestId: string) {
 }
 
 export async function getAllContestSubmissions(contestId: string, statusFilter?: string) {
+  // FIXED: Construim query-ul corect
   let query = supabase
     .from("contest_submissions")
     .select(`
@@ -117,12 +120,15 @@ export async function getAllContestSubmissions(contestId: string, statusFilter?:
         avatar_url
       )
     `)
-    .eq("contest_id", contestId)
-    .order("created_at", { ascending: false });
+    .eq("contest_id", contestId);
 
+  // FIXED: Aplicăm filtrul de status ÎNAINTE de order
   if (statusFilter) {
     query = query.eq("status", statusFilter);
   }
+
+  // APOI aplicăm order
+  query = query.order("created_at", { ascending: false });
 
   const { data, error } = await query;
 
@@ -140,7 +146,7 @@ export async function getUserSubmissionStatus(contestId: string) {
     .select("id, status, rejection_reason, title, image_url, created_at, votes_count, winner_rank")
     .eq("contest_id", contestId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle(); // FIXED: maybeSingle() în loc de single()
 
   if (error && error.code !== "PGRST116") throw error;
 
@@ -173,7 +179,7 @@ export async function getUserVote(contestId: string) {
     .select("submission_id")
     .eq("contest_id", contestId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle(); // FIXED: maybeSingle() în loc de single()
 
   if (error && error.code !== "PGRST116") throw error;
 
@@ -189,7 +195,7 @@ export async function hasUserSubmitted(contestId: string) {
     .select("id")
     .eq("contest_id", contestId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle(); // FIXED: maybeSingle() în loc de single()
 
   if (error && error.code !== "PGRST116") throw error;
 
