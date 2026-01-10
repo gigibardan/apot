@@ -30,8 +30,8 @@ export function FeaturedGuides({ limit = 6 }: FeaturedGuidesProps) {
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-4">
-              <Shield className="h-3 w-3 mr-1" />
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1 mb-4">
+              <Shield className="h-3.5 w-3.5 mr-2" />
               Ghizi Verificați
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Ghizii Noștri Profesioniști</h2>
@@ -61,8 +61,8 @@ export function FeaturedGuides({ limit = 6 }: FeaturedGuidesProps) {
     <section className="py-16 bg-muted/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4">
-            <Shield className="h-3 w-3 mr-1" />
+          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1 mb-4">
+            <Shield className="h-3.5 w-3.5 mr-2" />
             Ghizi Verificați
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ghizii Noștri Profesioniști</h2>
