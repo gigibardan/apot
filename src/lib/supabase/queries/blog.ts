@@ -91,23 +91,35 @@ export async function getFeaturedArticles(limit: number = 3) {
  * Get article by slug
  */
 export async function getBlogArticleBySlug(slug: string) {
-  const { data, error } = await supabase
+  // First get the article
+  const { data: article, error: articleError } = await supabase
     .from("blog_articles")
-    .select(`
-      *,
-      author:profiles!blog_articles_author_id_fkey (
-        id,
-        full_name,
-        avatar_url,
-        bio
-      )
-    `)
+    .select("*")
     .eq("slug", slug)
     .eq("published", true)
     .single();
 
-  if (error) throw error;
-  return data as BlogArticle & { 
+  if (articleError) throw articleError;
+  if (!article) throw new Error("Article not found");
+
+  // Then get author data if author_id exists
+  let authorData = null;
+  if ((article as any).author_id) {
+    const { data: author, error: authorError } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url, bio")
+      .eq("id", (article as any).author_id)
+      .single();
+
+    if (!authorError && author) {
+      authorData = author;
+    }
+  }
+
+  return {
+    ...article,
+    author: authorData
+  } as BlogArticle & { 
     author: { id: string; full_name: string | null; avatar_url: string | null; bio: string | null } | null 
   };
 }
