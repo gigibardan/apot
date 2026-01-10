@@ -257,8 +257,8 @@ export default function HomePage() {
       </Section>
 
       {/* Featured Objectives Section */}
-      <Section variant="muted">
-        <Container>
+      <Section variant="muted" className="overflow-hidden">
+        <Container className="overflow-hidden">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-display font-bold tracking-tight sm:text-4xl">
               Obiective Turistice Populare
@@ -308,11 +308,11 @@ export default function HomePage() {
           {/* Success State */}
           {!objectivesLoading && !objectivesError && objectives.length > 0 && (
             <>
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 overflow-hidden">
                 {objectives.map((objective, index) => (
                   <div
                     key={objective.id}
-                    className="animate-fade-in"
+                    className="animate-fade-in min-w-0"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <ObjectiveCard objective={objective} />
