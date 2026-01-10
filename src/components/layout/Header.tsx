@@ -291,7 +291,6 @@ export function Header() {
                 aria-hidden="true"
               />
             )}
-
             {/* Mobile Menu Drawer */}
             <div
               className={cn(
