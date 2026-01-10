@@ -81,6 +81,7 @@ export function Header() {
     <header
       className={cn(
         "sticky top-0 z-[100] w-full transition-all duration-300",
+        "pt-[env(safe-area-inset-top,0px)]",
         scrolled
           ? "bg-background/95 backdrop-blur-md shadow-sm"
           : "bg-background"
