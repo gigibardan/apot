@@ -24,7 +24,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-background">
       <SEO
         title="Contact"
         description="Contactează echipa APOT pentru întrebări, sugestii sau parteneriate. Suntem aici să te ajutăm cu informații despre obiective turistice."
@@ -36,7 +36,7 @@ export default function ContactPage() {
         1. HERO SECTION (Dark Style)
         ============================================= */}
       <div className="bg-[#0F172A] text-white border-b border-white/10">
-        <Container className="py-16 md:py-24">
+        <Container className="py-16 md:py-16">
           <div className="max-w-3xl space-y-6">
             <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1">
               <MessageSquare className="h-3.5 w-3.5 mr-2" />
@@ -45,7 +45,7 @@ export default function ContactPage() {
             <h1 className="text-4xl md:text-[2.75rem] font-bold tracking-tight leading-tight">
               Suntem aici să <span className="text-primary">te ajutăm</span>
             </h1>
-            <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
+            <p className="text-lg text-slate-300 leading-relaxed max-w-2xl">
               Ai o întrebare despre platformă sau vrei să devii partenerul nostru? Trimite-ne un mesaj și echipa APOT îți va răspunde în cel mai scurt timp.
             </p>
           </div>
@@ -77,13 +77,13 @@ export default function ContactPage() {
               desc: "Prezență națională" 
             },
           ].map((item, idx) => (
-            <Card key={idx} className="p-8 border-slate-200 shadow-lg rounded-2xl bg-white flex flex-col items-center text-center group hover:border-primary/30 transition-all duration-300">
-              <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
+          <Card key={idx} className="p-8 border-border shadow-lg rounded-2xl bg-card flex flex-col items-center text-center group hover:border-primary/30 transition-all duration-300">
+              <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
                 <item.icon className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-bold text-slate-900 text-lg mb-1">{item.title}</h3>
+              <h3 className="font-bold text-foreground text-lg mb-1">{item.title}</h3>
               <p className="font-medium text-primary mb-2">{item.value}</p>
-              <p className="text-sm text-slate-400">{item.desc}</p>
+              <p className="text-sm text-muted-foreground">{item.desc}</p>
             </Card>
           ))}
         </div>
@@ -97,8 +97,8 @@ export default function ContactPage() {
           {/* Info Side */}
           <div className="space-y-8 py-4">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Trimite-ne un mesaj</h2>
-              <p className="text-slate-500 leading-relaxed">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Trimite-ne un mesaj</h2>
+              <p className="text-muted-foreground leading-relaxed">
                 Completează formularul alăturat, iar un consultant APOT va prelua solicitarea ta. 
                 Fie că ești călător în căutare de informații sau ghid care dorește să se înscrie, 
                 suntem gata să colaborăm.
@@ -106,20 +106,20 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="flex gap-4 p-4 rounded-xl bg-white border border-slate-100">
-                <div className="shrink-0 w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-orange-600" />
+              <div className="flex gap-4 p-4 rounded-xl bg-card border border-border">
+                <div className="shrink-0 w-10 h-10 bg-orange-500/10 dark:bg-orange-500/20 rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-slate-900">Date securizate</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Informațiile tale sunt protejate conform GDPR.</p>
+                  <h4 className="font-bold text-sm text-foreground">Date securizate</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">Informațiile tale sunt protejate conform GDPR.</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Form Side */}
-          <Card className="p-8 md:p-10 shadow-xl border-slate-200 rounded-[2rem] bg-white">
+          <Card className="p-8 md:p-10 shadow-xl border-border rounded-[2rem] bg-card">
             <ContactForm />
           </Card>
         </div>

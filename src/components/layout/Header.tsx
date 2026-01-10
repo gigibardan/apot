@@ -80,7 +80,8 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-[100] w-full transition-all duration-300",
+        "fixed inset-x-0 top-0 z-[100] w-full transition-all duration-300",
+        "pt-[env(safe-area-inset-top,0px)]",
         scrolled
           ? "bg-background/95 backdrop-blur-md shadow-sm"
           : "bg-background"
@@ -88,7 +89,7 @@ export function Header() {
     >
       <div className="w-full px-4">
         <nav
-          className="flex items-center justify-between py-4"
+          className="flex h-[73px] items-center justify-between"
           aria-label="Navigation principală"
         >
           {/* Logo */}
@@ -291,7 +292,6 @@ export function Header() {
                 aria-hidden="true"
               />
             )}
-
             {/* Mobile Menu Drawer */}
             <div
               className={cn(

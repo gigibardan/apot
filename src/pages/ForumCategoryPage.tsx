@@ -6,6 +6,7 @@ import { Section } from "@/components/layout/Section";
 import { SEO } from "@/components/seo/SEO";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Button } from "@/components/ui/button";
+
 import { 
   Select, 
   SelectContent, 
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { PostCard } from "@/components/features/forum/PostCard";
 import { PostForm } from "@/components/features/forum/PostForm";
-import { ChevronLeft, Plus, MessageSquare } from "lucide-react";
+import { ChevronLeft, Plus, MessageSquare, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCategoryBySlug, getPostsByCategory } from "@/lib/supabase/queries/forum";
@@ -64,13 +65,17 @@ export default function ForumCategoryPage() {
   });
 
   if (categoryLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (!category) {
     return (
       <Container className="py-12">
-        <Alert>
+        <Alert variant="destructive">
           <AlertDescription>Categoria nu a fost găsită.</AlertDescription>
         </Alert>
       </Container>
@@ -80,56 +85,81 @@ export default function ForumCategoryPage() {
   const totalPages = Math.ceil((postsData?.count || 0) / POSTS_PER_PAGE);
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
       <SEO
         title={category.name}
         description={category.description || `Discuții în categoria ${category.name}`}
         canonical={`/forum/${categorySlug}`}
       />
 
-      <Section className="bg-gradient-to-b from-primary/5 to-background">
-        <Container>
-          <div className="py-8">
-            <Link to="/forum" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Înapoi la Forum
-            </Link>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">{category.name}</h1>
-                {category.description && (
-                  <p className="text-muted-foreground">{category.description}</p>
-                )}
-                <p className="text-sm text-muted-foreground mt-2">
-                  {postsData?.count || 0} {postsData?.count === 1 ? 'discuție' : 'discuții'}
-                </p>
+      {/* =============================================
+        1. COMPACT HERO SECTION (Dark Style)
+        ============================================= */}
+      <div className="bg-[#0F172A] text-white border-b border-white/10">
+        <Container className="py-8 md:py-10">
+          {/* Breadcrumb discret */}
+          <Link 
+            to="/forum" 
+            className="inline-flex items-center text-xs font-medium text-slate-400 hover:text-primary transition-colors mb-4 uppercase tracking-wider"
+          >
+            <ChevronLeft className="h-3 w-3 mr-1" />
+            Înapoi la Forum
+          </Link>
+
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-1 bg-primary rounded-full" />
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                  {category.name}
+                </h1>
               </div>
-              {user && (
-                <Button onClick={() => setShowNewPost(!showNewPost)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Discuție Nouă
-                </Button>
+              
+              {category.description && (
+                <p className="text-slate-400 max-w-2xl text-sm md:text-base leading-relaxed">
+                  {category.description}
+                </p>
               )}
+
+              <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <Hash className="h-3.5 w-3.5 text-primary/70" />
+                  {postsData?.count || 0} {postsData?.count === 1 ? 'discuție' : 'discuții'}
+                </span>
+              </div>
             </div>
+
+            {user && (
+              <Button 
+                onClick={() => setShowNewPost(!showNewPost)}
+                className="rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-bold"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Discuție Nouă
+              </Button>
+            )}
           </div>
         </Container>
-      </Section>
+      </div>
 
-      <Container className="py-8">
+      {/* =============================================
+        2. CONTENT AREA
+        ============================================= */}
+      <Container className="py-10">
         {!user && (
-          <Alert className="mb-6">
-            <MessageSquare className="h-4 w-4" />
-            <AlertDescription>
-              <Link to="/auth/login" className="font-semibold underline">
+          <Alert className="mb-8 border-primary/20 bg-primary/5 dark:bg-primary/10">
+            <MessageSquare className="h-4 w-4 text-primary" />
+            <AlertDescription className="dark:text-slate-300">
+              <Link to="/auth/login" className="font-bold text-primary hover:underline">
                 Autentifică-te
               </Link>{" "}
-              pentru a crea discuții noi și a participa la conversații.
+              pentru a crea discuții noi și a participa la conversații în comunitatea APOT.
             </AlertDescription>
           </Alert>
         )}
 
         {showNewPost && user && (
-          <div className="mb-8">
+          <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-300">
             <PostForm
               categoryId={category.id}
               onSubmit={(data) => createPostMutation.mutate(data)}
@@ -138,12 +168,12 @@ export default function ForumCategoryPage() {
           </div>
         )}
 
-        {/* Sort and Filter */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Sortare:</span>
+        {/* Filters bar stilizată */}
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Sortare</span>
             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[180px] h-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-lg text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -157,47 +187,67 @@ export default function ForumCategoryPage() {
 
         {/* Posts List */}
         {postsLoading ? (
-          <LoadingSpinner />
+          <div className="py-20 flex justify-center"><LoadingSpinner /></div>
         ) : postsData && postsData.posts.length > 0 ? (
-          <>
-            <div className="space-y-4 mb-8">
+          <div className="space-y-4">
+            <div className="grid gap-4 mb-8">
               {postsData.posts.map((post) => (
                 <PostCard key={post.id} post={post} categorySlug={categorySlug!} />
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination stilizată */}
             {totalPages > 1 && (
-              <div className="flex justify-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 1}
-                >
-                  Anteriorul
-                </Button>
-                <span className="flex items-center px-4 text-sm text-muted-foreground">
+              <div className="flex flex-col items-center gap-4 pt-8 border-t border-slate-100 dark:border-slate-900">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 1}
+                    className="hover:bg-primary/10 hover:text-primary"
+                  >
+                    Anteriorul
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <Button
+                        key={p}
+                        variant={p === page ? "default" : "ghost"}
+                        size="sm"
+                        className={`w-8 h-8 p-0 rounded-md ${p === page ? 'shadow-md shadow-primary/20' : ''}`}
+                        onClick={() => setPage(p)}
+                      >
+                        {p}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPage(page + 1)}
+                    disabled={page === totalPages}
+                    className="hover:bg-primary/10 hover:text-primary"
+                  >
+                    Următorul
+                  </Button>
+                </div>
+                <p className="text-[10px] uppercase tracking-tighter text-slate-400 font-bold">
                   Pagina {page} din {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  onClick={() => setPage(page + 1)}
-                  disabled={page === totalPages}
-                >
-                  Următorul
-                </Button>
+                </p>
               </div>
             )}
-          </>
+          </div>
         ) : (
-          <Alert>
-            <MessageSquare className="h-4 w-4" />
-            <AlertDescription>
-              Nu există discuții în această categorie încă. Fii primul care creează o discuție!
-            </AlertDescription>
-          </Alert>
+          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+            <MessageSquare className="h-12 w-12 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
+            <h3 className="text-lg font-bold dark:text-white">Nu există discuții încă</h3>
+            <p className="text-slate-500 max-w-sm mx-auto mt-2">
+              Fii primul care deschide o conversație în categoria {category.name}!
+            </p>
+          </div>
         )}
       </Container>
-    </>
+    </div>
   );
 }
