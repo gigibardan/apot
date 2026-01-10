@@ -126,9 +126,9 @@ export function Header() {
             {/* Community Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <button className="text-base font-medium transition-colors hover:text-primary text-foreground/80">
                   Comunitate
-                </Button>
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={8} className="z-[150]">
                 <DropdownMenuItem asChild>
