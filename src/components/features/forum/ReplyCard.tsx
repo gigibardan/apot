@@ -23,10 +23,10 @@ interface ReplyCardProps {
   onReport?: (replyId: string) => void;
 }
 
-export function ReplyCard({
-  reply,
+export function ReplyCard({ 
+  reply, 
   postId,
-  onVote,
+  onVote, 
   onReply,
   onEdit,
   onDelete,
@@ -38,7 +38,12 @@ export function ReplyCard({
   const [editContent, setEditContent] = useState(reply.content);
 
   const authorName = reply.author?.full_name || 'Utilizator Anonim';
-  const authorInitials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const authorInitials = authorName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   const isOwner = user?.id === reply.user_id;
   const canReply = reply.depth < 3;
@@ -49,37 +54,37 @@ export function ReplyCard({
       setIsEditing(false);
     }
   };
-console.log('Reply downvotes:', reply.downvotes_count, reply);
 
   return (
-    <div className={cn(
-      "flex gap-2 md:gap-3 transition-all",
-      reply.depth > 0 && "ml-3 md:ml-12 mt-4 pl-3 md:pl-0 border-l-2 md:border-l-0 border-slate-100 dark:border-slate-800"
-    )}>
+    <div className={cn("flex gap-3", reply.depth > 0 && "ml-12 mt-4")}>
       {/* Avatar */}
-      <Avatar className={cn(
-        "shrink-0 transition-all",
-        reply.depth > 0 ? "h-6 w-6 md:h-8 md:w-8" : "h-8 w-8 md:h-10 md:w-10"
-      )}>
+      <Avatar className="h-8 w-8 shrink-0">
         <AvatarImage src={reply.author?.avatar_url || undefined} alt={authorName} />
-        <AvatarFallback className="text-[10px] md:text-xs">{authorInitials}</AvatarFallback>
+        <AvatarFallback className="text-xs">{authorInitials}</AvatarFallback>
       </Avatar>
 
-      <div className="flex-1 min-w-0 text-left">
+      <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <Link
             to={`/profil/${reply.author?.username || reply.user_id}`}
-            className="font-bold text-xs md:text-sm hover:text-primary transition-colors truncate max-w-[120px] md:max-w-none"
+            className="font-semibold text-sm hover:text-primary transition-colors"
+            onClick={(e) => e.stopPropagation()}
           >
             {authorName}
           </Link>
-          <div className="flex items-center gap-1.5">
-            {reply.author?.id && <ReputationBadge userId={reply.author.id} showPoints={false} />}
-            <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">
-              {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: ro })}
-            </span>
-          </div>
+          {reply.author?.id && <ReputationBadge userId={reply.author.id} showPoints={false} />}
+          <span className="text-xs text-muted-foreground">
+            {formatDistanceToNow(new Date(reply.created_at), {
+              addSuffix: true,
+              locale: ro,
+            })}
+          </span>
+          {reply.depth > 0 && (
+            <Badge variant="outline" className="text-xs">
+              Nivel {reply.depth}
+            </Badge>
+          )}
         </div>
 
         {/* Content */}
@@ -88,87 +93,105 @@ console.log('Reply downvotes:', reply.downvotes_count, reply);
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full min-h-[100px] p-2 text-sm border rounded-xl bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              className="w-full min-h-[100px] p-2 border rounded-md"
             />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSubmitEdit}>Salvează</Button>
-              <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>Anulează</Button>
+              <Button size="sm" onClick={handleSubmitEdit}>
+                Salvează
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
+                Anulează
+              </Button>
             </div>
           </div>
         ) : (
-          <div className="mb-2 text-sm md:text-base leading-relaxed break-words">
+          <div className="mb-3">
             <MarkdownContent content={reply.content} />
           </div>
         )}
 
-        {/* Actions Bar */}
-        <div className="flex flex-wrap items-center gap-1 md:gap-2">
-          <div className="flex items-center bg-slate-50 dark:bg-slate-800/50 rounded-lg p-0.5 border dark:border-slate-800">
-            {/* Buton Upvote */}
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Vote buttons */}
+          <div className="flex items-center gap-1">
             <Button
-              variant="ghost"
               size="sm"
+              variant={reply.user_vote === 'upvote' ? 'default' : 'ghost'}
               onClick={() => onVote(reply.id, 'upvote')}
               disabled={!user}
-              className={cn(
-                "h-7 px-2 rounded-md transition-colors flex items-center gap-1",
-                reply.user_vote === 'upvote' && "text-primary bg-primary/10"
-              )}
+              className="h-7 px-2"
             >
-              <ThumbsUp className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium">{reply.upvotes_count || 0}</span>
+              <ThumbsUp className="h-3 w-3 mr-1" />
+              {reply.upvotes_count}
             </Button>
-
-            {/* Separator vertical */}
-            <div className="w-[1px] h-3 bg-slate-200 dark:bg-slate-700 mx-0.5" />
-
-            {/* Buton Downvote */}
             <Button
-              variant="ghost"
               size="sm"
+              variant={reply.user_vote === 'downvote' ? 'default' : 'ghost'}
               onClick={() => onVote(reply.id, 'downvote')}
               disabled={!user}
-              className={cn(
-                "h-7 px-2 rounded-md transition-colors flex items-center gap-1",
-                reply.user_vote === 'downvote' && "text-destructive bg-destructive/10"
-              )}
+              className="h-7 px-2"
             >
-              <ThumbsDown className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium">{reply.downvotes_count || 0}</span>
+              <ThumbsDown className="h-3 w-3 mr-1" />
+              {reply.downvotes_count}
             </Button>
           </div>
 
-          {/* Reply Button */}
+          {/* Reply button */}
           {canReply && user && (
             <Button
               size="sm"
               variant="ghost"
               onClick={() => setShowReplyForm(!showReplyForm)}
-              className="h-7 text-xs font-medium text-slate-500"
+              className="h-7"
             >
-              <MessageSquare className="h-3.5 w-3.5 mr-1" />
+              <MessageSquare className="h-3 w-3 mr-1" />
               Răspunde
             </Button>
           )}
 
-          {/* Owner Actions */}
+          {/* Edit/Delete for owner */}
           {isOwner && !isEditing && (
-            <div className="flex items-center gap-1">
-              <Button size="sm" variant="ghost" onClick={() => setIsEditing(true)} className="h-7 w-7 p-0">
-                <Edit className="h-3.5 w-3.5 text-slate-400" />
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsEditing(true)}
+                className="h-7"
+              >
+                <Edit className="h-3 w-3 mr-1" />
+                Editează
               </Button>
               {onDelete && (
-                <Button size="sm" variant="ghost" onClick={() => onDelete(reply.id)} className="h-7 w-7 p-0 text-destructive/70">
-                  <Trash2 className="h-3.5 w-3.5" />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onDelete(reply.id)}
+                  className="h-7 text-destructive"
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Șterge
                 </Button>
               )}
-            </div>
+            </>
+          )}
+
+          {/* Report button */}
+          {!isOwner && user && onReport && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onReport(reply.id)}
+              className="h-7"
+            >
+              <Flag className="h-3 w-3 mr-1" />
+              Raportează
+            </Button>
           )}
         </div>
 
-        {/* Reply Form Injection */}
+        {/* Reply form */}
         {showReplyForm && (
-          <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="mt-3">
             <ReplyForm
               postId={postId}
               parentReplyId={reply.id}
@@ -181,9 +204,9 @@ console.log('Reply downvotes:', reply.downvotes_count, reply);
           </div>
         )}
 
-        {/* Nested Replies Recursion */}
+        {/* Nested replies */}
         {reply.replies && reply.replies.length > 0 && (
-          <div className="mt-2 space-y-2 md:space-y-4">
+          <div className="mt-4 space-y-4">
             {reply.replies.map((nestedReply) => (
               <ReplyCard
                 key={nestedReply.id}

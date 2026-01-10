@@ -265,109 +265,6 @@ export default function ObjectiveSingle() {
     );
   }
 
-  const customProseStyles = `
-  .objective-content h2 {
-    font-size: 1.3rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid hsl(var(--border));
-    font-weight: 700;
-  }
-  
-  .objective-content h3 {
-    font-size: 1.2rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    font-weight: 700;
-  }
-  
-  .objective-content p {
-    font-size: 1rem;
-    line-height: 1.75;
-    margin-bottom: 1rem;
-  }
-  
-  .objective-content p + h2 {
-    margin-top: 2rem;
-  }
-  
-  .objective-content p + h3 {
-    margin-top: 1.5rem;
-  }
-  
-  /* Liste cu bullet points */
-  .objective-content ul {
-    list-style-type: disc;
-    margin-left: 1.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-left: 0.5rem;
-  }
-  
-  .objective-content ul li {
-    margin-bottom: 0.5rem;
-    padding-left: 0.5rem;
-  }
-  
-  .objective-content ul li p {
-    margin: 0;
-    display: inline;
-  }
-  
-  /* Liste numerotate */
-  .objective-content ol {
-    list-style-type: decimal;
-    margin-left: 1.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-left: 0.5rem;
-  }
-  
-  .objective-content ol li {
-    margin-bottom: 0.75rem;
-    padding-left: 0.5rem;
-  }
-  
-  .objective-content ol li p {
-    margin: 0;
-    display: inline;
-  }
-  
-  /* Links */
-  .objective-content a {
-    color: hsl(var(--primary));
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  .objective-content a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Strong și Emphasis */
-  .objective-content strong {
-    font-weight: 700;
-  }
-  
-  .objective-content em {
-    font-style: italic;
-  }
-  
-  /* Blockquote */
-  .objective-content blockquote {
-    border-left: 4px solid hsl(var(--primary));
-    background: hsl(var(--muted) / 0.5);
-    padding: 1rem 1.5rem;
-    margin: 1.5rem 0;
-    font-style: italic;
-  }
-  
-  .objective-content blockquote p {
-    margin: 0;
-  }
-`;
-
   // Success State
   return (
     <>
@@ -473,13 +370,10 @@ export default function ObjectiveSingle() {
                   Despre {objective.title}
                 </h2>
                 {sanitizedDescription ? (
-                  <>
-                    <style>{customProseStyles}</style>
-                    <div
-                      className="objective-content prose prose-slate dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
-                      dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
-                    />
-                  </>
+                  <div
+                    className="prose prose-slate dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
+                    dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+                  />
                 ) : objective.excerpt ? (
                   <p className="text-lg text-muted-foreground leading-relaxed">{objective.excerpt}</p>
                 ) : (

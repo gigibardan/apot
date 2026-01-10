@@ -72,7 +72,7 @@ export default function BlogPage() {
              style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-0 pointer-events-none" />
 
-        <Container className="relative z-10 py-12 md:py-16">
+        <Container className="relative z-10 py-12 md:py-20">
           <div className="flex flex-col lg:flex-row gap-10 items-center justify-between">
             <div className="text-center lg:text-left space-y-4 max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary-foreground text-xs font-medium border border-primary/30 mb-2">
@@ -82,7 +82,7 @@ export default function BlogPage() {
               <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-white">
                 Blog <span className="text-primary">APOT</span>
               </h1>
-              <p className="text-lg text-white/70 leading-relaxed">
+              <p className="text-lg text-slate-400 leading-relaxed">
                 Descoperă ghiduri, sfaturi utile și povești inspiraționale din întreaga lume.
               </p>
             </div>
@@ -94,7 +94,7 @@ export default function BlogPage() {
                 placeholder="Caută un subiect..."
                 className="w-full bg-slate-800/50 border-slate-700 text-black placeholder:text-slate-500 focus-visible:ring-primary"
               />
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-white/60 uppercase tracking-wider font-semibold">
+              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
                 <span>Sugestii:</span>
                 <button onClick={() => setSearchQuery("munte")} className="hover:text-primary transition-colors">#munte</button>
                 <button onClick={() => setSearchQuery("city break")} className="hover:text-primary transition-colors">#citybreak</button>
@@ -187,9 +187,9 @@ export default function BlogPage() {
         )}
 
         {/* Titlu Secțiune & Counter */}
-        <div className="mb-8 flex items-end justify-between border-b border-border pb-4">
+        <div className="mb-8 flex items-end justify-between border-b pb-4">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground capitalize">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 capitalize">
                 {category === "all" ? "Explorează noutățile" : category}
             </h2>
             <p className="text-muted-foreground text-sm mt-1">

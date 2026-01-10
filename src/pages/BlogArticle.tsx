@@ -230,19 +230,17 @@ export default function BlogArticle() {
   // Add this right before the return statement in BlogArticle component
 const customProseStyles = `
   .article-content h2 {
-    font-size: 1.3rem;
-    margin-top: 1rem;
+    font-size: 1.875rem;
+    margin-top: 1 rem;
     margin-bottom: 1rem;
     padding-top: 1rem;
     border-top: 1px solid hsl(var(--border));
-    font-weight: 700;
   }
   
   .article-content h3 {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     margin-top: 1rem;
     margin-bottom: 0.75rem;
-    font-weight: 700;
   }
   
   .article-content p {
@@ -257,77 +255,6 @@ const customProseStyles = `
   
   .article-content p + h3 {
     margin-top: 1.5rem;
-  }
-  
-  /* Liste cu bullet points */
-  .article-content ul {
-    list-style-type: disc;
-    margin-left: 1.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-left: 0.5rem;
-  }
-  
-  .article-content ul li {
-    margin-bottom: 0.5rem;
-    padding-left: 0.5rem;
-  }
-  
-  .article-content ul li p {
-    margin: 0;
-    display: inline;
-  }
-  
-  /* Liste numerotate */
-  .article-content ol {
-    list-style-type: decimal;
-    margin-left: 1.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-left: 0.5rem;
-  }
-  
-  .article-content ol li {
-    margin-bottom: 0.75rem;
-    padding-left: 0.5rem;
-  }
-  
-  .article-content ol li p {
-    margin: 0;
-    display: inline;
-  }
-  
-  /* Links */
-  .article-content a {
-    color: hsl(var(--primary));
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  .article-content a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Strong și Emphasis */
-  .article-content strong {
-    font-weight: 700;
-  }
-  
-  .article-content em {
-    font-style: italic;
-  }
-  
-  /* Blockquote */
-  .article-content blockquote {
-    border-left: 4px solid hsl(var(--primary));
-    background: hsl(var(--muted) / 0.5);
-    padding: 1rem 1.5rem;
-    margin: 1.5rem 0;
-    font-style: italic;
-  }
-  
-  .article-content blockquote p {
-    margin: 0;
   }
 `;
 
@@ -423,7 +350,7 @@ const customProseStyles = `
       </Section>
 
       {/* Main Content */}
-      <Section className="py-4">
+      <Section className="py-8">
         <Container>
           <div className="grid lg:grid-cols-[1fr_350px] gap-12">
             {/* Article Content */}

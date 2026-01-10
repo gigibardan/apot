@@ -12,8 +12,7 @@ import { DashboardFavorites } from "@/components/features/dashboard/DashboardFav
 import { DashboardReviews } from "@/components/features/dashboard/DashboardReviews";
 import { DashboardMessages } from "@/components/features/dashboard/DashboardMessages";
 import { DashboardActivity } from "@/components/features/dashboard/DashboardActivity";
-import { DashboardContestSubmissions } from "@/components/features/dashboard/DashboardContestSubmissions";
-import { User, Heart, Star, MessageSquare, Activity, Settings, Book, Trophy, Users, Camera } from "lucide-react";
+import { User, Heart, Star, MessageSquare, Activity, Settings, Book, Trophy, Users } from "lucide-react";
 
 /**
  * User Dashboard
@@ -50,7 +49,7 @@ export default function UserDashboard() {
 
           {/* Dashboard Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-10 gap-2">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 gap-2">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <Activity className="w-4 h-4" />
                 <span className="hidden sm:inline">Overview</span>
@@ -70,10 +69,6 @@ export default function UserDashboard() {
               <TabsTrigger value="journals" className="flex items-center gap-2">
                 <Book className="w-4 h-4" />
                 <span className="hidden sm:inline">Journals</span>
-              </TabsTrigger>
-              <TabsTrigger value="contests" className="flex items-center gap-2">
-                <Camera className="w-4 h-4" />
-                <span className="hidden sm:inline">Concursuri</span>
               </TabsTrigger>
               <TabsTrigger value="challenges" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
@@ -150,19 +145,6 @@ export default function UserDashboard() {
                   <p className="text-muted-foreground text-center py-8">
                     Journals feature coming soon - meanwhile, visit <a href="/journals" className="text-primary hover:underline">Travel Journals</a> to create your first journal!
                   </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Contests Tab */}
-            <TabsContent value="contests">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Participările Mele la Concursuri</CardTitle>
-                  <CardDescription>Fotografiile tale trimise în concursuri</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DashboardContestSubmissions userId={user!.id} />
                 </CardContent>
               </Card>
             </TabsContent>

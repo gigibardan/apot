@@ -357,54 +357,36 @@ export type Database = {
       }
       contest_submissions: {
         Row: {
-          accepted_terms: boolean
-          admin_notes: string | null
           contest_id: string
           created_at: string
           description: string | null
           id: string
           image_url: string
           objective_id: string | null
-          rejection_reason: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: string
           title: string
           user_id: string
           votes_count: number | null
           winner_rank: number | null
         }
         Insert: {
-          accepted_terms?: boolean
-          admin_notes?: string | null
           contest_id: string
           created_at?: string
           description?: string | null
           id?: string
           image_url: string
           objective_id?: string | null
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string
           title: string
           user_id: string
           votes_count?: number | null
           winner_rank?: number | null
         }
         Update: {
-          accepted_terms?: boolean
-          admin_notes?: string | null
           contest_id?: string
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string
           objective_id?: string | null
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string
           title?: string
           user_id?: string
           votes_count?: number | null
@@ -2828,10 +2810,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      approve_submission: {
-        Args: { p_admin_notes?: string; p_submission_id: string }
-        Returns: boolean
-      }
       award_badge: {
         Args: {
           p_badge_description: string
@@ -2847,10 +2825,6 @@ export type Database = {
       }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
       expire_suspensions: { Args: never; Returns: undefined }
-      get_contest_submission_stats: {
-        Args: { p_contest_id: string }
-        Returns: Json
-      }
       has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
       is_user_banned: { Args: { _user_id: string }; Returns: boolean }
       log_activity: {
@@ -2864,14 +2838,6 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
-      }
-      reject_submission: {
-        Args: { p_rejection_reason: string; p_submission_id: string }
-        Returns: boolean
-      }
-      remove_submission: {
-        Args: { p_reason: string; p_submission_id: string }
-        Returns: boolean
       }
     }
     Enums: {
