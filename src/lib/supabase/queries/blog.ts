@@ -93,13 +93,23 @@ export async function getFeaturedArticles(limit: number = 3) {
 export async function getBlogArticleBySlug(slug: string) {
   const { data, error } = await supabase
     .from("blog_articles")
-    .select("*")
+    .select(`
+      *,
+      author:profiles!blog_articles_author_id_fkey (
+        id,
+        full_name,
+        avatar_url,
+        bio
+      )
+    `)
     .eq("slug", slug)
     .eq("published", true)
     .single();
 
   if (error) throw error;
-  return data as BlogArticle;
+  return data as BlogArticle & { 
+    author: { id: string; full_name: string | null; avatar_url: string | null; bio: string | null } | null 
+  };
 }
 
 /**
