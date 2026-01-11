@@ -19,6 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getFavoritesCount } from "@/lib/supabase/queries/favorites";
 import { NotificationBell } from "@/components/features/forum/NotificationBell";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
+import { InstallPWAMenuItem } from "@/components/features/pwa/InstallPWAMenuItem";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -390,6 +391,9 @@ export function Header() {
                     </Link>
                   </div>
                 )}
+
+                {/* PWA Install Button - Last item */}
+                <InstallPWAMenuItem onInstallClick={() => setMobileMenuOpen(false)} />
 
                 {/* Bottom safe area */}
                 <div className="h-20" />
