@@ -23,6 +23,8 @@ import { createBlogArticle, updateBlogArticle } from "@/lib/supabase/mutations/b
 import { getBlogArticleById } from "@/lib/supabase/queries/blog";
 import { slugify } from "@/lib/utils";
 import { Constants } from "@/integrations/supabase/types";
+import { useAuth } from "@/contexts/AuthContext";
+
 
 const blogCategories = Constants.public.Enums.blog_category;
 
@@ -44,6 +46,7 @@ type ArticleFormData = z.infer<typeof articleSchema>;
 export default function BlogArticleForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth(); 
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(!!id);
   const [tagInput, setTagInput] = useState("");
@@ -126,6 +129,7 @@ export default function BlogArticleForm() {
         meta_description: data.meta_description || null,
         published,
         published_at: published ? new Date().toISOString() : null,
+        author_id: user?.id || null,
       };
 
       if (id) {
