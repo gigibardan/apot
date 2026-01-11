@@ -59,6 +59,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_chatbot_usage: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       authorized_guides: {
         Row: {
           created_at: string | null

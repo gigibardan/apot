@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Plus, Calendar, Clock, Pencil, Trash2, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import DOMPurify from "dompurify";
 
 interface ContestFormData {
   title: string;
@@ -258,7 +259,13 @@ export default function ContestsAdmin() {
                 {contest.description && (
                   <div 
                     className="text-muted-foreground prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: contest.description }}
+                    dangerouslySetInnerHTML={{ 
+                      __html: DOMPurify.sanitize(contest.description, {
+                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a', 'blockquote'],
+                        ALLOWED_ATTR: ['href', 'target', 'rel'],
+                        ALLOW_DATA_ATTR: false
+                      })
+                    }}
                   />
                 )}
 

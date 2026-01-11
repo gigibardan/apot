@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, Clock, Eye, MapPin, User, ArrowLeft, Share2 } from "lucide-react";
@@ -18,6 +18,7 @@ import { JournalComments } from "@/components/features/journals/JournalComments"
 import { FollowButton } from "@/components/features/social/FollowButton";
 import { format } from "date-fns";
 import { ro } from "date-fns/locale";
+import DOMPurify from "dompurify";
 
 export default function JournalSingle() {
   const { slug } = useParams<{ slug: string }>();
@@ -99,6 +100,16 @@ export default function JournalSingle() {
       .join("")
       .toUpperCase() || "?";
   };
+
+  // Sanitize HTML content to prevent XSS
+  const sanitizedContent = useMemo(() => {
+    if (!journal?.content) return "";
+    return DOMPurify.sanitize(journal.content, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'div', 'span'],
+      ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'title', 'class'],
+      ALLOW_DATA_ATTR: false
+    });
+  }, [journal?.content]);
 
   if (isLoading) {
     return (
@@ -258,7 +269,7 @@ export default function JournalSingle() {
 
             {/* Content */}
             <div className="prose prose-lg dark:prose-invert max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: journal.content }} />
+              <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
             </div>
 
             {/* Gallery */}
