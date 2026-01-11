@@ -66,10 +66,27 @@ serve(async (req) => {
       .from('profiles')
       .select('id, full_name, avatar_url')
 
+    // Get active bans for all users
+    const { data: activeBans } = await supabaseAdmin
+      .from('user_bans')
+      .select('user_id, ban_type, expires_at, reason')
+      .eq('is_active', true)
+
+    // Create a map of user bans for quick lookup
+    const banMap = new Map<string, { status: 'banned' | 'suspended', expires_at: string | null, reason: string }>()
+    activeBans?.forEach(ban => {
+      banMap.set(ban.user_id, {
+        status: ban.ban_type === 'ban' ? 'banned' : 'suspended',
+        expires_at: ban.expires_at,
+        reason: ban.reason
+      })
+    })
+
     // Combine data
     const usersWithDetails = users.map(user => {
       const userRole = roles?.find(r => r.user_id === user.id)?.role || 'user'
       const profile = profiles?.find(p => p.id === user.id)
+      const banInfo = banMap.get(user.id)
       
       return {
         id: user.id,
@@ -79,7 +96,11 @@ serve(async (req) => {
         role: userRole,
         created_at: user.created_at,
         last_sign_in_at: user.last_sign_in_at,
-        email_confirmed_at: user.email_confirmed_at
+        email_confirmed_at: user.email_confirmed_at,
+        // Status: active, banned, or suspended
+        status: banInfo?.status || 'active',
+        ban_expires_at: banInfo?.expires_at || null,
+        ban_reason: banInfo?.reason || null
       }
     })
 

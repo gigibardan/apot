@@ -31,7 +31,11 @@ interface UserBan {
   };
 }
 
-export default function UserBanManagement() {
+interface UserBanManagementProps {
+  onBanChange?: () => void;
+}
+
+export default function UserBanManagement({ onBanChange }: UserBanManagementProps) {
   const [bans, setBans] = useState<UserBan[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -114,6 +118,7 @@ export default function UserBanManagement() {
       setDialogOpen(false);
       resetForm();
       loadBans();
+      onBanChange?.();
     } catch (error) {
       console.error("Error creating ban:", error);
       toast.error("Eroare la crearea ban-ului");
@@ -133,6 +138,7 @@ export default function UserBanManagement() {
 
       toast.success("Ban ridicat cu succes!");
       loadBans();
+      onBanChange?.();
     } catch (error) {
       console.error("Error removing ban:", error);
       toast.error("Eroare la ridicarea ban-ului");
