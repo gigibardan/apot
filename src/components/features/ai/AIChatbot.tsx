@@ -158,6 +158,7 @@ export function AIChatbot() {
           isOpen && "hidden"
         )}
         size="icon"
+        aria-label="Deschide asistentul de călătorie"
       >
         <MessageCircle className="h-6 w-6" />
       </Button>
@@ -173,6 +174,7 @@ export function AIChatbot() {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
+              aria-label="Închide chat"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -227,6 +229,7 @@ export function AIChatbot() {
                   disabled={isLoading || !input.trim()}
                   size="icon"
                   className="flex-shrink-0"
+                  aria-label="Trimite mesaj"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
