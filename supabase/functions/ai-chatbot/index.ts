@@ -1,9 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Rate limit: 20 requests per hour per user
+const RATE_LIMIT_REQUESTS = 20;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -13,6 +18,8 @@ serve(async (req) => {
   try {
     const { messages } = await req.json();
     const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!GROQ_API_KEY) {
       console.error("GROQ_API_KEY not configured");
@@ -23,6 +30,75 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Initialize Supabase client with service role for rate limiting
+    const supabaseAdmin = createClient(
+      SUPABASE_URL!,
+      SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Extract user from authorization header
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      
+      // Try to get user from token (if it's a user JWT, not just the anon key)
+      const supabaseClient = createClient(SUPABASE_URL!, token);
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      
+      if (!userError && user) {
+        userId = user.id;
+      }
+    }
+
+    // If no authenticated user, check IP-based rate limit instead
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+
+    // Rate limiting check
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+    
+    let rateLimitQuery;
+    if (userId) {
+      // User-based rate limiting
+      rateLimitQuery = await supabaseAdmin
+        .from('ai_chatbot_usage')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', windowStart);
+    } else {
+      // IP-based rate limiting for anonymous users (stricter: 10 requests/hour)
+      rateLimitQuery = await supabaseAdmin
+        .from('ai_chatbot_usage')
+        .select('id', { count: 'exact', head: true })
+        .eq('ip_address', clientIP)
+        .is('user_id', null)
+        .gte('created_at', windowStart);
+    }
+
+    const requestCount = rateLimitQuery.count || 0;
+    const maxRequests = userId ? RATE_LIMIT_REQUESTS : 10; // Anonymous users get fewer requests
+
+    if (requestCount >= maxRequests) {
+      console.log(`Rate limit exceeded for ${userId ? 'user ' + userId : 'IP ' + clientIP}: ${requestCount}/${maxRequests}`);
+      return new Response(JSON.stringify({ 
+        error: "Ai depășit limita de cereri. Te rugăm să încerci din nou mai târziu sau să te autentifici pentru mai multe cereri." 
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Log usage for rate limiting
+    await supabaseAdmin.from('ai_chatbot_usage').insert({
+      user_id: userId,
+      ip_address: clientIP,
+    });
+
+    console.log(`AI request from ${userId ? 'user ' + userId : 'IP ' + clientIP}: ${requestCount + 1}/${maxRequests}`);
 
     const systemPrompt = `Ești asistent de călătorie expert pentru APOT.ro - platformă românească de turism internațional și local.
 
@@ -68,45 +144,6 @@ Pentru întrebări simple → Direct la subiect, fără fluff
 Pentru planificare → Itinerariu concret cu zile, buget, transport
 Pentru topicuri largi → Esențialul + întrebare smart: "Vrei detalii despre [opțiune 1], [opțiune 2] sau [opțiune 3]?"
 
-✅ EXEMPLE BUNE:
-
-User: "Când e cel mai bun sezon pentru Bali?"
-AI: "Cel mai bun sezon pentru Bali e aprilie-octombrie (sezon uscat) când ploile sunt rare și temperaturile sunt perfecte la 28-32°C. Iulie-august sunt lunile de vârf cu cele mai multe turisme și prețuri ridicate, așa că pentru cel mai bun raport calitate-preț recomand mai-iunie sau septembrie.
-
-Sezonul ploilor (noiembrie-martie) nu e de evitat complet. Ploile sunt scurte și intense (după-amiaza de obicei), prețurile sunt mai mici cu 30-40%, iar dimineața poți avea plajele aproape goale. Depinde dacă vrei soare garantat sau buget mai mic și mai puține mulțimi."
-
-User: "7 zile în Italia?"
-AI: "Pentru 7 zile în Italia recomand circuitul clasic Roma-Florența-Veneția care combină istoria antică, arta renascentistă și romantismul canalelor.
-
-Împarte zilele astfel: Roma 3 zile pentru Colosseum, Vatican și Fontana di Trevi, Florența 2 zile pentru Uffizi, Domul și Ponte Vecchio, Veneția 2 zile pentru San Marco, canale și insulele Murano și Burano. Trenurile rapide Frecciarossa leagă orașele în 1h30-2h, foarte comod.
-
-Bugetul estimat e 1200-1800 EUR per persoană incluzând cazare mid-range (70-100 EUR/noapte), tren (passes de 100-150 EUR), mese (30-50 EUR/zi) și intrări (150-200 EUR total). Sezonul ideal e aprilie-iunie sau septembrie-octombrie când e cald dar fără aglomerație extremă de turiști.
-
-Pe APOT.ro găsești ghizi locali în fiecare oraș care pot organiza tururi personalizate și îți pot recomanda restaurante autentice departe de capcane turistice."
-
-User: "Spune-mi despre Japonia"
-AI: "Japonia îmbină perfect tradiția milenară cu tehnologia de vârf oferind o experiență unică. Tokyo fascinează cu energia urbană non-stop, de la cartierul futurist Shibuya la temple liniștite ca Senso-ji. Kyoto păstrează peste 2000 de temple și sanctuare, iar tunelul de porți torii roșii de la Fushimi Inari e spectaculos.
-
-Gastronomia merită explorată dincolo de sushi. Ramen autentic într-un local mic din Tokyo, tempura proaspătă în Osaka sau kaiseki (meniu tradițional multi-feluri) într-o ryokan (pensiune tradițională) sunt experiențe de neuitat. Cultura japoneză surprinde prin contraste: de la ceremonia ceaiului zen până la karaoke vibrant și cafenele cu pisici.
-
-Cel mai bun sezon e primăvara (martie-mai) pentru flori de cireș sau toamna (septembrie-noiembrie) pentru frunze roșii. Bugetul pentru 10-12 zile variază între 2500-4000 EUR incluzând JR Pass pentru trenuri, cazare și intrări.
-
-Te interesează un itinerariu detaliat Tokyo-Kyoto-Osaka cu recomandări de cazare, informații despre cum funcționează sistemul de trenuri și JR Pass, sau sfaturi practice despre cultură și etichetă japoneză? Ce aspect te atrage cel mai mult?"
-
-❌ EXEMPLE GREȘITE:
-
-Greșit (prea verbose):
-"**Geografie:**
-- Spania se află în Peninsula Iberică
-- Are vecini Portugalia și Franța
-- Include insule Baleare și Canare
-**Climă:**
-- Mediteraneană la coaste
-- Continentală în interior..."
-
-Corect:
-"Spania ocupă Peninsula Iberică în sud-vestul Europei, cu Portugalia la vest și Franța la nord. Include și insulele Baleare în Mediterană și Canarele în Atlantic. Clima variază de la mediteraneană caldă pe coaste la continentală în interior cu veri fierbinți și ierni reci."
-
 🎨 TON: Prietenos, entuziast, natural, expert dar accesibil. Răspunde DOAR în română.
 
 🌱 VALORI: Turism responsabil, protejarea patrimoniului, experiențe autentice, susținerea comunităților locale.
@@ -130,7 +167,7 @@ Corect:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile", // Groq's best free model!
+          model: "llama-3.3-70b-versatile",
           messages: groqMessages,
           stream: true,
           max_tokens: 3072,
@@ -175,7 +212,7 @@ Corect:
           }
 
           let buffer = '';
-          let fullText = ''; // BUFFER GLOBAL - acumulăm tot textul
+          let fullText = '';
 
           while (true) {
             const { done, value } = await reader.read();
@@ -195,7 +232,6 @@ Corect:
                   const text = data.choices?.[0]?.delta?.content;
                   
                   if (text) {
-                    // DOAR acumulăm - NU trimitem încă
                     fullText += text;
                   }
                 } catch (e) {
@@ -205,9 +241,8 @@ Corect:
             }
           }
 
-          // AICI procesăm TOT textul acumulat
+          // Process all accumulated text
           const cleanedText = fullText
-            // Fix spații între cuvinte lipiite
             .replace(/([a-zăîâșț])([A-ZĂÎÂȘȚ])/g, '$1 $2')
             .replace(/\.([A-ZĂÎÂȘȚ])/g, '. $1')
             .replace(/,([a-zăîâșțA-ZĂÎÂȘȚ])/g, ', $1')
@@ -215,7 +250,6 @@ Corect:
             .replace(/;([a-zăîâșțA-ZĂÎÂȘȚ])/g, '; $1')
             .replace(/\)([a-zăîâșțA-ZĂÎÂȘȚ])/g, ') $1')
             .replace(/([a-zăîâșțA-ZĂÎÂȘȚ])\(/g, '$1 (')
-            // Curăță markdown
             .replace(/\*\*([^*]+)\*\*/g, '$1')
             .replace(/\*([^*]+)\*/g, '$1')
             .replace(/^#{1,6}\s+/gm, '')
@@ -224,11 +258,10 @@ Corect:
             .replace(/`([^`]+)`/g, '$1')
             .replace(/^>\s+/gm, '')
             .replace(/^\d+\.\s+/gm, '• ')
-            // Normalizează spații multiple
             .replace(/\s+/g, ' ')
             .trim();
 
-          // Trimite TOT textul curat dintr-o dată
+          // Send all cleaned text at once
           controller.enqueue(encoder.encode(
             `data: ${JSON.stringify({
               choices: [{

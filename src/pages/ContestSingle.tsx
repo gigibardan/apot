@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getContestBySlug, getContestSubmissions, getUserVote, getUserSubmissionStatus } from "@/lib/supabase/queries/contests";
@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
+import DOMPurify from "dompurify";
 
 interface SubmissionFormData {
   title: string;
@@ -112,6 +113,25 @@ export default function ContestSingle() {
   const isVoting = contest.status === "voting";
   const isEnded = contest.status === "ended";
 
+  // Sanitize HTML content to prevent XSS
+  const sanitizedDescription = useMemo(() => {
+    if (!contest?.description) return "";
+    return DOMPurify.sanitize(contest.description, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a', 'blockquote'],
+      ALLOWED_ATTR: ['href', 'target', 'rel'],
+      ALLOW_DATA_ATTR: false
+    });
+  }, [contest?.description]);
+
+  const sanitizedPrizes = useMemo(() => {
+    if (!contest?.prizes_description) return "";
+    return DOMPurify.sanitize(contest.prizes_description, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a', 'blockquote'],
+      ALLOWED_ATTR: ['href', 'target', 'rel'],
+      ALLOW_DATA_ATTR: false
+    });
+  }, [contest?.prizes_description]);
+
   return (
     <>
       <SEO title={contest.title} description={contest.description} ogImage={contest.cover_image} />
@@ -149,7 +169,7 @@ export default function ContestSingle() {
                   <h3 className="font-semibold mb-3">Despre Concurs</h3>
                   <div 
                     className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: contest.description }}
+                    dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
                   />
                 </CardContent>
               </Card>
@@ -160,7 +180,7 @@ export default function ContestSingle() {
                   <h3 className="font-semibold mb-3">Premii</h3>
                   <div 
                     className="prose prose-sm dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: contest.prizes_description }}
+                    dangerouslySetInnerHTML={{ __html: sanitizedPrizes }}
                   />
                 </CardContent>
               </Card>
