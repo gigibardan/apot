@@ -202,7 +202,7 @@ export function DashboardProfile({ userId }: DashboardProfileProps) {
             <Input
               id="email"
               type="email"
-              value={profile?.id || ""}
+              value={profile?.email || ""} 
               disabled
               className="bg-muted"
             />
