@@ -12,6 +12,8 @@ Disallow: /auth/
 # Disallow API endpoints
 Disallow: /api/
 
+Disallow: /test-database
+
 # Disallow search result pages with parameters (to avoid duplicate content)
 Disallow: /*?search=*
 Disallow: /*?page=*
