@@ -1,17 +1,6 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 
 const BASE_URL = "https://apot.club";
-
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY!;
-
-interface SitemapURL {
-  loc: string;
-  lastmod?: string;
-  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
-  priority?: number;
-}
 
 function escapeXml(str: string): string {
   return str.replace(/[<>&'"]/g, (c) => {
@@ -30,12 +19,18 @@ function toISODate(ts: string): string {
   return new Date(ts).toISOString().split("T")[0];
 }
 
+interface SitemapURL {
+  loc: string;
+  lastmod?: string;
+  changefreq?: string;
+  priority?: number;
+}
+
 function buildXml(urls: SitemapURL[]): string {
   const lines: string[] = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   ];
-
   for (const url of urls) {
     lines.push("  <url>");
     lines.push(`    <loc>${escapeXml(url.loc)}</loc>`);
@@ -44,30 +39,27 @@ function buildXml(urls: SitemapURL[]): string {
     if (url.priority !== undefined) lines.push(`    <priority>${url.priority.toFixed(1)}</priority>`);
     lines.push("  </url>");
   }
-
   lines.push("</urlset>");
   return lines.join("\n");
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: Request): Promise<Response> {
   try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    const urls: SitemapURL[] = [];
+    const supabaseUrl = process.env.VITE_SUPABASE_URL!;
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // ── Pagini statice ─────────────────────────────────────────────
-    const staticPages: SitemapURL[] = [
-      { loc: BASE_URL,                      changefreq: "daily",   priority: 1.0 },
-      { loc: `${BASE_URL}/obiective`,        changefreq: "daily",   priority: 0.9 },
-      { loc: `${BASE_URL}/ghizi`,            changefreq: "weekly",  priority: 0.8 },
-      { loc: `${BASE_URL}/ghizi-autorizati`, changefreq: "weekly",  priority: 0.8 },
-      { loc: `${BASE_URL}/blog`,             changefreq: "daily",   priority: 0.8 },
-      { loc: `${BASE_URL}/circuite`,         changefreq: "weekly",  priority: 0.7 },
-      { loc: `${BASE_URL}/despre`,           changefreq: "monthly", priority: 0.5 },
-      { loc: `${BASE_URL}/contact`,          changefreq: "monthly", priority: 0.5 },
+    const urls: SitemapURL[] = [
+      { loc: BASE_URL,                        changefreq: "daily",   priority: 1.0 },
+      { loc: `${BASE_URL}/obiective`,          changefreq: "daily",   priority: 0.9 },
+      { loc: `${BASE_URL}/ghizi`,              changefreq: "weekly",  priority: 0.8 },
+      { loc: `${BASE_URL}/ghizi-autorizati`,   changefreq: "weekly",  priority: 0.8 },
+      { loc: `${BASE_URL}/blog`,               changefreq: "daily",   priority: 0.8 },
+      { loc: `${BASE_URL}/circuite`,           changefreq: "weekly",  priority: 0.7 },
+      { loc: `${BASE_URL}/despre`,             changefreq: "monthly", priority: 0.5 },
+      { loc: `${BASE_URL}/contact`,            changefreq: "monthly", priority: 0.5 },
     ];
-    urls.push(...staticPages);
 
-    // ── Obiective turistice ────────────────────────────────────────
     const { data: objectives } = await supabase
       .from("objectives")
       .select("slug, updated_at")
@@ -84,7 +76,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // ── Ghizi normali (verificați) ─────────────────────────────────
     const { data: guides } = await supabase
       .from("guides")
       .select("slug, updated_at")
@@ -101,7 +92,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // ── Ghizi autorizați SITUR (2500+) ─────────────────────────────
     const { data: authorizedGuides } = await supabase
       .from("authorized_guides")
       .select("slug, updated_at")
@@ -118,7 +108,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // ── Articole blog ──────────────────────────────────────────────
     const { data: articles } = await supabase
       .from("blog_articles")
       .select("slug, updated_at")
@@ -137,12 +126,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const xml = buildXml(urls);
 
-    res.setHeader("Content-Type", "application/xml; charset=utf-8");
-    res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
-    res.status(200).send(xml);
-
+    return new Response(xml, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/xml; charset=utf-8",
+        "Cache-Control": "s-maxage=3600, stale-while-revalidate=86400",
+      },
+    });
   } catch (err) {
     console.error("Sitemap error:", err);
-    res.status(500).send("Error generating sitemap");
+    return new Response("Error generating sitemap", { status: 500 });
   }
 }
