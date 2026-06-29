@@ -347,9 +347,9 @@ The SEO component automatically generates hreflang tags for all pages:
 
 Generated HTML:
 ```html
-<link rel="alternate" hreflang="ro" href="https://apot.ro/ro/obiective/eiffel-tower" />
-<link rel="alternate" hreflang="en" href="https://apot.ro/en/obiective/eiffel-tower" />
-<link rel="alternate" hreflang="x-default" href="https://apot.ro/ro/obiective/eiffel-tower" />
+<link rel="alternate" hreflang="ro" href="https://apot.club/ro/obiective/eiffel-tower" />
+<link rel="alternate" hreflang="en" href="https://apot.club/en/obiective/eiffel-tower" />
+<link rel="alternate" hreflang="x-default" href="https://apot.club/ro/obiective/eiffel-tower" />
 ```
 
 ### Language Attribute

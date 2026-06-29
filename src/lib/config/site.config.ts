@@ -7,7 +7,7 @@ export const siteConfig = {
   name: "APOT",
   fullName: "Asociația pentru Protejarea Obiectivelor Turistice",
   description: "Platformă mondială cu informații detaliate despre obiective turistice din întreaga lume. Descoperă monumente, muzee, parcuri naturale și situri UNESCO.",
-  url: typeof window !== 'undefined' ? window.location.origin : "https://apot.ro",
+  url: typeof window !== 'undefined' ? window.location.origin : "https://apot.club",
   ogImage: "/images/og-image.jpg",
   locale: "ro-RO",
   links: {
@@ -17,7 +17,7 @@ export const siteConfig = {
     jinfotours: "https://jinfotours.ro",
   },
   contact: {
-    email: "contact@apot.ro",
+    email: "contact@apot.club",
     phone: "+40 XXX XXX XXX",
   },
 } as const;

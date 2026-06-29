@@ -122,7 +122,7 @@ export default function Settings() {
                   id="contact_email"
                   type="email"
                   {...register("contact_email")}
-                  placeholder="contact@apot.ro"
+                  placeholder="contact@apot.club"
                   className="mt-2"
                 />
               </div>

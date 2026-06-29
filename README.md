@@ -1,4 +1,4 @@
-# APOT.RO - Tourism Platform
+# apot.club - Tourism Platform
 
 ## 🌍 Overview
 

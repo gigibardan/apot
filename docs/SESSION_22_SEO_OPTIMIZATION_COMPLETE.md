@@ -43,7 +43,7 @@ Edge function that generates dynamic XML sitemap:
 - Category pages: 0.5
 - Static pages: 0.5
 
-**Access:** `https://apot.ro/sitemap`
+**Access:** `https://apot.club/sitemap`
 
 ### 3. Enhanced Meta Tags
 
@@ -138,17 +138,17 @@ All pages now include:
     {
       "@type": "WebSite",
       "name": "APOT",
-      "url": "https://apot.ro",
+      "url": "https://apot.club",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://apot.ro/obiective?search={search_term_string}"
+        "target": "https://apot.club/obiective?search={search_term_string}"
       }
     },
     {
       "@type": "Organization",
       "name": "APOT - Asociația pentru Protejarea Obiectivelor Turistice",
-      "url": "https://apot.ro",
-      "logo": "https://apot.ro/images/logo.png"
+      "url": "https://apot.club",
+      "logo": "https://apot.club/images/logo.png"
     }
   ]
 }
@@ -193,7 +193,7 @@ All pages now include:
     "name": "APOT",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://apot.ro/images/logo.png"
+      "url": "https://apot.club/images/logo.png"
     }
   },
   "timeRequired": "PT8M"
@@ -213,7 +213,7 @@ All pages now include:
    - Validate JSON-LD markup
 
 3. **Google Search Console**
-   - Submit sitemap: https://apot.ro/sitemap
+   - Submit sitemap: https://apot.club/sitemap
    - Monitor indexing status
    - Check for errors
 

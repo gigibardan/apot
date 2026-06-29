@@ -291,10 +291,10 @@ console.log(result.translatedText); // "Text to translate"
 ### Example Meta Tags
 ```html
 <html lang="ro">
-<link rel="canonical" href="https://apot.ro/obiective" />
-<link rel="alternate" hreflang="ro" href="https://apot.ro/obiective" />
-<link rel="alternate" hreflang="en" href="https://apot.ro/en/obiective" />
-<link rel="alternate" hreflang="x-default" href="https://apot.ro/obiective" />
+<link rel="canonical" href="https://apot.club/obiective" />
+<link rel="alternate" hreflang="ro" href="https://apot.club/obiective" />
+<link rel="alternate" hreflang="en" href="https://apot.club/en/obiective" />
+<link rel="alternate" hreflang="x-default" href="https://apot.club/obiective" />
 ```
 
 ---

@@ -85,9 +85,9 @@ Am implementat sistemul complet de multi-language support cu i18next, database t
 **Features SEO:**
 ```html
 <!-- Hreflang tags pentru fiecare limbă -->
-<link rel="alternate" hreflang="ro" href="https://apot.ro/obiective" />
-<link rel="alternate" hreflang="en" href="https://apot.ro/en/obiective" />
-<link rel="alternate" hreflang="x-default" href="https://apot.ro/obiective" />
+<link rel="alternate" hreflang="ro" href="https://apot.club/obiective" />
+<link rel="alternate" hreflang="en" href="https://apot.club/en/obiective" />
+<link rel="alternate" hreflang="x-default" href="https://apot.club/obiective" />
 
 <!-- Lang attribute în HTML tag -->
 <html lang="ro">

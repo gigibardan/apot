@@ -245,7 +245,7 @@ src/
 } />
 ```
 
-**Access:** `https://apot.ro/dashboard`
+**Access:** `https://apot.club/dashboard`
 
 ## Usage Examples
 

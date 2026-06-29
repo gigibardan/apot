@@ -441,7 +441,7 @@ export default function ObjectiveForm() {
                 placeholder="castelul-bran"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                apot.ro/obiective/{formData.slug || "..."}
+                apot.club/obiective/{formData.slug || "..."}
               </p>
             </div>
 

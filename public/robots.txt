@@ -24,7 +24,7 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap location (edge function)
-Sitemap: https://apot.ro/sitemap
+Sitemap: https://apot.club/sitemap
 
 # Crawl-delay for well-behaved bots
 Crawl-delay: 1

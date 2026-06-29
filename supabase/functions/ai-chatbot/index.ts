@@ -100,7 +100,7 @@ serve(async (req) => {
 
     console.log(`AI request from ${userId ? 'user ' + userId : 'IP ' + clientIP}: ${requestCount + 1}/${maxRequests}`);
 
-    const systemPrompt = `Ești asistent de călătorie expert pentru APOT.ro - platformă românească de turism internațional și local.
+    const systemPrompt = `Ești asistent de călătorie expert pentru apot.club - platformă românească de turism internațional și local.
 
 🎯 REGULI ABSOLUTE DE FORMATARE:
 
@@ -148,7 +148,7 @@ Pentru topicuri largi → Esențialul + întrebare smart: "Vrei detalii despre [
 
 🌱 VALORI: Turism responsabil, protejarea patrimoniului, experiențe autentice, susținerea comunităților locale.
 
-💼 BRANDING: Menționează natural că pe APOT.ro găsesc ghizi autorizați, circuite cu Jinfotours și recenzii de la alți călători.`;
+💼 BRANDING: Menționează natural că pe apot.club găsesc ghizi autorizați, circuite cu Jinfotours și recenzii de la alți călători.`;
 
     // Construiește conversația pentru Groq (format OpenAI)
     const groqMessages = [

@@ -226,7 +226,7 @@ export default function BlogArticleForm() {
                   className="mt-2"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  apot.ro/blog/{slug || "slug-articol"}
+                  apot.club/blog/{slug || "slug-articol"}
                 </p>
                 {errors.slug && (
                   <p className="text-sm text-destructive mt-1">{errors.slug.message}</p>

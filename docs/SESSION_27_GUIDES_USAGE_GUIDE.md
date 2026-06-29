@@ -871,14 +871,14 @@ https://apot.vercel.app/admin/mesaje-contact
 ## SUPORT & CONTACT
 
 ### Pentru Utilizatori:
-- 📧 Email: contact@apot.ro
+- 📧 Email: contact@apot.club
 - 📞 Telefon: +40 XXX XXX XXX
 - 💬 Chat: [Widget pe site]
 
 ### Pentru Admini:
 - 📖 Documentație completă: `/docs`
 - 🐛 Raportare bug: GitHub Issues
-- 💡 Feature request: contact@apot.ro
+- 💡 Feature request: contact@apot.club
 
 ---
 

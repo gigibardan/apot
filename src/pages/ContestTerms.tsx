@@ -33,10 +33,10 @@ export default function ContestTerms() {
             <CardContent className="prose prose-slate dark:prose-invert max-w-none">
               <h2>1. Eligibilitate</h2>
               <ul>
-                <li>Concursurile sunt deschise tuturor utilizatorilor înregistrați pe platforma APOT.ro</li>
+                <li>Concursurile sunt deschise tuturor utilizatorilor înregistrați pe platforma apot.club</li>
                 <li>Participanții trebuie să aibă vârsta minimă de 18 ani sau acordul părinților/tutorilor legali</li>
                 <li>Fiecare participant poate trimite o singură fotografie per concurs</li>
-                <li>Angajații și colaboratorii APOT.ro nu pot participa la concursuri</li>
+                <li>Angajații și colaboratorii apot.club nu pot participa la concursuri</li>
               </ul>
 
               <h2>2. Drepturile de Autor</h2>
@@ -48,9 +48,9 @@ export default function ContestTerms() {
               </ul>
 
               <h2>3. Licențiere și Utilizare</h2>
-              <p>Prin participarea la concurs, acordați APOT.ro o licență non-exclusivă, gratuită și perpetuă pentru:</p>
+              <p>Prin participarea la concurs, acordați apot.club o licență non-exclusivă, gratuită și perpetuă pentru:</p>
               <ul>
-                <li>Afișarea fotografiei pe site-ul apot.ro și canalele social media</li>
+                <li>Afișarea fotografiei pe site-ul apot.club și canalele social media</li>
                 <li>Utilizarea în materiale promoționale pentru concursuri viitoare</li>
                 <li>Includerea în galerii și colecții tematice</li>
               </ul>
@@ -71,7 +71,7 @@ export default function ContestTerms() {
 
               <h2>5. Procesul de Verificare</h2>
               <ul>
-                <li>Toate fotografiile sunt verificate de echipa APOT.ro înainte de a fi publicate</li>
+                <li>Toate fotografiile sunt verificate de echipa apot.club înainte de a fi publicate</li>
                 <li>Verificarea durează de obicei 24-48 de ore</li>
                 <li>Putem solicita dovezi suplimentare privind autenticitatea fotografiei (fișier RAW, metadate EXIF)</li>
                 <li>Decizia echipei de moderare este finală</li>
@@ -83,7 +83,7 @@ export default function ContestTerms() {
                 <li>Fiecare utilizator poate vota o singură fotografie per concurs</li>
                 <li>Voturile multiple sau frauduloase vor fi eliminate</li>
                 <li>Câștigătorii sunt determinați în funcție de numărul de voturi primite</li>
-                <li>În caz de egalitate, echipa APOT.ro va decide câștigătorul</li>
+                <li>În caz de egalitate, echipa apot.club va decide câștigătorul</li>
               </ul>
 
               <h2>7. Premii</h2>
@@ -100,20 +100,20 @@ export default function ContestTerms() {
                 <Link to="/politica-confidentialitate" className="text-primary hover:underline">
                   Politicii de Confidențialitate
                 </Link>{" "}
-                a APOT.ro.
+                a apot.club.
               </p>
 
               <h2>9. Modificări</h2>
               <p>
-                APOT.ro își rezervă dreptul de a modifica acești termeni și condiții. 
+                apot.club își rezervă dreptul de a modifica acești termeni și condiții. 
                 Participanții vor fi notificați despre orice modificări majore.
               </p>
 
               <h2>10. Contact</h2>
               <p>
                 Pentru întrebări legate de concursuri, ne puteți contacta la{" "}
-                <a href="mailto:contact@apot.ro" className="text-primary hover:underline">
-                  contact@apot.ro
+                <a href="mailto:contact@apot.club" className="text-primary hover:underline">
+                  contact@apot.club
                 </a>
               </p>
             </CardContent>

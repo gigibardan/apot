@@ -429,7 +429,7 @@ INSERT INTO objective_types (name, slug, icon, color, order_index) VALUES
 INSERT INTO settings (key, value, description) VALUES
   ('site_name', '"APOT"', 'Site name'),
   ('site_description', '"Platformă mondială pentru descoperirea obiectivelor turistice"', 'Site description'),
-  ('contact_email', '"contact@apot.ro"', 'Contact email'),
+  ('contact_email', '"contact@apot.club"', 'Contact email'),
   ('items_per_page', '12', 'Default items per page for listings'),
   ('enable_reviews', 'true', 'Enable user reviews'),
   ('auto_approve_reviews', 'false', 'Auto-approve reviews without moderation');

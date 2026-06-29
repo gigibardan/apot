@@ -217,8 +217,8 @@ Contributions welcome! Please:
 
 ## 📧 Contact
 
-- **Email**: contact@apot.ro
-- **Website**: https://apot.ro
+- **Email**: contact@apot.club
+- **Website**: https://apot.club
 
 ## 📄 License
 

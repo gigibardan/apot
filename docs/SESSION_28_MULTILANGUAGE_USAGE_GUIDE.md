@@ -146,9 +146,9 @@ export function MyPage() {
 
 Aceasta va genera automat:
 ```html
-<link rel="alternate" hreflang="ro" href="https://apot.ro/my-page" />
-<link rel="alternate" hreflang="en" href="https://apot.ro/en/my-page" />
-<link rel="alternate" hreflang="x-default" href="https://apot.ro/my-page" />
+<link rel="alternate" hreflang="ro" href="https://apot.club/my-page" />
+<link rel="alternate" hreflang="en" href="https://apot.club/en/my-page" />
+<link rel="alternate" hreflang="x-default" href="https://apot.club/my-page" />
 ```
 
 ---

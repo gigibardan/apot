@@ -218,7 +218,7 @@ export function SEOHelper({
         <CardContent>
           <div className="border rounded-lg p-4 bg-muted/30">
             <div className="text-sm text-green-700 mb-1">
-              apot.ro › obiective › {slug || "slug-aici"}
+              apot.club › obiective › {slug || "slug-aici"}
             </div>
             <div className="text-blue-600 text-lg font-medium mb-1 hover:underline cursor-pointer">
               {metaTitle || title || "Titlu lipsă"}

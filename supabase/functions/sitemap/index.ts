@@ -29,7 +29,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("VITE_SUPABASE_PUBLISHABLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const baseUrl = "https://apot.ro";
+    const baseUrl = "https://apot.club";
     const urls: SitemapURL[] = [];
 
     // Static pages with high priority
