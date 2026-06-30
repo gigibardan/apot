@@ -48,7 +48,9 @@ function buildXml(urls: SitemapURL[]): string {
 }
 
 export async function GET(req: Request): Promise<Response> {
-  const debug = new URL(req.url).searchParams.get("debug") === "1";
+  const url = new URL(req.url);
+  const debugSecret = process.env.SITEMAP_DEBUG_SECRET;
+  const debug = url.searchParams.get("debug") === "1" && !!debugSecret && url.searchParams.get("key") === debugSecret;
   const debugInfo: Record<string, unknown> = {};
 
   try {
