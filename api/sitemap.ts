@@ -58,6 +58,10 @@ export async function GET(req: Request): Promise<Response> {
     debugInfo.hasUrl = !!supabaseUrl;
     debugInfo.hasKey = !!supabaseKey;
     debugInfo.urlPrefix = supabaseUrl ? supabaseUrl.slice(0, 25) : null;
+    debugInfo.keyLength = supabaseKey ? supabaseKey.length : 0;
+    debugInfo.keyPrefix = supabaseKey ? supabaseKey.slice(0, 20) : null;
+    debugInfo.keySuffix = supabaseKey ? supabaseKey.slice(-15) : null;
+    debugInfo.keyDotCount = supabaseKey ? (supabaseKey.match(/\./g) ?? []).length : 0;
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -110,14 +114,33 @@ export async function GET(req: Request): Promise<Response> {
       });
     }
 
-    const { data: authorizedGuides, error: authGuidesError } = await supabase
-      .from("authorized_guides")
-      .select("slug, updated_at")
-      .eq("license_active", true)
-      .not("slug", "is", null)
-      .order("updated_at", { ascending: false });
+    const authorizedGuides: { slug: string; updated_at: string }[] = [];
+    let authGuidesError: { message: string } | null = null;
+    {
+      const pageSize = 1000;
+      let from = 0;
+      while (true) {
+        const { data: page, error } = await supabase
+          .from("authorized_guides")
+          .select("slug, updated_at")
+          .eq("license_active", true)
+          .not("slug", "is", null)
+          .order("updated_at", { ascending: false })
+          .range(from, from + pageSize - 1);
 
-    debugInfo.authorizedGuidesCount = authorizedGuides?.length ?? 0;
+        if (error) {
+          authGuidesError = error;
+          break;
+        }
+        if (!page || page.length === 0) break;
+
+        authorizedGuides.push(...page);
+        if (page.length < pageSize) break;
+        from += pageSize;
+      }
+    }
+
+    debugInfo.authorizedGuidesCount = authorizedGuides.length;
     debugInfo.authorizedGuidesError = authGuidesError?.message ?? null;
 
     for (const guide of authorizedGuides ?? []) {
