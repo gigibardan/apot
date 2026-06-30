@@ -103,7 +103,7 @@ export default function AboutPage() {
           
           <div className="grid md:grid-cols-3 gap-12">
             <div className="space-y-3">
-              <h3 className="font-bold text-xl text-primary">Trransparență</h3>
+              <h3 className="font-bold text-xl text-primary">Transparență</h3>
               <p className="text-muted-foreground">Oferim informații corecte și verificate despre destinațiile noastre, fără a ascunde provocările conservării acestora.</p>
             </div>
             <div className="space-y-3">
