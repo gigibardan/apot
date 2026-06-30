@@ -35,11 +35,13 @@ import {
 } from "@/lib/supabase/queries/objective-reviews";
 import { useAuth } from "@/contexts/AuthContext";
 import { ShareButtons } from "@/components/features/objectives/ShareButtons";
-import { generateObjectiveSchema, generateBreadcrumbSchema } from "@/lib/utils/structured-data";
+import { generateObjectiveSchema, generateBreadcrumbSchema, generateFAQSchema } from "@/lib/utils/structured-data";
 import type { ObjectiveWithRelations } from "@/types/database.types";
 import { Clock, Calendar, DollarSign, Clock3, Accessibility, Award, MapPin, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslatedObjective } from "@/hooks/useTranslatedContent";
+import { ObjectiveFAQ } from "@/components/features/objectives/ObjectiveFAQ";
+import { generateObjectiveFAQs } from "@/lib/utils/objective-faq";
 
 export default function ObjectiveSingle() {
   const { slug } = useParams<{ slug: string }>();
@@ -167,6 +169,11 @@ export default function ObjectiveSingle() {
     return objective?.excerpt || objective?.description?.slice(0, 160) || "";
   };
 
+  // FAQ generat automat din datele obiectivului (preț, program, accesibilitate etc.)
+  // Calculat o singură dată aici și refolosit atât în structured data cât
+  // și în componenta vizuală de mai jos, ca să nu se recalculeze de două ori.
+  const objectiveFaqs = objective ? generateObjectiveFAQs(objective) : [];
+
   const getStructuredData = () => {
     if (!objective) return undefined;
 
@@ -181,6 +188,8 @@ export default function ObjectiveSingle() {
       "@graph": [
         generateObjectiveSchema(objective),
         generateBreadcrumbSchema(breadcrumbItems),
+        // FAQ schema inclus doar dacă există măcar o întrebare generată
+        ...(objectiveFaqs.length > 0 ? [generateFAQSchema(objectiveFaqs)] : []),
       ],
     };
   };
@@ -674,6 +683,9 @@ export default function ObjectiveSingle() {
                   />
                 </div>
               </section>
+
+              {/* FAQ Section - generat automat din datele obiectivului */}
+              <ObjectiveFAQ faqs={objectiveFaqs} />
 
               {/* Similar Objectives */}
               {similar.length > 0 && (
