@@ -1,6 +1,7 @@
 import { ChevronRight, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
+import { siteConfig } from "@/lib/config/site.config";
 
 export interface BreadcrumbItem {
   label: string;
@@ -18,6 +19,9 @@ interface BreadcrumbsProps {
  */
 export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
   // Generate schema.org BreadcrumbList
+  // IMPORTANT: folosim siteConfig.url (fix, "https://apot.club"), NU
+  // window.location.origin -- altfel HTML-ul generat de prerender local
+  // ar conține "http://localhost:4173" în structured data.
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -26,13 +30,13 @@ export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
         "@type": "ListItem",
         "position": 1,
         "name": "Acasă",
-        "item": window.location.origin,
+        "item": siteConfig.url,
       },
       ...items.map((item, index) => ({
         "@type": "ListItem",
         "position": index + 2,
         "name": item.label,
-        "item": item.href ? `${window.location.origin}${item.href}` : undefined,
+        "item": item.href ? `${siteConfig.url}${item.href}` : undefined,
       })),
     ],
   };

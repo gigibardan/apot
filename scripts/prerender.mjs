@@ -1,31 +1,38 @@
 /**
  * Prerender script pentru paginile critice SEO
  *
+ * RULEAZĂ LOCAL (pe mașina ta), NU pe Vercel -- mediul de build Vercel
+ * nu are librăriile de sistem necesare pentru Chromium headless.
+ *
+ * Flux:
+ *   1. npm run build:prerender   (local, pe mașina ta)
+ *   2. git add public/obiective public/blog public/ghizi-autorizati
+ *   3. git commit + push
+ *   4. Vercel face build normal (fără Playwright) și servește fișierele statice
+ *
  * Generează HTML static (deja randat) pentru:
  *  - homepage
  *  - /obiective + fiecare obiectiv individual
  *  - /blog + fiecare articol
  *  - /ghizi-autorizati (doar pagina de listă, NU cei 2553 ghizi individuali)
- *
- * Rulează DUPĂ "vite build" (vezi package.json -> script "build").
- * Pornește un server local care servește build-ul, deschide fiecare
- * pagină într-un browser headless, așteaptă ca React Query să termine
- * de încărcat datele, apoi salvează HTML-ul rezultat ca fișier static.
- *
- * Vercel servește automat fișierul static dacy.html dacă există,
- * în loc de fallback-ul SPA gol — deci Google primește conținut deja randat.
  */
 
 import { chromium } from "playwright";
 import { createClient } from "@supabase/supabase-js";
-import { createServer } from "vite";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const DIST_DIR = path.join(ROOT, "dist");
+
+// Node nu citește automat .env.local ca Vite -- îl încărcăm explicit.
+// Încercăm .env.local întâi (prioritate, ca la Vite), apoi .env ca fallback.
+dotenv.config({ path: path.join(ROOT, ".env.local") });
+dotenv.config({ path: path.join(ROOT, ".env") });
+
+const PUBLIC_DIR = path.join(ROOT, "public");
 const PORT = 4173;
 const BASE_URL = `http://localhost:${PORT}`;
 
@@ -45,7 +52,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
  * Ghizii SITUR individuali (2553) NU sunt incluși — rămân SPA deocamdată.
  */
 async function getRoutesToPrerender() {
-  const routes = ["/", "/obiective", "/blog", "/ghizi-autorizati"];
+  const routes = ["/obiective", "/blog", "/ghizi-autorizati"];
 
   const { data: objectives, error: objError } = await supabase
     .from("objectives")
@@ -80,26 +87,31 @@ async function getRoutesToPrerender() {
 
 /**
  * Convertește o rută URL în calea fișierului HTML de output.
- * "/" -> dist/index.html (deja există, îl suprascriem cu varianta randată)
- * "/obiective" -> dist/obiective/index.html
- * "/obiective/turnul-x" -> dist/obiective/turnul-x/index.html
+ * Scriem în public/, NU în dist/, pentru că acest script rulează
+ * local înainte de commit -- fișierele trebuie să fie în Git, ca să
+ * existe deja când Vercel face build-ul normal (vite build le copiază
+ * automat din public/ în dist/).
+ *
+ * "/" -> NU suprascriem public/index.html (ar strica index-ul SPA normal
+ *        pe care vite build îl generează din src/) -- homepage rămâne SPA.
+ * "/obiective" -> public/obiective/index.html
+ * "/obiective/turnul-x" -> public/obiective/turnul-x/index.html
  */
 function routeToFilePath(route) {
-  if (route === "/") {
-    return path.join(DIST_DIR, "index.html");
-  }
-  return path.join(DIST_DIR, route, "index.html");
+  return path.join(PUBLIC_DIR, route, "index.html");
 }
 
 async function main() {
-  console.log("🚀 Pornesc prerender pentru paginile SEO critice...\n");
+  console.log("🚀 Pornesc prerender LOCAL pentru paginile SEO critice...\n");
+  console.log("ℹ️  Acest script rulează doar pe mașina ta, NU pe Vercel.\n");
 
   const routes = await getRoutesToPrerender();
   console.log(`📋 ${routes.length} rute de randat:`);
   routes.forEach((r) => console.log(`   ${r}`));
   console.log("");
 
-  // Servim build-ul static local cu un server minimal
+  // Servim build-ul existent din dist/ (rulează "npm run build" normal ÎNAINTE
+  // de acest script, ca dist/ să existe deja cu ultima variantă a aplicației).
   const { preview } = await import("vite");
   const previewServer = await preview({
     root: ROOT,

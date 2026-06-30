@@ -7,7 +7,12 @@ export const siteConfig = {
   name: "APOT",
   fullName: "Asociația pentru Protejarea Obiectivelor Turistice",
   description: "Platformă mondială cu informații detaliate despre obiective turistice din întreaga lume. Descoperă monumente, muzee, parcuri naturale și situri UNESCO.",
-  url: typeof window !== 'undefined' ? window.location.origin : "https://apot.club",
+  // IMPORTANT: nu mai folosim window.location.origin aici.
+  // În timpul prerender-ului local (Playwright -> vite preview pe localhost),
+  // window.location.origin ar fi "http://localhost:4173", ceea ce ar strica
+  // toate URL-urile canonice/og/hreflang din HTML-ul generat static.
+  // Domeniul de producție e fix, deci îl punem direct.
+  url: "https://apot.club",
   ogImage: "/images/og-image.jpg",
   locale: "ro-RO",
   links: {

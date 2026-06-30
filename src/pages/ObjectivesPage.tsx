@@ -11,6 +11,7 @@ import { getContinents, getCountries } from "@/lib/supabase/queries/taxonomies";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { ObjectiveWithRelations } from "@/types/database.types";
+import { siteConfig } from "@/lib/config/site.config";
 
 const PAGE_SIZE = 12;
 
@@ -228,7 +229,7 @@ export default function ObjectivesPage() {
           "@type": "TouristAttraction",
           "name": objective.title,
           "description": objective.excerpt || undefined,
-          "url": `${window.location.origin}/obiective/${objective.slug}`,
+          "url": `${siteConfig.url}/obiective/${objective.slug}`,
           "image": objective.featured_image || undefined,
         },
       })),
