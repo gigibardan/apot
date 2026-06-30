@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
+export const config = {
+  runtime: "edge",
+};
+
 const BASE_URL = "https://apot.club";
 
 function escapeXml(str: string): string {
@@ -43,7 +47,7 @@ function buildXml(urls: SitemapURL[]): string {
   return lines.join("\n");
 }
 
-export default async function handler(req: Request): Promise<Response> {
+export async function GET(req: Request): Promise<Response> {
   try {
     const supabaseUrl = process.env.VITE_SUPABASE_URL!;
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY!;
