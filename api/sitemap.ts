@@ -48,9 +48,17 @@ function buildXml(urls: SitemapURL[]): string {
 }
 
 export async function GET(req: Request): Promise<Response> {
+  const debug = new URL(req.url).searchParams.get("debug") === "1";
+  const debugInfo: Record<string, unknown> = {};
+
   try {
     const supabaseUrl = process.env.VITE_SUPABASE_URL!;
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY!;
+
+    debugInfo.hasUrl = !!supabaseUrl;
+    debugInfo.hasKey = !!supabaseKey;
+    debugInfo.urlPrefix = supabaseUrl ? supabaseUrl.slice(0, 25) : null;
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const urls: SitemapURL[] = [
@@ -64,12 +72,15 @@ export async function GET(req: Request): Promise<Response> {
       { loc: `${BASE_URL}/contact`,            changefreq: "monthly", priority: 0.5 },
     ];
 
-    const { data: objectives } = await supabase
+    const { data: objectives, error: objError } = await supabase
       .from("objectives")
       .select("slug, updated_at")
       .eq("published", true)
       .not("slug", "is", null)
       .order("updated_at", { ascending: false });
+
+    debugInfo.objectivesCount = objectives?.length ?? 0;
+    debugInfo.objectivesError = objError?.message ?? null;
 
     for (const obj of objectives ?? []) {
       urls.push({
@@ -80,12 +91,15 @@ export async function GET(req: Request): Promise<Response> {
       });
     }
 
-    const { data: guides } = await supabase
+    const { data: guides, error: guidesError } = await supabase
       .from("guides")
       .select("slug, updated_at")
       .eq("active", true)
       .not("slug", "is", null)
       .order("updated_at", { ascending: false });
+
+    debugInfo.guidesCount = guides?.length ?? 0;
+    debugInfo.guidesError = guidesError?.message ?? null;
 
     for (const guide of guides ?? []) {
       urls.push({
@@ -96,12 +110,15 @@ export async function GET(req: Request): Promise<Response> {
       });
     }
 
-    const { data: authorizedGuides } = await supabase
+    const { data: authorizedGuides, error: authGuidesError } = await supabase
       .from("authorized_guides")
       .select("slug, updated_at")
       .eq("license_active", true)
       .not("slug", "is", null)
       .order("updated_at", { ascending: false });
+
+    debugInfo.authorizedGuidesCount = authorizedGuides?.length ?? 0;
+    debugInfo.authorizedGuidesError = authGuidesError?.message ?? null;
 
     for (const guide of authorizedGuides ?? []) {
       urls.push({
@@ -112,12 +129,15 @@ export async function GET(req: Request): Promise<Response> {
       });
     }
 
-    const { data: articles } = await supabase
+    const { data: articles, error: articlesError } = await supabase
       .from("blog_articles")
       .select("slug, updated_at")
       .eq("published", true)
       .not("slug", "is", null)
       .order("updated_at", { ascending: false });
+
+    debugInfo.articlesCount = articles?.length ?? 0;
+    debugInfo.articlesError = articlesError?.message ?? null;
 
     for (const article of articles ?? []) {
       urls.push({
@@ -125,6 +145,14 @@ export async function GET(req: Request): Promise<Response> {
         lastmod: toISODate(article.updated_at),
         changefreq: "monthly",
         priority: 0.6,
+      });
+    }
+
+    if (debug) {
+      debugInfo.totalUrls = urls.length;
+      return new Response(JSON.stringify(debugInfo, null, 2), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
       });
     }
 
@@ -139,6 +167,10 @@ export async function GET(req: Request): Promise<Response> {
     });
   } catch (err) {
     console.error("Sitemap error:", err);
-    return new Response("Error generating sitemap", { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return new Response(
+      debug ? JSON.stringify({ ...debugInfo, fatalError: message }, null, 2) : "Error generating sitemap",
+      { status: 500, headers: debug ? { "Content-Type": "application/json" } : undefined }
+    );
   }
 }
