@@ -115,13 +115,24 @@ async function main() {
   let failCount = 0;
 
   for (const route of routes) {
+    console.log(`⏳ Randez: ${route}...`);
     const page = await context.newPage();
     try {
       const url = `${BASE_URL}${route}`;
-      await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
 
-      // Așteptăm puțin în plus ca React Query / componentele lazy să termine randarea
-      await page.waitForTimeout(800);
+      // Așteptăm explicit ca un element de conținut real să apară în DOM,
+      // în loc să ne bazăm pe "networkidle" (nesigur pe SPA cu conexiuni
+      // persistente: Supabase realtime, polling, websockets etc).
+      try {
+        await page.waitForSelector("h1", { timeout: 15000 });
+      } catch {
+        // Dacă nu apare niciun <h1> în 15s, continuăm oricum --
+        // mai bine salvăm ce avem decât să blocăm tot build-ul.
+      }
+
+      // Mic buffer suplimentar pentru randări asincrone (imagini, hidratare)
+      await page.waitForTimeout(1000);
 
       const html = await page.content();
 
@@ -153,3 +164,10 @@ main().catch((err) => {
   console.error("💥 Prerender script a eșuat complet:", err);
   process.exit(1);
 });
+
+// Plasă de siguranță: dacă scriptul agață mai mult de 4 minute, oprim forțat
+// procesul ca să nu blocăm build-ul Vercel la infinit.
+setTimeout(() => {
+  console.error("⏰ Timeout global (4 min) atins -- opresc forțat scriptul.");
+  process.exit(1);
+}, 4 * 60 * 1000).unref?.();
